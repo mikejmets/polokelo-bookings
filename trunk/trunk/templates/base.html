@@ -1,0 +1,42 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+	"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta name="author" content="Jurgen Blignaut" />
+  <meta name="description" content="Welcome to Polokelo Back-Office" />
+  <meta name="keywords" content="portraits, portrait, graphite, pastel, art, artist" />
+  <title>Polokelo Back-Office</title>
+  <link rel="stylesheet" href="/stylesheets/main.css" type="text/css" media="all" />
+</head>
+
+<body>
+
+<!-- Page Header -->
+
+<div class="banner">
+    <img src="/images/polokelo.png" alt="Polokelo Logo" />
+    <p>{% block pagetitle %}Polokelo Booking System Home{% endblock %}</p>
+</div>
+
+<div>
+    <div class="leftNavBar">
+        <!-- Left Navigation Bar -->
+        {% block sidebar %}
+        <ul>
+            <li><a href="/">Home</a></li>
+            <li><a href="/services/index">Manage Hosts</a></li>
+        </ul>
+        {% endblock sidebar %}
+    </div>
+
+    <!-- Main page content here -->
+    <div class="content">
+        {% block pagecontent %}
+        <h1>Welcome to the Polokelo Booking System.</h1>
+        <p>Click a link on the menu to the left for what you want to do.</p>
+        {% endblock pagecontent %} 
+    </div>
+</div>
+
+</body>
+</html>

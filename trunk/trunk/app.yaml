@@ -1,0 +1,29 @@
+application: polokelo-backoffice
+version: 0-1-alpha
+runtime: python
+api_version: 1
+
+handlers:
+- url: /images/(.*\.(gif|png|jpg))
+  static_files: images/\1
+  upload: images/(.*\.(gif|png|jpg))
+
+- url: /stylesheets
+  static_dir: stylesheets
+
+- url: /admin/.*
+  script: controllers/admin.py
+  login: admin
+
+- url: /services/.*
+  script: controllers/servicehandlers.py
+  login: required
+
+
+- url: /unload
+  script: $PYTHON_LIB/google/appengine/ext/remote_api/handler.py
+  login: admin
+
+- url: /.*
+  script: controllers/home.py
+  login: required
