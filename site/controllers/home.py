@@ -20,7 +20,7 @@ class HomePage(webapp.RequestHandler):
 
 
 application = webapp.WSGIApplication([
-                            ('/', HomePage),
+                            ('/index', HomePage),
                             ], debug=True)
 
 def main():

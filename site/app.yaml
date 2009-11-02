@@ -1,4 +1,4 @@
-application: polokelo-backoffice
+application: bookings-dev
 version: 0-1-alpha
 runtime: python
 api_version: 1
@@ -17,13 +17,18 @@ handlers:
 
 - url: /services/.*
   script: controllers/servicehandlers.py
-  login: required
+  login: admin
 
 
 - url: /unload
   script: $PYTHON_LIB/google/appengine/ext/remote_api/handler.py
   login: admin
 
+- url: /
+  script: bye.py
+  login: required
+
 - url: /.*
   script: controllers/home.py
-  login: required
+  login: admin
+
