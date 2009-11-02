@@ -1,9 +1,7 @@
 {% extends base_path %}
 
-{% block pagetitle %}Polokelo Host Management{% endblock %}
-
 {% block pagecontent %}
-    <h1>Polokelo Host Management</h1>
+    <h1>Host Management</h1>
 
     <h2>Create new host</h2>
     <p><a href="/services/captureowner">Capture details of a new host.</a></p>
@@ -13,8 +11,8 @@
         {% for owner in partners %}
         <tr>
             <td>{{ owner.surname }} {{ owner.firstNames }}</td>
-            <td><a href="/services/editowner?key={{ owner.key }}">edit</a></td>
-            <td><a href="/services/deleteowner?key={{ owner.key }}">delete</a></td>
+            <td><a href="/services/editowner?ownerkey={{ owner.key }}">edit</a></td>
+            <td><a href="/services/deleteowner?ownerkey={{ owner.key }}">delete</a></td>
         </tr>
         {% endfor %}
     </table>
