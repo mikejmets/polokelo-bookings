@@ -42,7 +42,7 @@ class CaptureOwner(webapp.RequestHandler):
             entity = data.save(commit=False)
             entity.creator = users.get_current_user()
             entity.put()
-            self.redirect('/services/index')
+            self.redirect('/services/hostinfo')
         else:
             filepath = os.path.join(PROJECT_PATH, 
                                         'templates', 'services', 'captureowner.html')
@@ -73,7 +73,7 @@ class EditOwner(webapp.RequestHandler):
             entity = data.save(commit=False)
             entity.creator = users.get_current_user()
             entity.put()
-            self.redirect('/services/index')
+            self.redirect('/services/hostinfo')
         else:
             filepath = os.path.join(PROJECT_PATH, 
                                         'templates', 'services', 'editowner.html')
@@ -95,7 +95,7 @@ class DeleteOwner(webapp.RequestHandler):
             # and other related data before deleting the owner
             owner.delete()
 
-        self.redirect('/services/index')
+        self.redirect('/services/hostinfo')
 
 
 application = webapp.WSGIApplication([
