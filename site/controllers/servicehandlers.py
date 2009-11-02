@@ -26,6 +26,7 @@ class OwnerForm(djangoforms.ModelForm):
         model = Owner
         exclude = ['created', 'creator']
 
+
 class CaptureOwner(webapp.RequestHandler):
 
     def get(self):
@@ -36,7 +37,7 @@ class CaptureOwner(webapp.RequestHandler):
                                                            }))
 
     def post(self):
-        data = OwnerForm(data = self.request.POST)
+        data = OwnerForm(data=self.request.POST)
         if data.is_valid():
             entity = data.save(commit=False)
             entity.creator = users.get_current_user()
@@ -50,9 +51,58 @@ class CaptureOwner(webapp.RequestHandler):
                                                                }))
 
 
+class EditOwner(webapp.RequestHandler):
+
+    def get(self):
+        ownerkey = self.request.get('ownerkey')
+        owner = Owner.get(ownerkey)
+        filepath = os.path.join(PROJECT_PATH, 
+                                    'templates', 'services', 'editowner.html')
+        self.response.out.write(template.render(filepath, 
+                                    {
+                                        'base_path':BASE_PATH,
+                                        'form':OwnerForm(instance=owner),
+                                        'ownerkey':ownerkey
+                                        }))
+
+    def post(self):
+        ownerkey = self.request.get('ownerkey')
+        owner = Owner.get(ownerkey)
+        data = OwnerForm(data=self.request.POST, instance=owner)
+        if data.is_valid():
+            entity = data.save(commit=False)
+            entity.creator = users.get_current_user()
+            entity.put()
+            self.redirect('/services/index')
+        else:
+            filepath = os.path.join(PROJECT_PATH, 
+                                        'templates', 'services', 'editowner.html')
+            self.response.out.write(template.render(filepath, 
+                                        {
+                                            'base_path':BASE_PATH,
+                                            'form':data,
+                                            'ownerkey':ownerkey
+                                            }))
+
+
+class DeleteOwner(webapp.RequestHandler):
+
+    def get(self):
+        ownerkey = self.request.get('ownerkey')
+        owner = Owner.get(ownerkey)
+        if owner:
+            # NOTE: obviously we will have to delete all venues 
+            # and other related data before deleting the owner
+            owner.delete()
+
+        self.redirect('/services/index')
+
+
 application = webapp.WSGIApplication([
-                            ('/services/index', ManageHosts),
+                            ('/services/hostinfo', ManageHosts),
                             ('/services/captureowner', CaptureOwner),
+                            ('/services/editowner', EditOwner),
+                            ('/services/deleteowner', DeleteOwner),
                             ], debug=True)
 
 def main():
