@@ -2,10 +2,8 @@
 	"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-  <meta name="author" content="Jurgen Blignaut" />
-  <meta name="description" content="Welcome to Polokelo Back-Office" />
-  <meta name="keywords" content="portraits, portrait, graphite, pastel, art, artist" />
-  <title>Polokelo Back-Office</title>
+  <meta name="author" content="Mother of Invention" />
+  <title>Polokelo Booking System</title>
   <link rel="stylesheet" href="/stylesheets/main.css" type="text/css" media="all" />
 </head>
 
@@ -15,7 +13,7 @@
 
 <div class="banner">
     <img src="/images/polokelo.png" alt="Polokelo Logo" />
-    <p>{% block pagetitle %}Polokelo Booking System Home{% endblock %}</p>
+    <div class="page-title">{% block pagetitle %}Polokelo Booking System{% endblock %}</div>
 </div>
 
 <div>
@@ -24,7 +22,7 @@
         {% block sidebar %}
         <ul>
             <li><a href="/index">Home</a></li>
-            <li><a href="/services/index">Manage Hosts</a></li>
+            <li><a href="/services/hostinfo">Manage Hosts</a></li>
         </ul>
         {% endblock sidebar %}
     </div>
@@ -32,7 +30,7 @@
     <!-- Main page content here -->
     <div class="content">
         {% block pagecontent %}
-        <h1>Welcome to the Polokelo Booking System.</h1>
+        <h1>Bookings Home</h1>
         <p>Click a link on the menu to the left for what you want to do.</p>
         {% endblock pagecontent %} 
     </div>
