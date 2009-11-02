@@ -16,6 +16,18 @@ div.banner {
   height: 80px;
 }
 
+.banner img {
+    float: left;
+}
+.banner div.page-title { 
+  width: 100%;
+  height: 100%;
+  vertical-align: center;
+  text-align: center;
+  font: normal bold normal 180% Verdana, sans-serif;
+  color: brown;
+}
+
 div.leftNavBar {
   float: left;  
   width: 150px;
@@ -27,12 +39,6 @@ div.leftNavBar {
 div.content {
   width: 99%; 
   margin-left: 160px;
-}
-
-.banner p { 
-  font: normal bold normal 120% Verdana, sans-serif;
-  color: brown;
-  text-align: right; 
 }
 
 /* ------------------ Heading styles --------------------------------------- */
@@ -78,7 +84,7 @@ img {
 }
 
 .leftNavBar li	{
-	font-size: 80%;
+	font-size: 90%;
 	font-weight: bold; 
 	list-style: none;
 	text-align: center;
