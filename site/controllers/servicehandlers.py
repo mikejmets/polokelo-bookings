@@ -12,6 +12,7 @@ from google.appengine.ext.db import djangoforms
 from controllers.home import BASE_PATH, PROJECT_PATH
 from models.hostinfo import Owner
 
+#logger = logging.getLogger('ServiceHandlers')
 
 def get_authentication_urls(dest_url):
     user = users.get_current_user()
@@ -93,6 +94,18 @@ class EditOwner(webapp.RequestHandler):
         data = OwnerForm(data=self.request.POST, instance=owner)
         if data.is_valid():
             entity = data.save(commit=False)
+            #Extra work for non required date fields
+            if not self.request.get('addendumADate'):
+                entity.addendumADate = None
+            if not self.request.get('addendumBDate'):
+                entity.addendumBDate = None
+            if not self.request.get('addendumCDate'):
+                entity.addendumCDate = None
+            if not self.request.get('addendumADate'):
+                entity.addendumADate = None
+            if not self.request.get('trainingSession'):
+                entity.trainingSession = None
+            #Change creator to last modified
             entity.creator = users.get_current_user()
             entity.put()
             self.redirect('/services/hostinfo')
