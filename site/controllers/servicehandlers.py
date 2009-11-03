@@ -12,13 +12,27 @@ from google.appengine.ext.db import djangoforms
 from controllers.home import BASE_PATH, PROJECT_PATH
 from models.hostinfo import Owner
 
+
+def get_authentication_urls(dest_url):
+    user = users.get_current_user()
+    if user:
+        return users.create_logout_url('/index'), 'Sign Out'
+    else:
+        return users.create_login_url(dest_url), 'Sign In'
+
+
 class ManageHosts(webapp.RequestHandler):
     def get(self):
+        auth_url, auth_url_text = get_authentication_urls(self.request.uri)
         partners = Owner.all().order('surname')
         filepath = os.path.join(PROJECT_PATH, 'templates', 'services', 'managehosts.html')
-        self.response.out.write(template.render(filepath, {'base_path':BASE_PATH,
-                                                           'partners':partners 
-                                                           }))
+        self.response.out.write(template.render(filepath, 
+                                    {
+                                        'base_path':BASE_PATH,
+                                        'partners':partners,
+                                        'auth_url':auth_url,
+                                        'auth_url_text':auth_url_text
+                                        }))
 
 
 class OwnerForm(djangoforms.ModelForm):
@@ -30,11 +44,16 @@ class OwnerForm(djangoforms.ModelForm):
 class CaptureOwner(webapp.RequestHandler):
 
     def get(self):
+        auth_url, auth_url_text = get_authentication_urls(self.request.uri)
         filepath = os.path.join(PROJECT_PATH, 
                                     'templates', 'services', 'captureowner.html')
-        self.response.out.write(template.render(filepath, {'base_path':BASE_PATH,
-                                                           'form':OwnerForm(),
-                                                           }))
+        self.response.out.write(template.render(filepath, 
+                                    {
+                                        'base_path':BASE_PATH,
+                                        'form':OwnerForm(),
+                                        'auth_url':auth_url,
+                                        'auth_url_text':auth_url_text
+                                        }))
 
     def post(self):
         data = OwnerForm(data=self.request.POST)
@@ -54,6 +73,7 @@ class CaptureOwner(webapp.RequestHandler):
 class EditOwner(webapp.RequestHandler):
 
     def get(self):
+        auth_url, auth_url_text = get_authentication_urls(self.request.uri)
         ownerkey = self.request.get('ownerkey')
         owner = Owner.get(ownerkey)
         filepath = os.path.join(PROJECT_PATH, 
@@ -62,7 +82,9 @@ class EditOwner(webapp.RequestHandler):
                                     {
                                         'base_path':BASE_PATH,
                                         'form':OwnerForm(instance=owner),
-                                        'ownerkey':ownerkey
+                                        'ownerkey':ownerkey,
+                                        'auth_url':auth_url,
+                                        'auth_url_text':auth_url_text
                                         }))
 
     def post(self):
