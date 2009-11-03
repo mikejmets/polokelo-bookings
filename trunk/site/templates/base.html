@@ -13,10 +13,12 @@
 
 <div class="banner">
     <img src="/images/polokelo.png" alt="Polokelo Logo" />
+    <div class="action-links">
+        <a href="{{ auth_url }}">{{ auth_url_text }}</a>
+    </div>
     <div class="page-title">
         {% block pagetitle %}Polokelo Booking System{% endblock %}
     </div>
-    <a href="{{ auth_url }}">{{ auth_url_text }}</a>
 </div>
 
 <div>

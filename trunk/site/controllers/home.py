@@ -12,16 +12,16 @@ from google.appengine.ext import db
 PROJECT_PATH = os.path.join(os.path.dirname(__file__), '..')
 BASE_PATH = os.path.join(PROJECT_PATH, 'templates', 'base.html')
 
-def get_authentication_urls():
+def get_authentication_urls(dest_url):
     user = users.get_current_user()
     if user:
         return users.create_logout_url('/index'), 'Sign Out'
     else:
-        return users.create_login_url('/index'), 'Sign In'
+        return users.create_login_url(dest_url), 'Sign In'
 
 class HomePage(webapp.RequestHandler):
     def get(self):
-        auth_url, auth_url_text = get_authentication_urls()
+        auth_url, auth_url_text = get_authentication_urls(self.request.uri)
         filepath = os.path.join(PROJECT_PATH, 'templates', 'index.html')
         self.response.out.write(template.render(filepath, 
                                     {
