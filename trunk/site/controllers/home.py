@@ -12,11 +12,23 @@ from google.appengine.ext import db
 PROJECT_PATH = os.path.join(os.path.dirname(__file__), '..')
 BASE_PATH = os.path.join(PROJECT_PATH, 'templates', 'base.html')
 
+def get_authentication_urls():
+    user = users.get_current_user()
+    if user:
+        return users.create_logout_url('/index'), 'Sign Out'
+    else:
+        return users.create_login_url('/index'), 'Sign In'
 
 class HomePage(webapp.RequestHandler):
     def get(self):
+        auth_url, auth_url_text = get_authentication_urls()
         filepath = os.path.join(PROJECT_PATH, 'templates', 'index.html')
-        self.response.out.write(template.render(filepath, {'base_path':BASE_PATH}))
+        self.response.out.write(template.render(filepath, 
+                                    {
+                                        'base_path':BASE_PATH,
+                                        'auth_url':auth_url,
+                                        'auth_url_text':auth_url_text
+                                        }))
 
 
 application = webapp.WSGIApplication([
