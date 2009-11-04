@@ -1,0 +1,13 @@
+{% extends base_path %}
+
+{% block pagecontent %}
+    <h1>Edit Existing Address</h1>
+    <form name="address" method="post" action="/services/owner/editaddress">
+        <input type="hidden" name="addresskey" value="{{ addresskey }}" />
+        <input type="hidden" name="ownerkey" value="{{ ownerkey }}" />
+        <table>
+            {{ form }}
+        </table>
+        <input type="submit" value="Update Address" />
+    </form>
+{% endblock pagecontent %}

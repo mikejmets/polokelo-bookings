@@ -11,11 +11,22 @@
         </tr>
         {% endfor %}
     </table>
-    <br />
 
+    <h4>Addresses</h4>
     <p>
     <a href="/services/owner/captureaddress?ownerkey={{ owner.key }}">Capture Address</a>
     </p>
+
+    <table>
+        {% for address in addresses %}
+        <tr>
+            <td>{{ address.addressType }}:</td>
+            <td>{{ address.listing_name }}</td>
+            <td><a href="/services/owner/editaddress?addresskey={{ address.key }}">edit</a></td>
+            <td><a href="/services/owner/deleteaddress?addresskey={{ address.key }}">delete</a></td>
+        </tr>
+        {% endfor %}
+    </table>
 
     <h2>Venues</h2>
     <p>
