@@ -1,25 +1,30 @@
 from google.appengine.ext import db
 from google.appengine.ext.db import polymodel
 
-#class Contact(db.Model):
-#    contactNumber = db.PhoneNumberProperty(required=True)
-#    streetAddress = db.StringProperty(required=True)
-#    suburb = db.StringProperty(required=True)
-#    city = db.StringProperty()
-#    country = db.StringProperty(default='South Africa')
-#    postCode = db.StringProperty()
+class Address(db.Model):
+    container = db.ReferenceProperty(db.Model, collection_name='entity_addresses')
+    created = db.DateTimeProperty(auto_now_add=True)
+    creator = db.UserProperty()
+    addressType = db.StringProperty(choices=['Home', 'Venue', 'Key Pickup'])
+    streetAddress = db.StringProperty(required=True)
+    suburb = db.StringProperty(required=True)
+    city = db.StringProperty()
+    country = db.StringProperty(default='South Africa')
+    postCode = db.StringProperty()
+
+# class PhoneNumber
 
 class Owner(db.Model):
     created = db.DateTimeProperty(auto_now_add=True)
     creator = db.UserProperty()
     referenceNumber = db.StringProperty(
         required=True, verbose_name='Reference Number')
-    surname = db.StringProperty(required=True)
+    surname = db.StringProperty(required=True, verbose_name='Surname')
     firstNames = db.StringProperty(
-        required=True, verbose_name='First Name')
+        required=True, verbose_name='First Names')
     emailAddress = db.EmailProperty(
         required=True, verbose_name='Email Address')
-    languages = db.StringListProperty()
+    languages = db.StringListProperty(verbose_name='Languages')
     addendumADate = db.DateProperty(verbose_name='Addendum A Date')
     addendumBDate = db.DateProperty(verbose_name='Addendum B Date')
     addendumCDate = db.DateProperty(verbose_name='Addendum C Date')
@@ -36,19 +41,20 @@ class Owner(db.Model):
 #    finalPaymentDate = db.DateProperty()
 
 class Venue(db.Model):
-    owner = db.ReferenceProperty(Owner)
+    owner = db.ReferenceProperty(Owner, collection_name='owner_venues')
     created = db.DateTimeProperty(auto_now_add=True)
     creator = db.UserProperty()
-    name = db.StringProperty()
-    venueType = db.StringListProperty()
-    contactPerson = db.StringProperty()
-    contactPersonNumber = db.PhoneNumberProperty()
-    keyPickupAddress = db.StringProperty()
+    name = db.StringProperty(verbose_name='Venue Name')
+    venueType = db.StringProperty(verbose_name='Class', 
+                        choices=['Backpack', 'Hostel', 'Family House', 'Guest House'])
+    contactPerson = db.StringProperty(verbose_name='Contact Person')
+    contactPersonNumber = db.PhoneNumberProperty(verbose_name='Contact Person Number')
+    keyPickupAddress = db.TextProperty(verbose_name='Where to pick up the key')
     photo1 = db.BlobProperty()
     photo2 = db.BlobProperty()
     photo3 = db.BlobProperty()
-    contractStartDate = db.DateProperty()
-    contractEndDate = db.DateProperty()
+    contractStartDate = db.DateProperty(verbose_name='Contracted Start Date')
+    contractEndDate = db.DateProperty(verbose_name='Contracted End Date')
 
 # class Inspection
 #     venue

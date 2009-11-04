@@ -4,9 +4,10 @@ from google.appengine.api import users
 from google.appengine.ext import webapp
 from google.appengine.ext.webapp import template
 from google.appengine.ext.db import djangoforms
+from google.appengine.ext import db
 
 from controllers.home import BASE_PATH, PROJECT_PATH
-from models.hostinfo import Owner, Venue
+from models.hostinfo import Owner, Venue, Address
 from controllers.utils import get_authentication_urls
 
 logger = logging.getLogger('OwnerHandler')
@@ -41,10 +42,10 @@ class ViewOwner(webapp.RequestHandler):
                     name = value.name
                     if value.verbose_name:
                         name = value.verbose_name
-                    #val = value.__get__(owner, value)
                     val = value.get_value_for_form(owner)
                     owner_values.append((name, val))
-        venues = Venue.all().filter('owner = ', owner).order('name')
+        # venues = Venue.all().filter('owner = ', owner).order('name')
+        venues = owner.owner_venues
         self.response.out.write(template.render(filepath, 
                                     {
                                         'base_path':BASE_PATH,
@@ -54,6 +55,61 @@ class ViewOwner(webapp.RequestHandler):
                                         'auth_url':auth_url,
                                         'auth_url_text':auth_url_text
                                         }))
+
+
+class AddressForm(djangoforms.ModelForm):
+    def __init__(self, *args, **kw):
+      super(djangoforms.ModelForm, self).__init__(*args, **kw)
+      self.fields.keyOrder = [
+            'addressType', 'streetAddress', 'suburb',
+            'city', 'country', 'postCode'
+          ]
+
+    class Meta:
+        model = Address
+        exclude = ['created', 'creator', 'container']
+
+
+class CaptureAddress(webapp.RequestHandler):
+
+    def get(self):
+        auth_url, auth_url_text = get_authentication_urls(self.request.uri)
+        ownerkey = self.request.get('ownerkey')
+        filepath = os.path.join(PROJECT_PATH, 
+                                    'templates', 'services', 'captureaddress.html')
+        self.response.out.write(template.render(filepath, 
+                                    {
+                                        'base_path':BASE_PATH,
+                                        'form':AddressForm(),
+                                        'ownerkey':ownerkey,
+                                        'auth_url':auth_url,
+                                        'auth_url_text':auth_url_text
+                                        }))
+
+    def post(self):
+        data = AddressForm(data=self.request.POST)
+        ownerkey = self.request.get('ownerkey')
+        owner = db.Model.get(ownerkey)
+        if data.is_valid():
+            entity = data.save(commit=False)
+            entity.creator = users.get_current_user()
+            entity.container = owner
+            entity.put()
+            self.redirect('/services/hostinfo')
+        else:
+            auth_url, auth_url_text = get_authentication_urls(self.request.uri)
+            filepath = os.path.join(PROJECT_PATH, 
+                                        'templates', 'services', 'captureaddress.html')
+            self.response.out.write(template.render(filepath, 
+                                    {
+                                        'base_path':BASE_PATH,
+                                        'form':data,
+                                        'ownerkey':ownerkey,
+                                        'auth_url':auth_url,
+                                        'auth_url_text':auth_url_text
+                                        }))
+
+
 class CaptureOwner(webapp.RequestHandler):
 
     def get(self):
