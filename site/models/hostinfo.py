@@ -1,15 +1,15 @@
 from google.appengine.ext import db
 from google.appengine.ext.db import polymodel
 
-class Contact(polymodel.PolyModel):
-    contactNumber = db.PhoneNumberProperty(required=True)
-    streetAddress = db.StringProperty(required=True)
-    suburb = db.StringProperty(required=True)
-    city = db.StringProperty()
-    country = db.StringProperty(default='South Africa')
-    postCode = db.StringProperty()
+#class Contact(db.Model):
+#    contactNumber = db.PhoneNumberProperty(required=True)
+#    streetAddress = db.StringProperty(required=True)
+#    suburb = db.StringProperty(required=True)
+#    city = db.StringProperty()
+#    country = db.StringProperty(default='South Africa')
+#    postCode = db.StringProperty()
 
-class Owner(Contact):
+class Owner(db.Model):
     created = db.DateTimeProperty(auto_now_add=True)
     creator = db.UserProperty()
     referenceNumber = db.StringProperty(required=True)
@@ -32,7 +32,7 @@ class Owner(Contact):
 #    depositPaymentDate = db.DateProperty()
 #    finalPaymentDate = db.DateProperty()
 
-class Venue(Contact):
+class Venue(db.Model):
     owner = db.ReferenceProperty(Owner)
     name = db.StringProperty()
     venueType = db.StringListProperty()
