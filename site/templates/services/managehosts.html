@@ -3,17 +3,18 @@
 {% block pagecontent %}
     <h1>Host Management</h1>
 
-    <h2>Create new host</h2>
+    <h2>Owners</h2>
     <p><a href="/services/captureowner">Capture details of a new host.</a></p>
-    <p><a href="/services/capturecontact">Capture details of a new contact.</a></p>
-
-    <h2>Current owners</h2>
-    <table>
+    <br />
+    <table width="40%">
         {% for owner in partners %}
         <tr>
-            <td>{{ owner.surname }} {{ owner.firstNames }}</td>
-            <td><a href="/services/editowner?ownerkey={{ owner.key }}">edit</a></td>
-            <td><a href="/services/deleteowner?ownerkey={{ owner.key }}">delete</a></td>
+          <td>
+              <a href="/services/viewowner?ownerkey={{ owner.key }}">
+                {{ owner.referenceNumber }}</a></td>
+          <td width="60%">{{ owner.surname }} {{ owner.firstNames }}</td>
+          <td><a href="/services/editowner?ownerkey={{ owner.key }}">edit</a></td>
+          <td><a href="/services/deleteowner?ownerkey={{ owner.key }}">delete</a></td>
         </tr>
         {% endfor %}
     </table>

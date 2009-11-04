@@ -1,0 +1,12 @@
+{% extends base_path %}
+
+{% block pagecontent %}
+    <h1>Capture New Venue</h1>
+    <form name="venue" method="post" action="/services/owner/capturevenue">
+        <input type="hidden" name="ownerkey" value="{{ ownerkey }}" />
+        <table>
+            {{ form }}
+        </table>
+        <input type="submit" value="Add Venue" />
+    </form>
+{% endblock pagecontent %}
