@@ -15,7 +15,7 @@ class Address(db.Model):
     def listing_name(self):
         fields = [self.streetAddress, self.suburb, self.city, 
                   self.country, self.postCode]
-        fields = [f for f in fields if (f.strip() != u'')]
+        fields = [f for f in fields if (f != None and f.strip() != u'')]
         return "%s" % ", ".join(fields)
 
 # class PhoneNumber
