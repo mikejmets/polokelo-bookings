@@ -5,12 +5,18 @@ class Address(db.Model):
     container = db.ReferenceProperty(db.Model, collection_name='entity_addresses')
     created = db.DateTimeProperty(auto_now_add=True)
     creator = db.UserProperty()
-    addressType = db.StringProperty(choices=['Home', 'Venue', 'Key Pickup'])
+    addressType = db.StringProperty(required=True)
     streetAddress = db.StringProperty(required=True)
     suburb = db.StringProperty(required=True)
     city = db.StringProperty()
     country = db.StringProperty(default='South Africa')
     postCode = db.StringProperty()
+
+    def listing_name(self):
+        fields = [self.streetAddress, self.suburb, self.city, 
+                  self.country, self.postCode]
+        fields = [f for f in fields if (f.strip() != u'')]
+        return "%s" % ", ".join(fields)
 
 # class PhoneNumber
 

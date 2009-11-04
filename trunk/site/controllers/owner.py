@@ -46,12 +46,14 @@ class ViewOwner(webapp.RequestHandler):
                     owner_values.append((name, val))
         # venues = Venue.all().filter('owner = ', owner).order('name')
         venues = owner.owner_venues
+        addresses = owner.entity_addresses
         self.response.out.write(template.render(filepath, 
                                     {
                                         'base_path':BASE_PATH,
                                         'owner':owner,
                                         'owner_values':owner_values,
                                         'venues':venues,
+                                        'addresses':addresses,
                                         'auth_url':auth_url,
                                         'auth_url_text':auth_url_text
                                         }))
@@ -95,7 +97,7 @@ class CaptureAddress(webapp.RequestHandler):
             entity.creator = users.get_current_user()
             entity.container = owner
             entity.put()
-            self.redirect('/services/hostinfo')
+            self.redirect('/services/viewowner?ownerkey=%s' % ownerkey)
         else:
             auth_url, auth_url_text = get_authentication_urls(self.request.uri)
             filepath = os.path.join(PROJECT_PATH, 
@@ -108,6 +110,63 @@ class CaptureAddress(webapp.RequestHandler):
                                         'auth_url':auth_url,
                                         'auth_url_text':auth_url_text
                                         }))
+
+class EditAddress(webapp.RequestHandler):
+
+    def get(self):
+        auth_url, auth_url_text = get_authentication_urls(self.request.uri)
+        addresskey = self.request.get('addresskey')
+        address = Address.get(addresskey)
+        owner = address.container
+        filepath = os.path.join(PROJECT_PATH, 
+                                    'templates', 'services', 'editaddress.html')
+        self.response.out.write(template.render(filepath, 
+                                    {
+                                        'base_path':BASE_PATH,
+                                        'form':AddressForm(instance=address),
+                                        'addresskey':addresskey,
+                                        'ownerkey': owner.key,
+                                        'auth_url':auth_url,
+                                        'auth_url_text':auth_url_text
+                                        }))
+
+    def post(self):
+        addresskey = self.request.get('addresskey')
+        address = Address.get(addresskey)
+        owner = address.container
+        data = AddressForm(data=self.request.POST, instance=address)
+        logging.info('--data %s' % data.is_valid())
+        if data.is_valid():
+            entity = data.save(commit=False)
+            entity.creator = users.get_current_user()
+            entity.container = owner
+            entity.put()
+            self.redirect('/services/viewowner?ownerkey=%s' % owner.key())
+        else:
+            auth_url, auth_url_text = get_authentication_urls(self.request.uri)
+            filepath = os.path.join(PROJECT_PATH, 
+                                        'templates', 'services', 'editaddress.html')
+            self.response.out.write(template.render(filepath, 
+                                    {
+                                        'base_path':BASE_PATH,
+                                        'form':data,
+                                        'ownerkey':owner.key(),
+                                        'auth_url':auth_url,
+                                        'auth_url_text':auth_url_text
+                                        }))
+
+
+class DeleteAddress(webapp.RequestHandler):
+
+    def get(self):
+        key = self.request.get('addresskey')
+        address = Address.get(key)
+        owner = address.container
+        if address:
+            # NOTE: obviously we will have to delete all venues 
+            # and other related data before deleting the address
+            address.delete()
+            self.redirect('/services/viewowner?ownerkey=%s' % owner.key())
 
 
 class CaptureOwner(webapp.RequestHandler):
