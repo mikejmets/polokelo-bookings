@@ -1,0 +1,28 @@
+{% extends base_path %}
+
+{% block pagecontent %}
+    <h1>Owner</h1>
+
+    <table>
+        {% for value in owner_values %}
+        <tr>
+          <td><strong>{{ value.0 }}:</strong></td>
+          <td> {{ value.1 }} </td>
+        </tr>
+        {% endfor %}
+    </table>
+
+    <h2>Venues</h2>
+    <p><a href="/services/owner/capturevenue?ownerkey={{ owner.key }}">Capture details of a new venue.</a></p>
+    <br />
+    <table>
+        {% for venue in venues %}
+        <tr>
+            <td>{{ venue.name }}</td>
+            <td><a href="/services/owner/editvenue?venuekey={{ venue.key }}&ownerkey={{ owner.key }}">edit</a></td>
+            <td><a href="/services/owner/deletevenue?venuekey={{ venue.key }}&ownerkey={{ owner.key }}">delete</a></td>
+        </tr>
+        {% endfor %}
+    </table>
+
+{% endblock pagecontent %}

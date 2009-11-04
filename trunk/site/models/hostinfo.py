@@ -12,15 +12,18 @@ from google.appengine.ext.db import polymodel
 class Owner(db.Model):
     created = db.DateTimeProperty(auto_now_add=True)
     creator = db.UserProperty()
-    referenceNumber = db.StringProperty(required=True)
+    referenceNumber = db.StringProperty(
+        required=True, verbose_name='Reference Number')
     surname = db.StringProperty(required=True)
-    firstNames = db.StringProperty(required=True)
-    emailAddress = db.EmailProperty(required=True)
+    firstNames = db.StringProperty(
+        required=True, verbose_name='First Name')
+    emailAddress = db.EmailProperty(
+        required=True, verbose_name='Email Address')
     languages = db.StringListProperty()
-    addendumADate = db.DateProperty()
-    addendumBDate = db.DateProperty()
-    addendumCDate = db.DateProperty()
-    trainingSession = db.DateProperty()
+    addendumADate = db.DateProperty(verbose_name='Addendum A Date')
+    addendumBDate = db.DateProperty(verbose_name='Addendum B Date')
+    addendumCDate = db.DateProperty(verbose_name='Addendum C Date')
+    trainingSession = db.DateProperty(verbose_name='Training Session Date')
 
 #class FinanceDetails(db.Model):
 #    owner = db.ReferenceProperty(Owner)
@@ -34,6 +37,8 @@ class Owner(db.Model):
 
 class Venue(db.Model):
     owner = db.ReferenceProperty(Owner)
+    created = db.DateTimeProperty(auto_now_add=True)
+    creator = db.UserProperty()
     name = db.StringProperty()
     venueType = db.StringListProperty()
     contactPerson = db.StringProperty()
