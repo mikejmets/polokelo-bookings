@@ -5,12 +5,11 @@ from google.appengine.ext.webapp.util import run_wsgi_app
 from google.appengine.ext.webapp import template
 
 from controllers.home import BASE_PATH, PROJECT_PATH
-from controllers.owner import ViewOwner, CaptureOwner, EditOwner, DeleteOwner
+from controllers.owner import ViewOwner, CaptureAddress
+from controllers.owner import CaptureOwner, EditOwner, DeleteOwner
 from controllers.venue import CaptureVenue, EditVenue, DeleteVenue
-from models.hostinfo import Owner, Venue
+from models.hostinfo import Owner
 from controllers.utils import get_authentication_urls
-
-#logger = logging.getLogger('ServiceHandlers')
 
 class ManageHosts(webapp.RequestHandler):
     def get(self):
@@ -31,10 +30,12 @@ application = webapp.WSGIApplication([
                             ('/services/captureowner', CaptureOwner),
                             ('/services/editowner', EditOwner),
                             ('/services/deleteowner', DeleteOwner),
+                            ('/services/owner/captureaddress', CaptureAddress),
                             ('/services/owner/capturevenue', CaptureVenue),
                             ('/services/owner/editvenue', EditVenue),
                             ('/services/owner/deletevenue', DeleteVenue),
                             ], debug=True)
+
 
 def main():
     run_wsgi_app(application)
