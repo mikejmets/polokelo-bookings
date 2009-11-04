@@ -135,7 +135,6 @@ class EditAddress(webapp.RequestHandler):
         address = Address.get(addresskey)
         owner = address.container
         data = AddressForm(data=self.request.POST, instance=address)
-        logging.info('--data %s' % data.is_valid())
         if data.is_valid():
             entity = data.save(commit=False)
             entity.creator = users.get_current_user()
