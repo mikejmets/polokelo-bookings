@@ -1,0 +1,12 @@
+{% extends base_path %}
+
+{% block pagecontent %}
+    <h1>Capture an Address</h1>
+    <form name="address" method="post" action="/services/owner/captureaddress">
+        <input type="hidden" name="ownerkey" value="{{ ownerkey }}" />
+        <table>
+            {{ form }}
+        </table>
+        <input type="submit" value="Add Address" />
+    </form>
+{% endblock pagecontent %}
