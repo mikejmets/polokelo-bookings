@@ -117,3 +117,7 @@ img {
 	background: #8489D6;
 }
 
+form th {
+    text-align: right;
+    padding-right: 5px;
+}
