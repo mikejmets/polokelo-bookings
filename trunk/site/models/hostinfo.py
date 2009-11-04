@@ -1,54 +1,50 @@
 from google.appengine.ext import db
+from google.appengine.ext.db import polymodel
 
-
-class Owner(db.Model):
-    created = db.DateTimeProperty(auto_now_add=True)
-    creator = db.UserProperty()
-    referenceNumber = db.StringProperty(required=True)
-    surname = db.StringProperty(required=True)
-    firstNames = db.StringProperty(required=True)
+class Contact(polymodel.PolyModel):
     contactNumber = db.PhoneNumberProperty(required=True)
-    emailAddress = db.EmailProperty(required=True)
-    languages = db.StringListProperty()
     streetAddress = db.StringProperty(required=True)
     suburb = db.StringProperty(required=True)
     city = db.StringProperty()
     country = db.StringProperty(default='South Africa')
     postCode = db.StringProperty()
+
+class Owner(Contact):
+    created = db.DateTimeProperty(auto_now_add=True)
+    creator = db.UserProperty()
+    referenceNumber = db.StringProperty(required=True)
+    surname = db.StringProperty(required=True)
+    firstNames = db.StringProperty(required=True)
+    emailAddress = db.EmailProperty(required=True)
+    languages = db.StringListProperty()
     addendumADate = db.DateProperty()
     addendumBDate = db.DateProperty()
     addendumCDate = db.DateProperty()
     trainingSession = db.DateProperty()
 
-# class FinanceDetails
-#     owner
-#     registrationFeePaymentDate
-#     bankName
-#     branchCode
-#     accountNumber
-#     swiftCode
-#     depositPaymentDate
-#     finalPaymentDate
-# 
-# class Venue
-#     owner
-#     name
-#     venueType
-#     venueContactNumber
-#     contactPerson
-#     contactPersonNumber
-#     streetAddress
-#     suburb
-#     city
-#     country
-#     postCode
-#     keyPickupAddress
-#     photo1
-#     photo2
-#     photo3
-#     contractStartDate
-#     contractEndDate
-# 
+#class FinanceDetails(db.Model):
+#    owner = db.ReferenceProperty(Owner)
+#    registrationFeePaymentDate = db.DateProperty()
+#    bankName = db.StringProperty()
+#    branchCode = db.StringProperty()
+#    accountNumber = db.StringProperty()
+#    swiftCode = db.StringProperty()
+#    depositPaymentDate = db.DateProperty()
+#    finalPaymentDate = db.DateProperty()
+
+class Venue(Contact):
+    owner = db.ReferenceProperty(Owner)
+    name = db.StringProperty()
+    venueType = db.StringListProperty()
+    contactPerson = db.StringProperty()
+    contactPersonNumber = db.PhoneNumberProperty()
+    keyPickupAddress = db.StringProperty()
+    photo1 = db.BlobProperty()
+    photo2 = db.BlobProperty()
+    photo3 = db.BlobProperty()
+    contractStartDate = db.DateProperty()
+    contractEndDate = db.DateProperty()
+
 # class Inspection
 #     venue
 #     date

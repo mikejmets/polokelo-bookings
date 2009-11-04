@@ -22,7 +22,7 @@ def get_authentication_urls(dest_url):
         return users.create_login_url(dest_url), 'Sign In'
 
 
-class ManageHosts(webapp.RequestHandler):
+class ManageOwners(webapp.RequestHandler):
     def get(self):
         auth_url, auth_url_text = get_authentication_urls(self.request.uri)
         partners = Owner.all().order('surname')
@@ -37,6 +37,15 @@ class ManageHosts(webapp.RequestHandler):
 
 
 class OwnerForm(djangoforms.ModelForm):
+    def __init__(self, *args, **kw):
+      super(djangoforms.ModelForm, self).__init__(*args, **kw)
+      self.fields.keyOrder = [
+          'referenceNumber',
+          'surname', 'firstNames', 'emailAddress', 'languages', 
+          'contactNumber', 
+          'streetAddress', 'suburb', 'city', 'country', 'postCode', 
+          'addendumADate', 'addendumBDate', 'addendumCDate', 'trainingSession',]
+
     class Meta:
         model = Owner
         exclude = ['created', 'creator']
@@ -134,7 +143,7 @@ class DeleteOwner(webapp.RequestHandler):
 
 
 application = webapp.WSGIApplication([
-                            ('/services/hostinfo', ManageHosts),
+                            ('/services/hostinfo', ManageOwners),
                             ('/services/captureowner', CaptureOwner),
                             ('/services/editowner', EditOwner),
                             ('/services/deleteowner', DeleteOwner),
