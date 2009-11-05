@@ -48,6 +48,7 @@ class ViewOwner(webapp.RequestHandler):
         venues = owner.owner_venues
         addresses = owner.entity_addresses
         phonenumbers = owner.entity_phonenumbers
+        emails = owner.entity_emails
         self.response.out.write(template.render(filepath, 
                                     {
                                         'base_path':BASE_PATH,
@@ -56,6 +57,7 @@ class ViewOwner(webapp.RequestHandler):
                                         'venues':venues,
                                         'addresses':addresses,
                                         'phonenumbers':phonenumbers,
+                                        'emails':emails,
                                         'auth_url':auth_url,
                                         'auth_url_text':auth_url_text
                                         }))

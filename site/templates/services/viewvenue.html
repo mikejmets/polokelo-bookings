@@ -28,9 +28,22 @@
         {% endfor %}
     </table>
 
+    <hr />
+    <p>
+    <a href="/services/owner/captureemail?containerkey={{ venue.key }}">Capture Email Address</a>
+    </p>
+    <table>
+        {% for email in emails %}
+        <tr>
+            <td>{{ email.emailType }}:</td>
+            <td>{{ email.email }}</td>
+            <td><a href="/services/owner/editemail?emailkey={{ email.key }}">edit</a></td>
+            <td><a href="/services/owner/deleteemail?emailkey={{ email.key }}">delete</a></td>
+        </tr>
+        {% endfor %}
+    </table>
 
     <hr />
-
     <p>
     <a href="/services/owner/captureaddress?containerkey={{ venue.key }}">Capture Address</a>
     </p>

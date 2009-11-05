@@ -13,7 +13,6 @@
     </table>
 
     <hr />
-
     <p>
     <a href="/services/owner/capturephone?containerkey={{ owner.key }}">Capture Contact Number</a>
     </p>
@@ -24,6 +23,21 @@
             <td>{{ number.number }}</td>
             <td><a href="/services/owner/editphone?phonekey={{ number.key }}">edit</a></td>
             <td><a href="/services/owner/deletephone?phonekey={{ number.key }}">delete</a></td>
+        </tr>
+        {% endfor %}
+    </table>
+
+    <hr />
+    <p>
+    <a href="/services/owner/captureemail?containerkey={{ owner.key }}">Capture Email Address</a>
+    </p>
+    <table>
+        {% for email in emails %}
+        <tr>
+            <td>{{ email.emailType }}:</td>
+            <td>{{ email.email }}</td>
+            <td><a href="/services/owner/editemail?emailkey={{ email.key }}">edit</a></td>
+            <td><a href="/services/owner/deleteemail?emailkey={{ email.key }}">delete</a></td>
         </tr>
         {% endfor %}
     </table>
