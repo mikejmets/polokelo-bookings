@@ -104,6 +104,21 @@
         {% endfor %}
     </table>
 
+    <hr />
+    <p>
+    <a href="/services/owner/capturebedroom?containerkey={{ venue.key }}">Capture Bedroom</a>
+    </p>
+
+    <table>
+        {% for bedroom in bedrooms %}
+        <tr>
+            <td width="60%">{{ bedroom.listing_name }}</td>
+            <td><a href="/services/owner/editbedroom?bedroomkey={{ bedroom.key }}">edit</a></td>
+            <td><a href="/services/owner/deletebedroom?bedroomkey={{ bedroom.key }}">delete</a></td>
+        </tr>
+        {% endfor %}
+    </table>
+
 
 
 {% endblock pagecontent %}

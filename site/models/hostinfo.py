@@ -105,15 +105,23 @@ class Complaint(db.Model):
 #     thumbNail
 #     fullSize
 # 
-# class Room
-#     venue
-#     bathroom
-#     bathroomType
-#     name
-#     capacity
-#     childrenUnder12
-#     disabledFriendly
-# 
+class Bedroom(db.Model):
+    venue = db.ReferenceProperty(Venue, collection_name='venue_bedrooms')
+    created = db.DateTimeProperty(auto_now_add=True)
+    creator = db.UserProperty()
+    name = db.StringProperty(required=True)
+    bathroomType = db.StringProperty(
+        required=True, choices=['En suite', 'Own', 'Shared'])
+    disabilityFriendly = db.BooleanProperty(default=False)
+    childFriendly = db.BooleanProperty(default=False)
+    capacity = db.IntegerProperty(required=True, default=1)
+
+    def listing_name(self):
+        fields = [self.name, self.bathroomType, self.capacity]
+        fields = [str(f) for f in fields]
+        return "%s" % ", ".join(fields)
+
+
 
 class Bathroom(db.Model):
     venue = db.ReferenceProperty(Venue, collection_name='venue_bathrooms')
