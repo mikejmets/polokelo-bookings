@@ -1,5 +1,9 @@
 {% extends base_path %}
 
+{% block breadcrumbs %}
+<a href="{{came_from}}">go back</a>
+{% endblock %}
+
 {% block pagecontent %}
     <h1>Edit Existing Bathroom</h1>
     <form name="instspection" method="post" action="/services/owner/editbathroom">

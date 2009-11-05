@@ -1,5 +1,9 @@
 {% extends base_path %}
 
+{% block breadcrumbs %}
+<a href="/services/viewowner?ownerkey={{ownerkey}}">go back</a>
+{% endblock %}
+
 {% block pagecontent %}
     <h1>Capture New Venue</h1>
     <form name="venue" method="post" action="/services/owner/capturevenue">
