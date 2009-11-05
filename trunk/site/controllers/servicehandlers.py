@@ -5,7 +5,7 @@ from google.appengine.ext.webapp.util import run_wsgi_app
 from google.appengine.ext.webapp import template
 
 from controllers.home import BASE_PATH, PROJECT_PATH
-from controllers.owner import CaptureAddress, EditAddress, DeleteAddress
+from controllers.address import CaptureAddress, EditAddress, DeleteAddress
 from controllers.owner import ViewOwner, CaptureOwner, EditOwner, DeleteOwner
 from controllers.venue import CaptureVenue, EditVenue, DeleteVenue
 from models.hostinfo import Owner

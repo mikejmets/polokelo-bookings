@@ -25,7 +25,7 @@ handlers:
   login: admin
 
 - url: /
-  script: bye.py
+  script: controllers/home.py
   login: required
 
 - url: /.*
