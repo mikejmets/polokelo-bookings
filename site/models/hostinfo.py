@@ -5,7 +5,8 @@ class Address(db.Model):
     container = db.ReferenceProperty(db.Model, collection_name='entity_addresses')
     created = db.DateTimeProperty(auto_now_add=True)
     creator = db.UserProperty()
-    addressType = db.StringProperty(required=True)
+    addressType = db.StringProperty(required=True,
+        choices=['Physical', 'Postal', 'Key Collection', 'Other'])
     streetAddress = db.StringProperty(required=True)
     suburb = db.StringProperty(required=True)
     city = db.StringProperty()
