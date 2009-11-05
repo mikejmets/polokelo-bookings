@@ -7,7 +7,7 @@ from google.appengine.ext.webapp import template
 from controllers.home import BASE_PATH, PROJECT_PATH
 from controllers.address import CaptureAddress, EditAddress, DeleteAddress
 from controllers.owner import ViewOwner, CaptureOwner, EditOwner, DeleteOwner
-from controllers.venue import CaptureVenue, EditVenue, DeleteVenue
+from controllers.venue import ViewVenue, CaptureVenue, EditVenue, DeleteVenue
 from models.hostinfo import Owner
 from controllers.utils import get_authentication_urls
 
@@ -33,6 +33,7 @@ application = webapp.WSGIApplication([
                             ('/services/owner/captureaddress', CaptureAddress),
                             ('/services/owner/editaddress', EditAddress),
                             ('/services/owner/deleteaddress', DeleteAddress),
+                            ('/services/owner/viewvenue', ViewVenue),
                             ('/services/owner/capturevenue', CaptureVenue),
                             ('/services/owner/editvenue', EditVenue),
                             ('/services/owner/deletevenue', DeleteVenue),

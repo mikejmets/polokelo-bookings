@@ -1,0 +1,32 @@
+{% extends base_path %}
+
+{% block pagecontent %}
+    <h1>Venue</h1>
+
+    <table>
+        {% for value in venue_values %}
+        <tr>
+          <td><strong>{{ value.0 }}:</strong></td>
+          <td> {{ value.1 }} </td>
+        </tr>
+        {% endfor %}
+    </table>
+
+    <hr />
+    <p>
+    <a href="/services/owner/captureaddress?containerkey={{ venue.key }}">Capture Address</a>
+    </p>
+
+    <table>
+        {% for address in addresses %}
+        <tr>
+            <td>{{ address.addressType }}:</td>
+            <td>{{ address.listing_name }}</td>
+            <td><a href="/services/owner/editaddress?addresskey={{ address.key }}">edit</a></td>
+            <td><a href="/services/owner/deleteaddress?addresskey={{ address.key }}">delete</a></td>
+        </tr>
+        {% endfor %}
+    </table>
+
+
+{% endblock pagecontent %}
