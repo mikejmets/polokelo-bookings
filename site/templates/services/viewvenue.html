@@ -13,6 +13,23 @@
     </table>
 
     <hr />
+    <p>
+    <a href="/services/owner/capturephone?containerkey={{ venue.key }}">Capture Contact Number</a>
+    </p>
+
+    <table>
+        {% for number in phonenumbers %}
+        <tr>
+            <td>{{ number.numberType }}:</td>
+            <td>{{ number.number }}</td>
+            <td><a href="/services/owner/editphone?phonekey={{ number.key }}">edit</a></td>
+            <td><a href="/services/owner/deletephone?phonekey={{ number.key }}">delete</a></td>
+        </tr>
+        {% endfor %}
+    </table>
+
+
+    <hr />
 
     <p>
     <a href="/services/owner/captureaddress?containerkey={{ venue.key }}">Capture Address</a>
@@ -30,18 +47,16 @@
     </table>
 
     <hr />
-
     <p>
-    <a href="/services/owner/capturephone?containerkey={{ venue.key }}">Capture Contact Number</a>
+    <a href="/services/owner/captureinspection?containerkey={{ venue.key }}">Capture Inspection Record</a>
     </p>
 
     <table>
-        {% for number in phonenumbers %}
+        {% for inspection in inspections %}
         <tr>
-            <td>{{ number.numberType }}:</td>
-            <td>{{ number.number }}</td>
-            <td><a href="/services/owner/editphone?phonekey={{ number.key }}">edit</a></td>
-            <td><a href="/services/owner/deletephone?phonekey={{ number.key }}">delete</a></td>
+            <td width="60%">{{ inspection.listing_name }}</td>
+            <td><a href="/services/owner/editinspection?inspectionkey={{ inspection.key }}">edit</a></td>
+            <td><a href="/services/owner/deleteinspection?inspectionkey={{ inspection.key }}">delete</a></td>
         </tr>
         {% endfor %}
     </table>
