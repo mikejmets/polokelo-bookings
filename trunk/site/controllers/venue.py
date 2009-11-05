@@ -36,12 +36,14 @@ class ViewVenue(webapp.RequestHandler):
                     val = value.get_value_for_form(venue)
                     venue_values.append((name, val))
         addresses = venue.entity_addresses
+        phonenumbers = venue.entity_phonenumbers
         self.response.out.write(template.render(filepath, 
                                     {
                                         'base_path':BASE_PATH,
                                         'venue':venue,
                                         'venue_values':venue_values,
                                         'addresses':addresses,
+                                        'phonenumbers':phonenumbers,
                                         'auth_url':auth_url,
                                         'auth_url_text':auth_url_text
                                         }))
