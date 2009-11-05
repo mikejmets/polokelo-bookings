@@ -42,6 +42,21 @@ div.leftNavBar {
   padding: 1.5em 0;
 }
 
+
+div.breadcrumbs {
+  margin-left: 160px;
+  width: 100%;
+  background: lightgrey;
+  color: white;
+  padding: 2px;
+}
+div.breadcrumbs a,
+div.breadcrumbs a:hover,
+div.breadcrumbs a:visited {
+    color: white;
+}
+
+
 div.content {
   width: 99%; 
   margin-left: 160px;

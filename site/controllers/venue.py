@@ -42,9 +42,11 @@ class ViewVenue(webapp.RequestHandler):
         bedrooms = venue.venue_bedrooms
         emails = venue.entity_emails
         bathrooms = venue.venue_bathrooms
+        ownerkey = venue.owner.key()
         self.response.out.write(template.render(filepath, 
                                     {
                                         'base_path':BASE_PATH,
+                                        'ownerkey':ownerkey,
                                         'venue':venue,
                                         'venue_values':venue_values,
                                         'addresses':addresses,

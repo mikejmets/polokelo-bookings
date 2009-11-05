@@ -1,5 +1,9 @@
 {% extends base_path %}
 
+{% block breadcrumbs %}
+<a href="/services/hostinfo">go back</a>
+{% endblock %}
+
 {% block pagecontent %}
     <h1>Capture New Owner</h1>
     <form name="owner" method="post" action="/services/captureowner">

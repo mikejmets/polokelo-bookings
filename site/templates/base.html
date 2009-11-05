@@ -33,11 +33,16 @@
     </div>
 
     <!-- Main page content here -->
-    <div class="content">
-        {% block pagecontent %}
-        <h1>Bookings Home</h1>
-        <p>Click a link on the menu to the left for what you want to do.</p>
-        {% endblock pagecontent %} 
+    <div>
+        <div class="breadcrumbs">
+            &gt;&gt;&nbsp;{% block breadcrumbs %}{% endblock %}
+        </div>
+        <div class="content">
+            {% block pagecontent %}
+            <h1>Bookings Home</h1>
+            <p>Click a link on the menu to the left for what you want to do.</p>
+            {% endblock pagecontent %} 
+        </div>
     </div>
 </div>
 
