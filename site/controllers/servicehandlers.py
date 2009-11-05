@@ -10,6 +10,8 @@ from controllers.owner import ViewOwner, CaptureOwner, EditOwner, DeleteOwner
 from controllers.venue import ViewVenue, CaptureVenue, EditVenue, DeleteVenue
 from controllers.inspection \
     import CaptureInspection, EditInspection, DeleteInspection
+from controllers.complaint \
+    import CaptureComplaint, EditComplaint, DeleteComplaint
 from controllers.phonenumber import CapturePhoneNumber, EditPhoneNumber, DeletePhoneNumber
 from models.hostinfo import Owner
 from controllers.utils import get_authentication_urls
@@ -28,25 +30,28 @@ class ManageHosts(webapp.RequestHandler):
                                         }))
 
 application = webapp.WSGIApplication([
-                            ('/services/hostinfo', ManageHosts),
-                            ('/services/viewowner', ViewOwner),
-                            ('/services/captureowner', CaptureOwner),
-                            ('/services/editowner', EditOwner),
-                            ('/services/deleteowner', DeleteOwner),
-                            ('/services/owner/captureaddress', CaptureAddress),
-                            ('/services/owner/editaddress', EditAddress),
-                            ('/services/owner/deleteaddress', DeleteAddress),
-                            ('/services/owner/viewvenue', ViewVenue),
-                            ('/services/owner/capturevenue', CaptureVenue),
-                            ('/services/owner/editvenue', EditVenue),
-                            ('/services/owner/deletevenue', DeleteVenue),
-                            ('/services/owner/captureinspection', CaptureInspection),
-                            ('/services/owner/editinspection', EditInspection),
-                            ('/services/owner/deleteinspection', DeleteInspection),
-                            ('/services/owner/capturephone', CapturePhoneNumber),
-                            ('/services/owner/editphone', EditPhoneNumber),
-                            ('/services/owner/deletephone', DeletePhoneNumber),
-                            ], debug=True)
+                  ('/services/hostinfo', ManageHosts),
+                  ('/services/viewowner', ViewOwner),
+                  ('/services/captureowner', CaptureOwner),
+                  ('/services/editowner', EditOwner),
+                  ('/services/deleteowner', DeleteOwner),
+                  ('/services/owner/captureaddress', CaptureAddress),
+                  ('/services/owner/editaddress', EditAddress),
+                  ('/services/owner/deleteaddress', DeleteAddress),
+                  ('/services/owner/viewvenue', ViewVenue),
+                  ('/services/owner/capturevenue', CaptureVenue),
+                  ('/services/owner/editvenue', EditVenue),
+                  ('/services/owner/deletevenue', DeleteVenue),
+                  ('/services/owner/captureinspection', CaptureInspection),
+                  ('/services/owner/editinspection', EditInspection),
+                  ('/services/owner/deleteinspection', DeleteInspection),
+                  ('/services/owner/capturecomplaint', CaptureComplaint),
+                  ('/services/owner/editcomplaint', EditComplaint),
+                  ('/services/owner/deletecomplaint', DeleteComplaint),
+                  ('/services/owner/capturephone', CapturePhoneNumber),
+                  ('/services/owner/editphone', EditPhoneNumber),
+                  ('/services/owner/deletephone', DeletePhoneNumber),
+                  ], debug=True)
 
 
 def main():

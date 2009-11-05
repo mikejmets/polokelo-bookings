@@ -61,6 +61,21 @@
         {% endfor %}
     </table>
 
+    <hr />
+    <p>
+    <a href="/services/owner/capturecomplaint?containerkey={{ venue.key }}">Capture Compaint Record</a>
+    </p>
+
+    <table>
+        {% for complaint in complaints %}
+        <tr>
+            <td width="60%">{{ complaint.listing_name }}</td>
+            <td><a href="/services/owner/editcomplaint?complaintkey={{ complaint.key }}">edit</a></td>
+            <td><a href="/services/owner/deletecomplaint?complaintkey={{ complaint.key }}">delete</a></td>
+        </tr>
+        {% endfor %}
+    </table>
+
 
 
 {% endblock pagecontent %}
