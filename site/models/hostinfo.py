@@ -133,11 +133,19 @@ class Bathroom(db.Model):
     def listing_name(self):
         return "%s" % self.description
 
-# class Bed
-#     room
-#     bedType
-# 
-# 
+class Bed(db.Model):
+    bedroom = db.ReferenceProperty(Bedroom, collection_name='bedroom_beds')
+    created = db.DateTimeProperty(auto_now_add=True)
+    creator = db.UserProperty()
+    bedType = db.StringProperty(
+        required=True, choices=['Single', 'Double', 'Bunk'])
+    capacity = db.IntegerProperty(required=True, default=1)
+
+    def listing_name(self):
+        fields = [self.bedType, self.capacity]
+        fields = [str(f) for f in fields]
+        return "%s" % ", ".join(fields)
+
 # class Berth
 #     bed
 # 

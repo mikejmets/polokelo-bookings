@@ -1,0 +1,30 @@
+{% extends base_path %}
+
+{% block pagecontent %}
+    <h1>Bedroom</h1>
+
+    <table>
+        {% for value in bedroom_values %}
+        <tr>
+          <td><strong>{{ value.0 }}:</strong></td>
+          <td> {{ value.1 }} </td>
+        </tr>
+        {% endfor %}
+    </table>
+
+    <hr />
+    <p>
+    <a href="/services/owner/capturebed?containerkey={{ bedroom.key }}">Capture Bed</a>
+    </p>
+
+    <table>
+        {% for bed in beds %}
+        <tr>
+            <td>{{ bed.listing_name }}:</td>
+            <td><a href="/services/owner/editbed?bedkey={{ bed.key }}">edit</a></td>
+            <td><a href="/services/owner/deletebed?bedkey={{ bed.key }}">delete</a></td>
+        </tr>
+        {% endfor %}
+    </table>
+
+{% endblock pagecontent %}
