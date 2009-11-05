@@ -1,0 +1,13 @@
+{% extends base_path %}
+
+{% block pagecontent %}
+    <h1>Edit Existing Bedroom</h1>
+    <form name="instspection" method="post" action="/services/owner/editbedroom">
+        <input type="hidden" name="bedroomkey" value="{{ bedroomkey }}" />
+        <input type="hidden" name="came_from" value="{{ came_from }}" />
+        <table>
+            {{ form }}
+        </table>
+        <input type="submit" value="Update Bedroom" />
+    </form>
+{% endblock pagecontent %}
