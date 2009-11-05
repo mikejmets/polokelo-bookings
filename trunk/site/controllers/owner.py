@@ -14,12 +14,12 @@ logger = logging.getLogger('OwnerHandler')
 
 
 class OwnerForm(djangoforms.ModelForm):
-    def __init__(self, *args, **kw):
-      super(djangoforms.ModelForm, self).__init__(*args, **kw)
-      self.fields.keyOrder = [
-          'referenceNumber',
-          'surname', 'firstNames', 'emailAddress', 'languages', 
-          'addendumADate', 'addendumBDate', 'addendumCDate', 'trainingSession',]
+    #def __init__(self, *args, **kw):
+    #  super(djangoforms.ModelForm, self).__init__(*args, **kw)
+    #  self.fields.keyOrder = [
+    #      'referenceNumber',
+    #      'surname', 'firstNames', 'emailAddress', 'languages', 
+    #      'addendumADate', 'addendumBDate', 'addendumCDate', 'trainingSession',]
 
     class Meta:
         model = Owner

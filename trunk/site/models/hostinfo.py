@@ -42,20 +42,6 @@ class Owner(db.Model):
     emailAddress = db.EmailProperty(
         required=True, verbose_name='Email Address')
     languages = db.StringListProperty(verbose_name='Languages')
-    addendumADate = db.DateProperty(verbose_name='Addendum A Date')
-    addendumBDate = db.DateProperty(verbose_name='Addendum B Date')
-    addendumCDate = db.DateProperty(verbose_name='Addendum C Date')
-    trainingSession = db.DateProperty(verbose_name='Training Session Date')
-
-#class FinanceDetails(db.Model):
-#    owner = db.ReferenceProperty(Owner)
-#    registrationFeePaymentDate = db.DateProperty()
-#    bankName = db.StringProperty()
-#    branchCode = db.StringProperty()
-#    accountNumber = db.StringProperty()
-#    swiftCode = db.StringProperty()
-#    depositPaymentDate = db.DateProperty()
-#    finalPaymentDate = db.DateProperty()
 
 class Venue(db.Model):
     owner = db.ReferenceProperty(Owner, collection_name='owner_venues')
@@ -65,10 +51,14 @@ class Venue(db.Model):
     venueType = db.StringProperty(verbose_name='Class', 
         choices=['Backpack', 'Hostel', 'Family House', 'Guest House'])
     contactPerson = db.StringProperty(verbose_name='Contact Person')
-    # contactPersonNumber = db.PhoneNumberProperty(verbose_name='Contact Person Number')
     photo1 = db.BlobProperty()
     photo2 = db.BlobProperty()
     photo3 = db.BlobProperty()
+    disabilityFriendly = db.BooleanProperty(default=False)
+    childFriendly = db.BooleanProperty(default=False)
+    addendumADate = db.DateProperty(verbose_name='Addendum A Date')
+    addendumBDate = db.DateProperty(verbose_name='Addendum B Date')
+    addendumCDate = db.DateProperty(verbose_name='Addendum C Date')
     contractStartDate = db.DateProperty(verbose_name='Contracted Start Date')
     contractEndDate = db.DateProperty(verbose_name='Contracted End Date')
 
@@ -109,6 +99,18 @@ class Complaint(db.Model):
 #     childrenUnder12
 #     disabledFriendly
 # 
+class BathRoom(db.Model):
+    venue = db.ReferenceProperty(Venue, collection_name='venue_bathrooms')
+    created = db.DateTimeProperty(auto_now_add=True)
+    creator = db.UserProperty()
+    description = db.TextProperty(required=True)
+    disabilityFriendly = db.BooleanProperty(required=True, default=False)
+
+    def listing_name(self):
+        fields = [self.description, self.disabledFriendly]
+        fields = [str(f) for f in fields]
+        return "%s" % ", ".join(fields)
+
 # class Bathroom
 #     venue
 #     description
