@@ -1,0 +1,13 @@
+{% extends base_path %}
+
+{% block pagecontent %}
+    <h1>Capture an Complaint</h1>
+    <form name="complaint" method="post" action="/services/owner/capturecomplaint">
+        <input type="hidden" name="containerkey" value="{{ containerkey }}" />
+        <input type="hidden" name="came_from" value="{{ came_from }}" />
+        <table>
+            {{ form }}
+        </table>
+        <input type="submit" value="Add Complaint" />
+    </form>
+{% endblock pagecontent %}
