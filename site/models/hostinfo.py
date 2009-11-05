@@ -56,7 +56,6 @@ class Venue(db.Model):
                         choices=['Backpack', 'Hostel', 'Family House', 'Guest House'])
     contactPerson = db.StringProperty(verbose_name='Contact Person')
     contactPersonNumber = db.PhoneNumberProperty(verbose_name='Contact Person Number')
-    keyPickupAddress = db.TextProperty(verbose_name='Where to pick up the key')
     photo1 = db.BlobProperty()
     photo2 = db.BlobProperty()
     photo3 = db.BlobProperty()

@@ -14,7 +14,7 @@
 
     <hr />
     <p>
-    <a href="/services/owner/captureaddress?ownerkey={{ owner.key }}">Capture Address</a>
+    <a href="/services/owner/captureaddress?containerkey={{ owner.key }}">Capture Address</a>
     </p>
 
     <table>
@@ -37,7 +37,7 @@
     <table>
         {% for venue in venues %}
         <tr>
-            <td>{{ venue.name }}</td>
+          <td><a href="/services/owner/viewvenue?venuekey={{ venue.key }}&ownerkey={{ owner.key }}">{{ venue.name }}</a></td>
             <td><a href="/services/owner/editvenue?venuekey={{ venue.key }}&ownerkey={{ owner.key }}">edit</a></td>
             <td><a href="/services/owner/deletevenue?venuekey={{ venue.key }}&ownerkey={{ owner.key }}">delete</a></td>
         </tr>

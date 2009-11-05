@@ -3,7 +3,8 @@
 {% block pagecontent %}
     <h1>Capture an Address</h1>
     <form name="address" method="post" action="/services/owner/captureaddress">
-        <input type="hidden" name="ownerkey" value="{{ ownerkey }}" />
+        <input type="hidden" name="containerkey" value="{{ containerkey }}" />
+        <input type="hidden" name="came_from" value="{{ came_from }}" />
         <table>
             {{ form }}
         </table>

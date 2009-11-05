@@ -4,7 +4,7 @@
     <h1>Edit Existing Address</h1>
     <form name="address" method="post" action="/services/owner/editaddress">
         <input type="hidden" name="addresskey" value="{{ addresskey }}" />
-        <input type="hidden" name="ownerkey" value="{{ ownerkey }}" />
+        <input type="hidden" name="came_from" value="{{ came_from }}" />
         <table>
             {{ form }}
         </table>
