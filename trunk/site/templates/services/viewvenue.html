@@ -63,7 +63,7 @@
 
     <hr />
     <p>
-    <a href="/services/owner/capturecomplaint?containerkey={{ venue.key }}">Capture Compaint Record</a>
+    <a href="/services/owner/capturecomplaint?containerkey={{ venue.key }}">Capture Complaint Record</a>
     </p>
 
     <table>
@@ -72,6 +72,21 @@
             <td width="60%">{{ complaint.listing_name }}</td>
             <td><a href="/services/owner/editcomplaint?complaintkey={{ complaint.key }}">edit</a></td>
             <td><a href="/services/owner/deletecomplaint?complaintkey={{ complaint.key }}">delete</a></td>
+        </tr>
+        {% endfor %}
+    </table>
+
+    <hr />
+    <p>
+    <a href="/services/owner/capturebathroom?containerkey={{ venue.key }}">Capture Bathroom</a>
+    </p>
+
+    <table>
+        {% for bathroom in bathrooms %}
+        <tr>
+            <td width="60%">{{ bathroom.listing_name }}</td>
+            <td><a href="/services/owner/editbathroom?bathroomkey={{ bathroom.key }}">edit</a></td>
+            <td><a href="/services/owner/deletebathroom?bathroomkey={{ bathroom.key }}">delete</a></td>
         </tr>
         {% endfor %}
     </table>

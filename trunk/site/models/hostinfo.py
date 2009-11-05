@@ -99,24 +99,16 @@ class Complaint(db.Model):
 #     childrenUnder12
 #     disabledFriendly
 # 
-class BathRoom(db.Model):
+class Bathroom(db.Model):
     venue = db.ReferenceProperty(Venue, collection_name='venue_bathrooms')
     created = db.DateTimeProperty(auto_now_add=True)
     creator = db.UserProperty()
     description = db.TextProperty(required=True)
-    disabilityFriendly = db.BooleanProperty(required=True, default=False)
+    disabilityFriendly = db.BooleanProperty(default=False)
 
     def listing_name(self):
-        fields = [self.description, self.disabledFriendly]
-        fields = [str(f) for f in fields]
-        return "%s" % ", ".join(fields)
+        return "%s" % self.description
 
-# class Bathroom
-#     venue
-#     description
-#     disabledFriendly
-# 
-# 
 # class Bed
 #     room
 #     bedType

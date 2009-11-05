@@ -8,6 +8,8 @@ from controllers.home import BASE_PATH, PROJECT_PATH
 from controllers.address import CaptureAddress, EditAddress, DeleteAddress
 from controllers.owner import ViewOwner, CaptureOwner, EditOwner, DeleteOwner
 from controllers.venue import ViewVenue, CaptureVenue, EditVenue, DeleteVenue
+from controllers.bathroom \
+    import CaptureBathroom, EditBathroom, DeleteBathroom
 from controllers.inspection \
     import CaptureInspection, EditInspection, DeleteInspection
 from controllers.complaint \
@@ -42,6 +44,9 @@ application = webapp.WSGIApplication([
                   ('/services/owner/capturevenue', CaptureVenue),
                   ('/services/owner/editvenue', EditVenue),
                   ('/services/owner/deletevenue', DeleteVenue),
+                  ('/services/owner/capturebathroom', CaptureBathroom),
+                  ('/services/owner/editbathroom', EditBathroom),
+                  ('/services/owner/deletebathroom', DeleteBathroom),
                   ('/services/owner/captureinspection', CaptureInspection),
                   ('/services/owner/editinspection', EditInspection),
                   ('/services/owner/deleteinspection', DeleteInspection),
