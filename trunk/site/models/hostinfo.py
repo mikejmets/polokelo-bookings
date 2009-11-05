@@ -2,7 +2,8 @@ from google.appengine.ext import db
 from google.appengine.ext.db import polymodel
 
 class Address(db.Model):
-    container = db.ReferenceProperty(db.Model, collection_name='entity_addresses')
+    container = db.ReferenceProperty(
+        db.Model, collection_name='entity_addresses')
     created = db.DateTimeProperty(auto_now_add=True)
     creator = db.UserProperty()
     addressType = db.StringProperty(required=True,
@@ -62,7 +63,7 @@ class Venue(db.Model):
     creator = db.UserProperty()
     name = db.StringProperty(verbose_name='Venue Name')
     venueType = db.StringProperty(verbose_name='Class', 
-                        choices=['Backpack', 'Hostel', 'Family House', 'Guest House'])
+        choices=['Backpack', 'Hostel', 'Family House', 'Guest House'])
     contactPerson = db.StringProperty(verbose_name='Contact Person')
     # contactPersonNumber = db.PhoneNumberProperty(verbose_name='Contact Person Number')
     photo1 = db.BlobProperty()
@@ -71,16 +72,30 @@ class Venue(db.Model):
     contractStartDate = db.DateProperty(verbose_name='Contracted Start Date')
     contractEndDate = db.DateProperty(verbose_name='Contracted End Date')
 
-# class Inspection
-#     venue
-#     date
-#     notes
-# 
-# class Complaint
-#     venue
-#     date
-#     notes
-# 
+class Inspection(db.Model):
+    venue = db.ReferenceProperty(Venue, collection_name='venue_inspections')
+    created = db.DateTimeProperty(auto_now_add=True)
+    creator = db.UserProperty()
+    inspectionDate = db.DateProperty(required=True)
+    notes = db.TextProperty(required=True)
+
+    def listing_name(self):
+        fields = [self.inspectionDate, self.notes]
+        fields = [str(f) for f in fields]
+        return "%s" % ", ".join(fields)
+
+class Complaint(db.Model):
+    venue = db.ReferenceProperty(Venue, collection_name='venue_complaints')
+    created = db.DateTimeProperty(auto_now_add=True)
+    creator = db.UserProperty()
+    complaintDate = db.DateProperty(required=True)
+    notes = db.TextProperty(required=True)
+
+    def listing_name(self):
+        fields = [self.complaintDate, self.notes]
+        fields = [str(f) for f in fields]
+        return "%s" % ", ".join(fields)
+
 # class Photo
 #     thumbNail
 #     fullSize

@@ -13,21 +13,6 @@
     </table>
 
     <hr />
-    <p>
-    <a href="/services/owner/captureaddress?containerkey={{ owner.key }}">Capture Address</a>
-    </p>
-
-    <table>
-        {% for address in addresses %}
-        <tr>
-            <td>{{ address.addressType }}:</td>
-            <td>{{ address.listing_name }}</td>
-            <td><a href="/services/owner/editaddress?addresskey={{ address.key }}">edit</a></td>
-            <td><a href="/services/owner/deleteaddress?addresskey={{ address.key }}">delete</a></td>
-        </tr>
-        {% endfor %}
-    </table>
-    <hr />
 
     <p>
     <a href="/services/owner/capturephone?containerkey={{ owner.key }}">Capture Contact Number</a>
@@ -43,12 +28,26 @@
         {% endfor %}
     </table>
 
+    <hr />
+    <p>
+    <a href="/services/owner/captureaddress?containerkey={{ owner.key }}">Capture Address</a>
+    </p>
+
+    <table>
+        {% for address in addresses %}
+        <tr>
+            <td>{{ address.addressType }}:</td>
+            <td>{{ address.listing_name }}</td>
+            <td><a href="/services/owner/editaddress?addresskey={{ address.key }}">edit</a></td>
+            <td><a href="/services/owner/deleteaddress?addresskey={{ address.key }}">delete</a></td>
+        </tr>
+        {% endfor %}
+    </table>
 
     <h2>Venues</h2>
     <p>
     <a href="/services/owner/capturevenue?ownerkey={{ owner.key }}">Capture details of a new venue.</a>
     </p>
-    <br />
 
     <table>
         {% for venue in venues %}
