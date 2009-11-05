@@ -39,6 +39,7 @@ class ViewVenue(webapp.RequestHandler):
         inspections = venue.venue_inspections
         complaints = venue.venue_complaints
         phonenumbers = venue.entity_phonenumbers
+        emails = venue.entity_emails
         bathrooms = venue.venue_bathrooms
         self.response.out.write(template.render(filepath, 
                                     {
@@ -49,6 +50,7 @@ class ViewVenue(webapp.RequestHandler):
                                         'inspections':inspections,
                                         'complaints':complaints,
                                         'phonenumbers':phonenumbers,
+                                        'emails':emails,
                                         'bathrooms':bathrooms,
                                         'auth_url':auth_url,
                                         'auth_url_text':auth_url_text

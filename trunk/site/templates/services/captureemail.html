@@ -1,0 +1,13 @@
+{% extends base_path %}
+
+{% block pagecontent %}
+    <h1>Capture an Email Address</h1>
+    <form name="emailaddress" method="post" action="/services/owner/captureemail">
+        <input type="hidden" name="containerkey" value="{{ containerkey }}" />
+        <input type="hidden" name="came_from" value="{{ came_from }}" />
+        <table>
+            {{ form }}
+        </table>
+        <input type="submit" value="Add Email" />
+    </form>
+{% endblock pagecontent %}

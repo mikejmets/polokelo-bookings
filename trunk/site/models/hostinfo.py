@@ -20,6 +20,7 @@ class Address(db.Model):
         fields = [f for f in fields if (f != None and f.strip() != u'')]
         return "%s" % ", ".join(fields)
 
+
 class PhoneNumber(db.Model):
     container = db.ReferenceProperty(db.Model, collection_name='entity_phonenumbers')
     created = db.DateTimeProperty(auto_now_add=True)
@@ -27,8 +28,19 @@ class PhoneNumber(db.Model):
     numberType = db.StringProperty(
             verbose_name = 'Number Type',
             required=True,
-            choices=['Home', 'Work', 'Fax', 'Mobile'])
+            choices=['Home', 'Work', 'Fax', 'Mobile', 'Other'])
     number = db.PhoneNumberProperty(verbose_name='Number', required=True)
+
+
+class EmailAddress(db.Model):
+    container = db.ReferenceProperty(db.Model, collection_name='entity_emails')
+    created = db.DateTimeProperty(auto_now_add=True)
+    creator = db.UserProperty()
+    emailType = db.StringProperty(
+            verbose_name = 'Email Type',
+            required=True,
+            choices=['Personal', 'Office', 'Venue', 'Other'])
+    email = db.EmailProperty(verbose_name='Email Address', required=True)
 
 
 class Owner(db.Model):
@@ -42,6 +54,7 @@ class Owner(db.Model):
     emailAddress = db.EmailProperty(
         required=True, verbose_name='Email Address')
     languages = db.StringListProperty(verbose_name='Languages')
+
 
 class Venue(db.Model):
     owner = db.ReferenceProperty(Owner, collection_name='owner_venues')
@@ -62,6 +75,7 @@ class Venue(db.Model):
     contractStartDate = db.DateProperty(verbose_name='Contracted Start Date')
     contractEndDate = db.DateProperty(verbose_name='Contracted End Date')
 
+
 class Inspection(db.Model):
     venue = db.ReferenceProperty(Venue, collection_name='venue_inspections')
     created = db.DateTimeProperty(auto_now_add=True)
@@ -73,6 +87,7 @@ class Inspection(db.Model):
         fields = [self.inspectionDate, self.notes]
         fields = [str(f) for f in fields]
         return "%s" % ", ".join(fields)
+
 
 class Complaint(db.Model):
     venue = db.ReferenceProperty(Venue, collection_name='venue_complaints')
@@ -99,6 +114,7 @@ class Complaint(db.Model):
 #     childrenUnder12
 #     disabledFriendly
 # 
+
 class Bathroom(db.Model):
     venue = db.ReferenceProperty(Venue, collection_name='venue_bathrooms')
     created = db.DateTimeProperty(auto_now_add=True)
