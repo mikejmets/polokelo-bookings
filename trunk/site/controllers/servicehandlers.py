@@ -9,7 +9,8 @@ from controllers.address import CaptureAddress, EditAddress, DeleteAddress
 from controllers.owner import ViewOwner, CaptureOwner, EditOwner, DeleteOwner
 from controllers.venue import ViewVenue, CaptureVenue, EditVenue, DeleteVenue
 from controllers.bedroom \
-    import CaptureBedroom, EditBedroom, DeleteBedroom
+    import ViewBedroom, CaptureBedroom, EditBedroom, DeleteBedroom
+from controllers.bed  import CaptureBed, EditBed, DeleteBed
 from controllers.bathroom \
     import CaptureBathroom, EditBathroom, DeleteBathroom
 from controllers.inspection \
@@ -49,9 +50,13 @@ application = webapp.WSGIApplication([
                   ('/services/owner/capturevenue', CaptureVenue),
                   ('/services/owner/editvenue', EditVenue),
                   ('/services/owner/deletevenue', DeleteVenue),
+                  ('/services/owner/viewbedroom', ViewBedroom),
                   ('/services/owner/capturebedroom', CaptureBedroom),
                   ('/services/owner/editbedroom', EditBedroom),
                   ('/services/owner/deletebedroom', DeleteBedroom),
+                  ('/services/owner/capturebed', CaptureBed),
+                  ('/services/owner/editbed', EditBed),
+                  ('/services/owner/deletebed', DeleteBed),
                   ('/services/owner/capturebathroom', CaptureBathroom),
                   ('/services/owner/editbathroom', EditBathroom),
                   ('/services/owner/deletebathroom', DeleteBathroom),

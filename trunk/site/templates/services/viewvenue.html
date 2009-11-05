@@ -112,7 +112,7 @@
     <table>
         {% for bedroom in bedrooms %}
         <tr>
-            <td width="60%">{{ bedroom.listing_name }}</td>
+            <td><a href="/services/owner/viewbedroom?bedroomkey={{ bedroom.key }}">{{ bedroom.listing_name }}</a></td>
             <td><a href="/services/owner/editbedroom?bedroomkey={{ bedroom.key }}">edit</a></td>
             <td><a href="/services/owner/deletebedroom?bedroomkey={{ bedroom.key }}">delete</a></td>
         </tr>
