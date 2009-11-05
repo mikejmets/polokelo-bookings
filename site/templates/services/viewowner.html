@@ -27,6 +27,22 @@
         </tr>
         {% endfor %}
     </table>
+    <hr />
+
+    <p>
+    <a href="/services/owner/capturephone?containerkey={{ owner.key }}">Capture Contact Number</a>
+    </p>
+    <table>
+        {% for number in phonenumbers %}
+        <tr>
+            <td>{{ number.numberType }}:</td>
+            <td>{{ number.number }}</td>
+            <td><a href="/services/owner/editphone?phonekey={{ number.key }}">edit</a></td>
+            <td><a href="/services/owner/deletephone?phonekey={{ number.key }}">delete</a></td>
+        </tr>
+        {% endfor %}
+    </table>
+
 
     <h2>Venues</h2>
     <p>

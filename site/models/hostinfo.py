@@ -19,7 +19,16 @@ class Address(db.Model):
         fields = [f for f in fields if (f != None and f.strip() != u'')]
         return "%s" % ", ".join(fields)
 
-# class PhoneNumber
+class PhoneNumber(db.Model):
+    container = db.ReferenceProperty(db.Model, collection_name='entity_phonenumbers')
+    created = db.DateTimeProperty(auto_now_add=True)
+    creator = db.UserProperty()
+    numberType = db.StringProperty(
+            verbose_name = 'Number Type',
+            required=True,
+            choices=['Home', 'Work', 'Fax', 'Mobile'])
+    number = db.PhoneNumberProperty(verbose_name='Number', required=True)
+
 
 class Owner(db.Model):
     created = db.DateTimeProperty(auto_now_add=True)
@@ -55,7 +64,7 @@ class Venue(db.Model):
     venueType = db.StringProperty(verbose_name='Class', 
                         choices=['Backpack', 'Hostel', 'Family House', 'Guest House'])
     contactPerson = db.StringProperty(verbose_name='Contact Person')
-    contactPersonNumber = db.PhoneNumberProperty(verbose_name='Contact Person Number')
+    # contactPersonNumber = db.PhoneNumberProperty(verbose_name='Contact Person Number')
     photo1 = db.BlobProperty()
     photo2 = db.BlobProperty()
     photo3 = db.BlobProperty()

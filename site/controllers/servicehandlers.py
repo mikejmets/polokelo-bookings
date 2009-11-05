@@ -8,6 +8,7 @@ from controllers.home import BASE_PATH, PROJECT_PATH
 from controllers.address import CaptureAddress, EditAddress, DeleteAddress
 from controllers.owner import ViewOwner, CaptureOwner, EditOwner, DeleteOwner
 from controllers.venue import ViewVenue, CaptureVenue, EditVenue, DeleteVenue
+from controllers.phonenumber import CapturePhoneNumber, EditPhoneNumber, DeletePhoneNumber
 from models.hostinfo import Owner
 from controllers.utils import get_authentication_urls
 
@@ -37,6 +38,9 @@ application = webapp.WSGIApplication([
                             ('/services/owner/capturevenue', CaptureVenue),
                             ('/services/owner/editvenue', EditVenue),
                             ('/services/owner/deletevenue', DeleteVenue),
+                            ('/services/owner/capturephone', CapturePhoneNumber),
+                            ('/services/owner/editphone', EditPhoneNumber),
+                            ('/services/owner/deletephone', DeletePhoneNumber),
                             ], debug=True)
 
 

@@ -47,6 +47,7 @@ class ViewOwner(webapp.RequestHandler):
         # venues = Venue.all().filter('owner = ', owner).order('name')
         venues = owner.owner_venues
         addresses = owner.entity_addresses
+        phonenumbers = owner.entity_phonenumbers
         self.response.out.write(template.render(filepath, 
                                     {
                                         'base_path':BASE_PATH,
@@ -54,6 +55,7 @@ class ViewOwner(webapp.RequestHandler):
                                         'owner_values':owner_values,
                                         'venues':venues,
                                         'addresses':addresses,
+                                        'phonenumbers':phonenumbers,
                                         'auth_url':auth_url,
                                         'auth_url_text':auth_url_text
                                         }))
