@@ -126,9 +126,8 @@ class DeleteAddress(webapp.RequestHandler):
         address = Address.get(key)
         container = address.container
         if address:
-            # NOTE: obviously we will have to delete all venues 
-            # and other related data before deleting the address
-            address.delete()
+            #recursive delete
+            address.rdelete()
         self.redirect(came_from)
 
 

@@ -117,7 +117,8 @@ class DeleteEmailAddress(webapp.RequestHandler):
         emailkey = self.request.get('emailkey')
         emailaddress = EmailAddress.get(emailkey)
         if emailaddress:
-            emailaddress.delete()
+            #recursive delete
+            emailaddress.rdelete()
 
         self.redirect(came_from)
 

@@ -119,9 +119,8 @@ class DeleteInspection(webapp.RequestHandler):
         inspection = Inspection.get(key)
         container = inspection.venue
         if inspection:
-            # NOTE: obviously we will have to delete all venues 
-            # and other related data before deleting the inspection
-            inspection.delete()
+            #recursive delete
+            inspection.rdelete()
         self.redirect(came_from)
 
 

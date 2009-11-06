@@ -117,9 +117,8 @@ class DeletePhoneNumber(webapp.RequestHandler):
         phonekey = self.request.get('phonekey')
         phonenumber = PhoneNumber.get(phonekey)
         if phonenumber:
-            # NOTE: obviously we will have to delete all venues 
-            # and other related data before deleting the PhoneNumber
-            phonenumber.delete()
+            #recursive delete
+            phonenumber.rdelete()
 
         self.redirect(came_from)
 
