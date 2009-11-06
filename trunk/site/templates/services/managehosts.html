@@ -5,7 +5,10 @@
 
     <h2>Owners</h2>
     <p><strong>Owners</strong>
-      (<a href="/services/owner/captureowner"> New </a>)
+      <a title="Add a new owner"
+         href="/services/owner/captureowner">
+          <img src="/images/add.png"/>
+      </a>
     </p>
     <table class="listing">
         <thead>
@@ -20,8 +23,16 @@
               <a href="/services/viewowner?ownerkey={{ owner.key }}">
                 {{ owner.referenceNumber }}</a></td>
           <td width="60%">{{ owner.surname }} {{ owner.firstNames }}</td>
-          <td><a href="/services/editowner?ownerkey={{ owner.key }}">Edit</a></td>
-          <td><a href="/services/deleteowner?ownerkey={{ owner.key }}">Delete</a></td>
+          <td class="action">
+            <a title="Edit this owner"
+              href="/services/editowner?ownerkey={{ owner.key }}">
+              <img src="/images/edit.png"/>
+            </a></td>
+          <td class="action">
+            <a title="Delete this owner"
+              href="/services/deleteowner?ownerkey={{ owner.key }}">
+              <img src="/images/delete.png"/>
+            </a></td>
         </tr>
         {% endfor %}
     </table>

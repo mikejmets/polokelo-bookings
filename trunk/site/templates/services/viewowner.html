@@ -24,7 +24,10 @@
     </td>
     <td valign="top">
       <p><strong>Contact Numbers</strong>
-        (<a href="/services/owner/capturephone?containerkey={{ owner.key }}"> New </a>)
+      <a title="Add a new contact number"
+         href="/services/owner/capturephone?containerkey={{ owner.key }}">
+          <img src="/images/add.png"/>
+        </a>
       </p>
       <table class="listing">
           <thead>
@@ -37,15 +40,25 @@
           <tr>
               <td>{{ number.numberType }}</td>
               <td>{{ number.number }}</td>
-              <td><a href="/services/owner/editphone?phonekey={{ number.key }}">Edit</a></td>
-              <td><a href="/services/owner/deletephone?phonekey={{ number.key }}">Delete</a></td>
+              <td class="action">
+                <a title="Edit this contact number"
+                   href="/services/owner/editphone?phonekey={{ number.key }}">
+                <img src="/images/edit.png"/></a></td>
+                </a></td>
+              <td class="action">
+                <a title="Delete this contact number"
+                   href="/services/owner/deletephone?phonekey={{ number.key }}">
+                <img src="/images/delete.png"/></a></td>
+                </a></td>
           </tr>
           {% endfor %}
       </table>
 
       <hr />
       <p><strong>Email Addresses</strong>
-        (<a href="/services/owner/captureemail?containerkey={{ owner.key }}"> New </a>)
+      <a title="Add a new email address"
+         href="/services/owner/captureemail?containerkey={{ owner.key }}">
+          <img src="/images/add.png"/></a>
       </p>
       <table class="listing">
           <thead>
@@ -58,15 +71,26 @@
           <tr>
               <td>{{ email.emailType }}</td>
               <td>{{ email.email }}</td>
-              <td><a href="/services/owner/editemail?emailkey={{ email.key }}">Edit</a></td>
-              <td><a href="/services/owner/deleteemail?emailkey={{ email.key }}">Delete</a></td>
+              <td class="action">
+                <a title="Edit this email address"
+                   href="/services/owner/editemail?emailkey={{ email.key }}">
+              <img src="/images/edit.png"/></a></td>
+              </a></td>
+              <td class="action">
+                <a title="Delete this email address"
+                   href="/services/owner/deleteemail?emailkey={{ email.key }}">
+                <img src="/images/delete.png"/></a></td>
+              </a></td>
           </tr>
           {% endfor %}
       </table>
 
       <hr />
       <p><strong>Addresses</strong>
-        (<a href="/services/owner/captureaddress?containerkey={{ owner.key }}"> New </a>)
+      <a title="Add a new address"
+         href="/services/owner/captureaddress?containerkey={{ owner.key }}">
+          <img src="/images/add.png"/>
+      </a>
       </p>
 
       <table class="listing">
@@ -80,8 +104,16 @@
           <tr>
               <td>{{ address.addressType }}</td>
               <td>{{ address.listing_name }}</td>
-              <td><a href="/services/owner/editaddress?addresskey={{ address.key }}">Edit</a></td>
-              <td><a href="/services/owner/deleteaddress?addresskey={{ address.key }}">Delete</a></td>
+              <td class="action">
+                <a title="Edit this address"
+                   href="/services/owner/editaddress?addresskey={{ address.key }}">
+              <img src="/images/edit.png"/></a></td>
+              </a></td>
+              <td class="action">
+                <a title="Delete this address"
+                   href="/services/owner/deleteaddress?addresskey={{ address.key }}">
+                <img src="/images/delete.png"/></a></td>
+              </a></td>
           </tr>
           {% endfor %}
       </table>
@@ -91,7 +123,11 @@
 
     <h2>Venues</h2>
     <p><strong>Venues</strong>
-      (<a href="/services/owner/capturevenue?containerkey={{ owner.key }}"> New </a>)
+    <a title="Add a new venue"
+       href="/services/owner/capturevenue?containerkey={{ owner.key }}">
+      <img src="/images/add.png"/></a></td>
+      New 
+    </a>
     </p>
 
     <table class="listing">
@@ -103,8 +139,16 @@
         {% for venue in venues %}
         <tr>
           <td><a href="/services/owner/viewvenue?venuekey={{ venue.key }}&ownerkey={{ owner.key }}">{{ venue.name }}</a></td>
-            <td><a href="/services/owner/editvenue?venuekey={{ venue.key }}&ownerkey={{ owner.key }}">Edit</a></td>
-            <td><a href="/services/owner/deletevenue?venuekey={{ venue.key }}&ownerkey={{ owner.key }}">Delete</a></td>
+          <td class="action">
+            <a title="Edit this venue"
+               href="/services/owner/editvenue?venuekey={{ venue.key }}&ownerkey={{ owner.key }}">
+              <img src="/images/edit.png"/></a></td>
+          </a></td>
+          <td class="action">
+            <a title="Delete this venue"
+               href="/services/owner/deletevenue?venuekey={{ venue.key }}&ownerkey={{ owner.key }}">
+              <img src="/images/delete.png"/></a></td>
+          </a></td>
         </tr>
         {% endfor %}
     </table>
