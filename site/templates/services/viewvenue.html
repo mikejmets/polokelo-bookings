@@ -97,7 +97,10 @@
 
       <h3>Rooms</h3>
       <p><strong>Bedrooms</strong>
-      (<a href="/services/owner/capturebedroom?containerkey={{ venue.key }}"> New </a>)
+       <a title="Add a new room"
+          href="/services/owner/capturebedroom?containerkey={{ venue.key }}">
+         <img src="/images/add.png"/>
+       </a>
       </p>
       <table class="listing">
           <thead>
@@ -112,8 +115,12 @@
               <td><a href="/services/owner/viewbedroom?bedroomkey={{ bedroom.key }}">{{ bedroom.name }}</a></td>
               <td>{{ bedroom.bathroomType }}</td>
               <td>{{ bedroom.capacity }}</td>
-              <td><a href="/services/owner/editbedroom?bedroomkey={{ bedroom.key }}">Edit</a></td>
-              <td><a href="/services/owner/deletebedroom?bedroomkey={{ bedroom.key }}">Delete</a></td>
+              <td><a title="Edit this room" 
+                     href="/services/owner/editbedroom?bedroomkey={{ bedroom.key }}">
+                  <img src="/images/edit.png"/></a></td>
+              <td><a title="Delete this room" 
+                     href="/services/owner/deletebedroom?bedroomkey={{ bedroom.key }}">
+                  <img src="/images/delete.png"/></a></td>
           </tr>
           {% endfor %}
       </table>
