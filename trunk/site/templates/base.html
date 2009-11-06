@@ -35,7 +35,10 @@
     <!-- Main page content here -->
     <div>
         <div class="breadcrumbs">
-            &gt;&gt;&nbsp;{% block breadcrumbs %}{% endblock %}
+            &gt;&gt;&nbsp;
+            {% block breadcrumbs %}
+            <a href="/index">home</a>
+            {% endblock %}
         </div>
         <div class="content">
             {% block pagecontent %}
