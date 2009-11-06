@@ -47,6 +47,7 @@ class ViewVenue(webapp.RequestHandler):
                                     {
                                         'base_path':BASE_PATH,
                                         'ownerkey':ownerkey,
+                                        'owner_name':venue.owner.listing_name(),
                                         'venue':venue,
                                         'venue_values':venue_values,
                                         'addresses':addresses,

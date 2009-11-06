@@ -62,6 +62,9 @@ class Owner(db.Model):
         required=True, verbose_name='First Names')
     languages = db.StringListProperty(verbose_name='Languages')
 
+    def listing_name(self):
+        return "%s %s" % (self.firstNames, self.surname)
+
     def rdelete(self):
         for r in self.owner_venues:
             r.rdelete()
