@@ -95,6 +95,19 @@ img {
   border: 0;
 }
 
+img.photoleft { float: left; }
+span.photoright {
+  font-weight: bold;
+  font-size: 90%;
+  color: #F5A4A4;
+  text-align: left; 
+}
+div.photothumb {
+    width: 33%; 
+    float:left; 
+    margin-bottom: 25px;
+}
+
 
 /* ------------------ Menu styles --------------------------------------- */
 .leftNavBar ul {

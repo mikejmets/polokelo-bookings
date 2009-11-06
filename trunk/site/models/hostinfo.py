@@ -85,9 +85,9 @@ class Venue(db.Model):
     venueType = db.StringProperty(verbose_name='Class', 
         choices=['Backpack', 'Hostel', 'Family House', 'Guest House'])
     contactPerson = db.StringProperty(verbose_name='Contact Person')
-    photo1 = db.BlobProperty()
-    photo2 = db.BlobProperty()
-    photo3 = db.BlobProperty()
+    # photo1 = db.BlobProperty()
+    # photo2 = db.BlobProperty()
+    # photo3 = db.BlobProperty()
     disabilityFriendly = db.BooleanProperty(default=False)
     childFriendly = db.BooleanProperty(default=False)
     addendumADate = db.DateProperty(verbose_name='Addendum A Date')
@@ -113,6 +113,13 @@ class Venue(db.Model):
             r.rdelete()
         self.delete()
 
+class Photograph(db.Model):
+    venue = db.ReferenceProperty(Venue, collection_name='venue_photos')
+    created = db.DateTimeProperty(auto_now_add=True)
+    creator = db.UserProperty()
+    caption = db.StringProperty()
+    thumbnail = db.BlobProperty()
+    fullsize = db.BlobProperty()
 
 class Inspection(db.Model):
     venue = db.ReferenceProperty(Venue, collection_name='venue_inspections')

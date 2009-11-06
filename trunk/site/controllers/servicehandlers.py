@@ -21,8 +21,11 @@ from controllers.phonenumber \
         import CapturePhoneNumber, EditPhoneNumber, DeletePhoneNumber
 from controllers.emailaddress \
         import CaptureEmailAddress, EditEmailAddress, DeleteEmailAddress
+from controllers.photograph \
+        import CapturePhotograph, EditPhotograph, DeletePhotograph
 from models.hostinfo import Owner
 from controllers.utils import get_authentication_urls
+
 
 class ManageHosts(webapp.RequestHandler):
     def get(self):
@@ -50,6 +53,9 @@ application = webapp.WSGIApplication([
                   ('/services/owner/capturevenue', CaptureVenue),
                   ('/services/owner/editvenue', EditVenue),
                   ('/services/owner/deletevenue', DeleteVenue),
+                  ('/services/owner/capturephotograph', CapturePhotograph),
+                  ('/services/owner/editphotograph', EditPhotograph),
+                  ('/services/owner/deletephotograph', DeletePhotograph),
                   ('/services/owner/viewbedroom', ViewBedroom),
                   ('/services/owner/capturebedroom', CaptureBedroom),
                   ('/services/owner/editbedroom', EditBedroom),

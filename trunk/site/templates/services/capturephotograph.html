@@ -1,0 +1,43 @@
+{% extends base_path %}
+
+{% block breadcrumbs %}
+<a href="{{came_from}}">go back</a>
+{% endblock %}
+
+{% block pagecontent %}
+    <h1>Capture a Photograph</h1>
+    <form name="photograph" 
+          enctype="multipart/form-data" 
+          method="post" 
+          action="/services/owner/capturephotograph">
+        <input type="hidden" name="venuekey" value="{{ venuekey }}" />
+        <input type="hidden" name="came_from" value="{{ came_from }}" />
+        <table>
+            {% ifnotequal error_msg '' %}
+            <tr>
+                <td colspan="2">
+                    <span class="error">{{error_msg}}</span>
+                </td>
+            </tr>
+            {% endifnotequal %}
+            <tr>
+              <td valign="top">
+                <strong>Caption</strong>
+              </td>
+              <td>
+                  <input type="text" name="caption" value="{{caption}}" />
+              </td>
+            </tr>
+            <tr>
+              <td valign="top">
+                <strong>Full Size Image File</strong>
+              </td>
+              <td>
+                <input type="file" name="fullsize" value="" />
+              </td>
+            </tr>
+        </table>
+        <input type="submit" name="action" value="Add Photograph" />
+    </form>
+{% endblock pagecontent %} 
+

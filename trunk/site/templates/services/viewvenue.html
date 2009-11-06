@@ -9,7 +9,7 @@
 
 <table width="100%">
   <tr>
-    <td>
+    <td valign="top">
       <table>
           <tr>
             <td><strong>Owner:</strong></td>
@@ -25,7 +25,7 @@
           {% endfor %}
       </table>
     </td>
-    <td>
+    <td valign="top">
       <p><strong>Contact Numbers</strong>
       <a title="Add to number"
         href="/services/owner/capturephone?containerkey={{ venue.key }}">
@@ -48,7 +48,8 @@
                 <a title="Edit this number"
                   href="/services/owner/editphone?phonekey={{ number.key }}">
                   <img src="/images/edit.png"/>
-                </a></td>
+                </a>
+              </td>
 
               <td class="action">
                 <a title="Delete this number"
@@ -127,6 +128,36 @@
 </table>
 
 
+    <hr />
+      <p><strong>Photographs</strong>
+      <a title="Add a Photograph"
+        href="/services/owner/capturephotograph?venuekey={{ venue.key }}">
+        <img src="/images/add.png"/>
+      </a>
+      </p>
+
+    <table cellspacing="15">
+        <tr>
+            {% for photo in photographs %}
+            <td valign="bottom">
+                <a href="/viewer/fullsize?photokey={{photo.key}}">
+                        <img src="/viewer/thumbnail?photokey={{photo.key}}" 
+                        alt="{{photo.caption}}" /></a>
+                <br />
+                <a title="Edit this Photograph"
+                  href="/services/owner/editphotograph?photokey={{ photo.key }}">
+                  <img src="/images/edit.png"/>
+                </a>
+                &nbsp;
+                <a title="Delete this Photograph"
+                  href="/services/owner/deletephotograph?photokey={{ photo.key }}">
+                  <img src="/images/delete.png"/>
+                </a>
+            </td>
+            {% endfor %}
+        </tr>
+    </table>
+
       <h3>Rooms</h3>
       <p><strong>Bedrooms</strong>
        <a title="Add a new room"
@@ -191,7 +222,10 @@
 
       <h3>Other Information</h3>
       <p><strong>Inspection Records</strong>
-      (<a href="/services/owner/captureinspection?containerkey={{ venue.key }}"> New </a>)
+      <a title="Add an Inspection Record"
+        href="/services/owner/captureinspection?containerkey={{ venue.key }}">
+        <img src="/images/add.png"/>
+      </a>
       </p>
 
       <table class="listing">
@@ -213,7 +247,10 @@
 
       <hr />
       <p><strong>Complaint Records</strong>
-      (<a href="/services/owner/capturecomplaint?containerkey={{ venue.key }}"> New </a>)
+      <a title="Add a Inspection Record"
+        href="/services/owner/capturecomplaint?containerkey={{ venue.key }}">
+        <img src="/images/add.png"/>
+      </a>
       </p>
 
       <table class="listing">
