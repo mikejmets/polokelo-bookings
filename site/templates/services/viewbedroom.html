@@ -13,21 +13,34 @@
     </table>
 
     <hr />
-    <p>
-    <a href="/services/owner/capturebed?containerkey={{ bedroom.key }}">Capture Bed</a>
-    </p>
+      <p><strong>Beds</strong>
+      <a title="Add a new bed"
+         href="/services/owner/capturebed?containerkey={{ bedroom.key }}">
+          <img src="/images/add.png"/></a></td>
+        </a>
+      </p>
 
     <table class="listing">
         <thead>
-          <td>Name</td>
+          <td>Type</td>
+          <td>Capacity</td>
           <td>Action</td>
           <td>Action</td>
         </thead>
         {% for bed in beds %}
         <tr>
-            <td>{{ bed.listing_name }}:</td>
-            <td><a href="/services/owner/editbed?bedkey={{ bed.key }}">edit</a></td>
-            <td><a href="/services/owner/deletebed?bedkey={{ bed.key }}">delete</a></td>
+            <td>{{ bed.bedType }}</td>
+            <td>{{ bed.capacity }}</td>
+            <td class="action">
+              <a title="Edit this bed"
+                href="/services/owner/editbed?bedkey={{ bed.key }}">
+                <img src="/images/edit.png"/>
+              </a></td>
+            <td class="action">
+              <a title="Delete this bed" 
+                href="/services/owner/deletebed?bedkey={{ bed.key }}">
+                <img src="/images/delete.png"/>
+              </a></td>
         </tr>
         {% endfor %}
     </table>

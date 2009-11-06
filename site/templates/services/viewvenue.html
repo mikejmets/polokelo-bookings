@@ -218,8 +218,6 @@
           {% endfor %}
       </table>
 
-
-
       <h3>Other Information</h3>
       <p><strong>Inspection Records</strong>
       <a title="Add an Inspection Record"
@@ -239,8 +237,14 @@
           <tr>
               <td>{{ inspection.inspectionDate }}</td>
               <td>{{ inspection.notes }}</td>
-              <td><a href="/services/owner/editinspection?inspectionkey={{ inspection.key }}">Edit</a></td>
-              <td><a href="/services/owner/deleteinspection?inspectionkey={{ inspection.key }}">Delete</a></td>
+              <td class="action">
+                <a href="/services/owner/editinspection?inspectionkey={{ inspection.key }}">
+                  <img src="/images/edit.png"/></a></td>
+              </a></td>
+              <td class="action">
+                <a href="/services/owner/deleteinspection?inspectionkey={{ inspection.key }}">
+                  <img src="/images/delete.png"/></a></td>
+                </a></td>
           </tr>
           {% endfor %}
       </table>
@@ -264,8 +268,16 @@
           <tr>
               <td>{{ complaint.complaintDate }}</td>
               <td>{{ complaint.notes }}</td>
-              <td><a href="/services/owner/editcomplaint?complaintkey={{ complaint.key }}">Edit</a></td>
-              <td><a href="/services/owner/deletecomplaint?complaintkey={{ complaint.key }}">Delete</a></td>
+              <td class="action">
+                <a title="Edit this complaint"
+                   href="/services/owner/editcomplaint?complaintkey={{ complaint.key }}">
+                  <img src="/images/edit.png"/></a></td>
+                </a></td>
+              <td class="action">
+                <a title="Delete this complaint"
+                   href="/services/owner/deletecomplaint?complaintkey={{ complaint.key }}">
+                  <img src="/images/delete.png"/></a></td>
+                </a></td>
           </tr>
           {% endfor %}
       </table>
