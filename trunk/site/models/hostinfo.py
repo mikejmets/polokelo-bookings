@@ -20,6 +20,9 @@ class Address(db.Model):
         fields = [f for f in fields if (f != None and f.strip() != u'')]
         return "%s" % ", ".join(fields)
 
+    def rdelete(self):
+        self.delete()
+
 
 class PhoneNumber(db.Model):
     container = db.ReferenceProperty(db.Model, collection_name='entity_phonenumbers')
@@ -30,6 +33,9 @@ class PhoneNumber(db.Model):
             required=True,
             choices=['Home', 'Work', 'Fax', 'Mobile', 'Other'])
     number = db.PhoneNumberProperty(verbose_name='Number', required=True)
+
+    def rdelete(self):
+        self.delete()
 
 
 class EmailAddress(db.Model):
@@ -42,6 +48,9 @@ class EmailAddress(db.Model):
             choices=['Personal', 'Office', 'Venue', 'Other'])
     email = db.EmailProperty(verbose_name='Email Address', required=True)
 
+    def rdelete(self):
+        self.delete()
+
 
 class Owner(db.Model):
     created = db.DateTimeProperty(auto_now_add=True)
@@ -52,6 +61,17 @@ class Owner(db.Model):
     firstNames = db.StringProperty(
         required=True, verbose_name='First Names')
     languages = db.StringListProperty(verbose_name='Languages')
+
+    def rdelete(self):
+        for r in self.owner_venues:
+            r.rdelete()
+        for r in self.entity_addresses:
+            r.rdelete()
+        for r in self.entity_emails:
+            r.rdelete()
+        for r in self.entity_phonenumbers:
+            r.rdelete()
+        self.delete()
 
 
 class Venue(db.Model):
@@ -73,6 +93,23 @@ class Venue(db.Model):
     contractStartDate = db.DateProperty(verbose_name='Contracted Start Date')
     contractEndDate = db.DateProperty(verbose_name='Contracted End Date')
 
+    def rdelete(self):
+        for r in self.venue_inspections:
+            r.rdelete()
+        for r in self.venue_complaints:
+            r.rdelete()
+        for r in self.venue_bedrooms:
+            r.rdelete()
+        for r in self.venue_bathrooms:
+            r.rdelete()
+        for r in self.entity_addresses:
+            r.rdelete()
+        for r in self.entity_emails:
+            r.rdelete()
+        for r in self.entity_phonenumbers:
+            r.rdelete()
+        self.delete()
+
 
 class Inspection(db.Model):
     venue = db.ReferenceProperty(Venue, collection_name='venue_inspections')
@@ -86,6 +123,9 @@ class Inspection(db.Model):
         fields = [str(f) for f in fields]
         return "%s" % ", ".join(fields)
 
+    def rdelete(self):
+        self.delete()
+
 
 class Complaint(db.Model):
     venue = db.ReferenceProperty(Venue, collection_name='venue_complaints')
@@ -98,6 +138,9 @@ class Complaint(db.Model):
         fields = [self.complaintDate, self.notes]
         fields = [str(f) for f in fields]
         return "%s" % ", ".join(fields)
+
+    def rdelete(self):
+        self.delete()
 
 # class Photo
 #     thumbNail
@@ -119,6 +162,10 @@ class Bedroom(db.Model):
         fields = [str(f) for f in fields]
         return "%s" % ", ".join(fields)
 
+    def rdelete(self):
+        for r in self.bedroom_beds:
+            r.rdelete()
+        self.delete()
 
 
 class Bathroom(db.Model):
@@ -130,6 +177,9 @@ class Bathroom(db.Model):
 
     def listing_name(self):
         return "%s" % self.description
+
+    def rdelete(self):
+        self.delete()
 
 class Bed(db.Model):
     bedroom = db.ReferenceProperty(Bedroom, collection_name='bedroom_beds')
@@ -144,6 +194,9 @@ class Bed(db.Model):
         fields = [str(f) for f in fields]
         return "%s" % ", ".join(fields)
 
+    def rdelete(self):
+        self.delete()
+        
 # class Berth
 #     bed
 # 

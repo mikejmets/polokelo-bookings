@@ -152,9 +152,8 @@ class DeleteVenue(webapp.RequestHandler):
         venuekey = self.request.get('venuekey')
         venue = Venue.get(venuekey)
         if venue:
-            # NOTE: obviously we will have to delete all venues 
-            # and other related data before deleting the venue
-            venue.delete()
+            #recursive delete
+            venue.rdelete()
 
         self.redirect('/services/viewowner?ownerkey=%s' % ownerkey)
 

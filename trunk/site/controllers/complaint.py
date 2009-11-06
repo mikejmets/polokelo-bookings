@@ -119,9 +119,8 @@ class DeleteComplaint(webapp.RequestHandler):
         complaint = Complaint.get(key)
         container = complaint.venue
         if complaint:
-            # NOTE: obviously we will have to delete all venues 
-            # and other related data before deleting the complaint
-            complaint.delete()
+            #recursive delete
+            complaint.rdelete()
         self.redirect(came_from)
 
 

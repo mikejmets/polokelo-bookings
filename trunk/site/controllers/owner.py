@@ -147,9 +147,8 @@ class DeleteOwner(webapp.RequestHandler):
         ownerkey = self.request.get('ownerkey')
         owner = Owner.get(ownerkey)
         if owner:
-            # NOTE: obviously we will have to delete all venues 
-            # and other related data before deleting the owner
-            owner.delete()
+            #recursive delete
+            owner.rdelete()
 
         self.redirect('/services/hostinfo')
 

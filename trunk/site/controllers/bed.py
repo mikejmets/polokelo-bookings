@@ -119,9 +119,8 @@ class DeleteBed(webapp.RequestHandler):
         bed = Bed.get(key)
         container = bed.bedroom
         if bed:
-            # NOTE: obviously we will have to delete all bed 
-            # and other related data before deleting the bed
-            bed.delete()
+            #recursive delete
+            bed.rdelete()
         self.redirect(came_from)
 
 

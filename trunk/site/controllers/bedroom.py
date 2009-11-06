@@ -147,9 +147,8 @@ class DeleteBedroom(webapp.RequestHandler):
         bedroom = Bedroom.get(key)
         container = bedroom.venue
         if bedroom:
-            # NOTE: obviously we will have to delete all venues 
-            # and other related data before deleting the bedroom
-            bedroom.delete()
+            #recursive delete
+            bedroom.rdelete()
         self.redirect(came_from)
 
 
