@@ -45,7 +45,7 @@ div.leftNavBar {
 
 div.breadcrumbs {
   margin-left: 160px;
-  width: 100%;
+  width: auto;
   background: lightgrey;
   color: white;
   padding: 2px;
@@ -58,7 +58,7 @@ div.breadcrumbs a:visited {
 
 
 div.content {
-  width: 99%; 
+  width: auto; 
   margin-left: 160px;
 }
 
