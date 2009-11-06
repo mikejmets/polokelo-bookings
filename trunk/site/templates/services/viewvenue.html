@@ -115,11 +115,12 @@
               <td><a href="/services/owner/viewbedroom?bedroomkey={{ bedroom.key }}">{{ bedroom.name }}</a></td>
               <td>{{ bedroom.bathroomType }}</td>
               <td>{{ bedroom.capacity }}</td>
-              <td><a title="Edit this room" 
+              <td class="action"><a title="Edit this room" 
                      href="/services/owner/editbedroom?bedroomkey={{ bedroom.key }}">
                   <img src="/images/edit.png"/></a></td>
-              <td><a title="Delete this room" 
-                     href="/services/owner/deletebedroom?bedroomkey={{ bedroom.key }}">
+              <td class="action">
+                <a title="Delete this room" 
+                   href="/services/owner/deletebedroom?bedroomkey={{ bedroom.key }}">
                   <img src="/images/delete.png"/></a></td>
           </tr>
           {% endfor %}

@@ -139,6 +139,9 @@ img {
 .listing thead {
 	font-weight: bold; 
 }
+.action {
+  text-align: center !important;
+}
 .listing td {
   border: 1px solid lightblue;
 }
