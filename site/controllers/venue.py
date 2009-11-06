@@ -36,6 +36,7 @@ class ViewVenue(webapp.RequestHandler):
                     val = value.get_value_for_form(venue)
                     venue_values.append((name, val))
         addresses = venue.entity_addresses
+        photographs = venue.venue_photos
         inspections = venue.venue_inspections
         complaints = venue.venue_complaints
         phonenumbers = venue.entity_phonenumbers
@@ -51,6 +52,7 @@ class ViewVenue(webapp.RequestHandler):
                                         'venue':venue,
                                         'venue_values':venue_values,
                                         'addresses':addresses,
+                                        'photographs':photographs,
                                         'inspections':inspections,
                                         'complaints':complaints,
                                         'phonenumbers':phonenumbers,
