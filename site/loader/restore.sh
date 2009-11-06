@@ -12,3 +12,4 @@ bulkloader.py --restore --app_id=bookings-dev --email=mikejmets@gmail.com --kind
 bulkloader.py --restore --app_id=bookings-dev --email=mikejmets@gmail.com --kind=Bedroom --url=$HOST/unload --filename=$DATA_DIR/bedrooms $APP_DIR
 bulkloader.py --restore --app_id=bookings-dev --email=mikejmets@gmail.com --kind=Bathroom --url=$HOST/unload --filename=$DATA_DIR/bathrooms $APP_DIR
 bulkloader.py --restore --app_id=bookings-dev --email=mikejmets@gmail.com --kind=Bed --url=$HOST/unload --filename=$DATA_DIR/beds $APP_DIR
+rm -rf bulkloader-*
