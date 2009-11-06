@@ -22,13 +22,19 @@
     <p>
     <a href="/services/owner/capturephone?containerkey={{ owner.key }}">Capture Contact Number</a>
     </p>
-    <table>
+    <table class="listing">
+        <thead>
+          <td>Type</td>
+          <td>Number</td>
+          <td>Action</td>
+          <td>Action</td>
+        </thead>
         {% for number in phonenumbers %}
         <tr>
-            <td>{{ number.numberType }}:</td>
+            <td>{{ number.numberType }}</td>
             <td>{{ number.number }}</td>
-            <td><a href="/services/owner/editphone?phonekey={{ number.key }}">edit</a></td>
-            <td><a href="/services/owner/deletephone?phonekey={{ number.key }}">delete</a></td>
+            <td><a href="/services/owner/editphone?phonekey={{ number.key }}">Edit</a></td>
+            <td><a href="/services/owner/deletephone?phonekey={{ number.key }}">Delete</a></td>
         </tr>
         {% endfor %}
     </table>
@@ -37,13 +43,19 @@
     <p>
     <a href="/services/owner/captureemail?containerkey={{ owner.key }}">Capture Email Address</a>
     </p>
-    <table>
+    <table class="listing">
+        <thead>
+          <td>Type</td>
+          <td>Address</td>
+          <td>Action</td>
+          <td>Action</td>
+        </thead>
         {% for email in emails %}
         <tr>
-            <td>{{ email.emailType }}:</td>
+            <td>{{ email.emailType }}</td>
             <td>{{ email.email }}</td>
-            <td><a href="/services/owner/editemail?emailkey={{ email.key }}">edit</a></td>
-            <td><a href="/services/owner/deleteemail?emailkey={{ email.key }}">delete</a></td>
+            <td><a href="/services/owner/editemail?emailkey={{ email.key }}">Edit</a></td>
+            <td><a href="/services/owner/deleteemail?emailkey={{ email.key }}">Delete</a></td>
         </tr>
         {% endfor %}
     </table>
@@ -53,13 +65,19 @@
     <a href="/services/owner/captureaddress?containerkey={{ owner.key }}">Capture Address</a>
     </p>
 
-    <table>
+    <table class="listing">
+        <thead>
+          <td>Type</td>
+          <td>Address</td>
+          <td>Action</td>
+          <td>Action</td>
+        </thead>
         {% for address in addresses %}
         <tr>
             <td>{{ address.addressType }}:</td>
             <td>{{ address.listing_name }}</td>
-            <td><a href="/services/owner/editaddress?addresskey={{ address.key }}">edit</a></td>
-            <td><a href="/services/owner/deleteaddress?addresskey={{ address.key }}">delete</a></td>
+            <td><a href="/services/owner/editaddress?addresskey={{ address.key }}">Edit</a></td>
+            <td><a href="/services/owner/deleteaddress?addresskey={{ address.key }}">Delete</a></td>
         </tr>
         {% endfor %}
     </table>
@@ -69,12 +87,17 @@
     <a href="/services/owner/capturevenue?ownerkey={{ owner.key }}">Capture details of a new venue.</a>
     </p>
 
-    <table>
+    <table class="listing">
+        <thead>
+          <td>Name</td>
+          <td>Action</td>
+          <td>Action</td>
+        </thead>
         {% for venue in venues %}
         <tr>
           <td><a href="/services/owner/viewvenue?venuekey={{ venue.key }}&ownerkey={{ owner.key }}">{{ venue.name }}</a></td>
-            <td><a href="/services/owner/editvenue?venuekey={{ venue.key }}&ownerkey={{ owner.key }}">edit</a></td>
-            <td><a href="/services/owner/deletevenue?venuekey={{ venue.key }}&ownerkey={{ owner.key }}">delete</a></td>
+            <td><a href="/services/owner/editvenue?venuekey={{ venue.key }}&ownerkey={{ owner.key }}">Edit</a></td>
+            <td><a href="/services/owner/deletevenue?venuekey={{ venue.key }}&ownerkey={{ owner.key }}">Delete</a></td>
         </tr>
         {% endfor %}
     </table>

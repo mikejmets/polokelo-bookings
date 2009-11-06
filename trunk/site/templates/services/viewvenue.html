@@ -21,13 +21,19 @@
     <a href="/services/owner/capturephone?containerkey={{ venue.key }}">Capture Contact Number</a>
     </p>
 
-    <table>
+    <table class="listing">
+        <thead>
+          <td>Type</td>
+          <td>Number</td>
+          <td>Action</td>
+          <td>Action</td>
+        </thead>
         {% for number in phonenumbers %}
         <tr>
             <td>{{ number.numberType }}:</td>
             <td>{{ number.number }}</td>
-            <td><a href="/services/owner/editphone?phonekey={{ number.key }}">edit</a></td>
-            <td><a href="/services/owner/deletephone?phonekey={{ number.key }}">delete</a></td>
+            <td><a href="/services/owner/editphone?phonekey={{ number.key }}">Edit</a></td>
+            <td><a href="/services/owner/deletephone?phonekey={{ number.key }}">Delete</a></td>
         </tr>
         {% endfor %}
     </table>
@@ -36,13 +42,19 @@
     <p>
     <a href="/services/owner/captureemail?containerkey={{ venue.key }}">Capture Email Address</a>
     </p>
-    <table>
+    <table class="listing">
+        <thead>
+          <td>Type</td>
+          <td>Email</td>
+          <td>Action</td>
+          <td>Action</td>
+        </thead>
         {% for email in emails %}
         <tr>
             <td>{{ email.emailType }}:</td>
             <td>{{ email.email }}</td>
-            <td><a href="/services/owner/editemail?emailkey={{ email.key }}">edit</a></td>
-            <td><a href="/services/owner/deleteemail?emailkey={{ email.key }}">delete</a></td>
+            <td><a href="/services/owner/editemail?emailkey={{ email.key }}">Edit</a></td>
+            <td><a href="/services/owner/deleteemail?emailkey={{ email.key }}">Delete</a></td>
         </tr>
         {% endfor %}
     </table>
@@ -52,43 +64,19 @@
     <a href="/services/owner/captureaddress?containerkey={{ venue.key }}">Capture Address</a>
     </p>
 
-    <table>
+    <table class="listing">
+        <thead>
+          <td>Type</td>
+          <td>Address</td>
+          <td>Action</td>
+          <td>Action</td>
+        </thead>
         {% for address in addresses %}
         <tr>
             <td>{{ address.addressType }}:</td>
             <td>{{ address.listing_name }}</td>
-            <td><a href="/services/owner/editaddress?addresskey={{ address.key }}">edit</a></td>
-            <td><a href="/services/owner/deleteaddress?addresskey={{ address.key }}">delete</a></td>
-        </tr>
-        {% endfor %}
-    </table>
-
-    <hr />
-    <p>
-    <a href="/services/owner/captureinspection?containerkey={{ venue.key }}">Capture Inspection Record</a>
-    </p>
-
-    <table>
-        {% for inspection in inspections %}
-        <tr>
-            <td width="60%">{{ inspection.listing_name }}</td>
-            <td><a href="/services/owner/editinspection?inspectionkey={{ inspection.key }}">edit</a></td>
-            <td><a href="/services/owner/deleteinspection?inspectionkey={{ inspection.key }}">delete</a></td>
-        </tr>
-        {% endfor %}
-    </table>
-
-    <hr />
-    <p>
-    <a href="/services/owner/capturecomplaint?containerkey={{ venue.key }}">Capture Complaint Record</a>
-    </p>
-
-    <table>
-        {% for complaint in complaints %}
-        <tr>
-            <td width="60%">{{ complaint.listing_name }}</td>
-            <td><a href="/services/owner/editcomplaint?complaintkey={{ complaint.key }}">edit</a></td>
-            <td><a href="/services/owner/deletecomplaint?complaintkey={{ complaint.key }}">delete</a></td>
+            <td><a href="/services/owner/editaddress?addresskey={{ address.key }}">Edit</a></td>
+            <td><a href="/services/owner/deleteaddress?addresskey={{ address.key }}">Delete</a></td>
         </tr>
         {% endfor %}
     </table>
@@ -98,12 +86,17 @@
     <a href="/services/owner/capturebathroom?containerkey={{ venue.key }}">Capture Bathroom</a>
     </p>
 
-    <table>
+    <table class="listing">
+        <thead>
+          <td>Name</td>
+          <td>Action</td>
+          <td>Action</td>
+        </thead>
         {% for bathroom in bathrooms %}
         <tr>
             <td width="60%">{{ bathroom.listing_name }}</td>
-            <td><a href="/services/owner/editbathroom?bathroomkey={{ bathroom.key }}">edit</a></td>
-            <td><a href="/services/owner/deletebathroom?bathroomkey={{ bathroom.key }}">delete</a></td>
+            <td><a href="/services/owner/editbathroom?bathroomkey={{ bathroom.key }}">Edit</a></td>
+            <td><a href="/services/owner/deletebathroom?bathroomkey={{ bathroom.key }}">Delete</a></td>
         </tr>
         {% endfor %}
     </table>
@@ -113,16 +106,65 @@
     <a href="/services/owner/capturebedroom?containerkey={{ venue.key }}">Capture Bedroom</a>
     </p>
 
-    <table>
+    <table class="listing">
+        <thead>
+          <td>Name</td>
+          <td>Action</td>
+          <td>Action</td>
+        </thead>
         {% for bedroom in bedrooms %}
         <tr>
             <td><a href="/services/owner/viewbedroom?bedroomkey={{ bedroom.key }}">{{ bedroom.listing_name }}</a></td>
-            <td><a href="/services/owner/editbedroom?bedroomkey={{ bedroom.key }}">edit</a></td>
-            <td><a href="/services/owner/deletebedroom?bedroomkey={{ bedroom.key }}">delete</a></td>
+            <td><a href="/services/owner/editbedroom?bedroomkey={{ bedroom.key }}">Edit</a></td>
+            <td><a href="/services/owner/deletebedroom?bedroomkey={{ bedroom.key }}">Delete</a></td>
         </tr>
         {% endfor %}
     </table>
 
+
+    <hr />
+    <p>
+    <a href="/services/owner/captureinspection?containerkey={{ venue.key }}">Capture Inspection Record</a>
+    </p>
+
+    <table class="listing">
+        <thead>
+          <td>Date</td>
+          <td>Details</td>
+          <td>Action</td>
+          <td>Action</td>
+        </thead>
+        {% for inspection in inspections %}
+        <tr>
+            <td>{{ inspection.inspectionDate }}</td>
+            <td>{{ inspection.notes }}</td>
+            <td><a href="/services/owner/editinspection?inspectionkey={{ inspection.key }}">Edit</a></td>
+            <td><a href="/services/owner/deleteinspection?inspectionkey={{ inspection.key }}">Delete</a></td>
+        </tr>
+        {% endfor %}
+    </table>
+
+    <hr />
+    <p>
+    <a href="/services/owner/capturecomplaint?containerkey={{ venue.key }}">Capture Complaint Record</a>
+    </p>
+
+    <table class="listing">
+        <thead>
+          <td>Date</td>
+          <td>Details</td>
+          <td>Action</td>
+          <td>Action</td>
+        </thead>
+        {% for complaint in complaints %}
+        <tr>
+            <td>{{ complaint.complaintDate }}</td>
+            <td>{{ complaint.notes }}</td>
+            <td><a href="/services/owner/editcomplaint?complaintkey={{ complaint.key }}">Edit</a></td>
+            <td><a href="/services/owner/deletecomplaint?complaintkey={{ complaint.key }}">Delete</a></td>
+        </tr>
+        {% endfor %}
+    </table>
 
 
 {% endblock pagecontent %}
