@@ -51,8 +51,6 @@ class Owner(db.Model):
     surname = db.StringProperty(required=True, verbose_name='Surname')
     firstNames = db.StringProperty(
         required=True, verbose_name='First Names')
-    emailAddress = db.EmailProperty(
-        required=True, verbose_name='Email Address')
     languages = db.StringListProperty(verbose_name='Languages')
 
 
