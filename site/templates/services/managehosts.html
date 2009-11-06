@@ -5,16 +5,21 @@
 
     <h2>Owners</h2>
     <p><a href="/services/captureowner">Capture details of a new host.</a></p>
-    <br />
-    <table width="40%">
+    <table class="listing">
+        <thead>
+          <td>Reference</td>
+          <td>Details</td>
+          <td>Action</td>
+          <td>Action</td>
+        </thead>
         {% for owner in partners %}
         <tr>
           <td>
               <a href="/services/viewowner?ownerkey={{ owner.key }}">
                 {{ owner.referenceNumber }}</a></td>
           <td width="60%">{{ owner.surname }} {{ owner.firstNames }}</td>
-          <td><a href="/services/editowner?ownerkey={{ owner.key }}">edit</a></td>
-          <td><a href="/services/deleteowner?ownerkey={{ owner.key }}">delete</a></td>
+          <td><a href="/services/editowner?ownerkey={{ owner.key }}">Edit</a></td>
+          <td><a href="/services/deleteowner?ownerkey={{ owner.key }}">Delete</a></td>
         </tr>
         {% endfor %}
     </table>

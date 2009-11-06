@@ -130,6 +130,17 @@ img {
 
 .leftNavBar li a:active {
 	background: #8489D6;
+  border: 1;
+}
+
+.listing table {
+  border: 1px solid black;
+}
+.listing thead {
+	font-weight: bold; 
+}
+.listing td {
+  border: 1px solid lightblue;
 }
 
 form th {
