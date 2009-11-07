@@ -47,7 +47,8 @@
                 </a></td>
               <td class="action">
                 <a title="Delete this contact number"
-                   href="/services/owner/deletephone?phonekey={{ number.key }}">
+                   href="/services/owner/deletephone?phonekey={{ number.key }}"
+                   onclick="return confirm('Are you sure?');">
                 <img src="/images/delete.png"/></a></td>
                 </a></td>
           </tr>
@@ -78,7 +79,8 @@
               </a></td>
               <td class="action">
                 <a title="Delete this email address"
-                   href="/services/owner/deleteemail?emailkey={{ email.key }}">
+                   href="/services/owner/deleteemail?emailkey={{ email.key }}"
+                   onclick="return confirm('Are you sure?');">
                 <img src="/images/delete.png"/></a></td>
               </a></td>
           </tr>
@@ -111,7 +113,8 @@
               </a></td>
               <td class="action">
                 <a title="Delete this address"
-                   href="/services/owner/deleteaddress?addresskey={{ address.key }}">
+                   href="/services/owner/deleteaddress?addresskey={{ address.key }}"
+                   onclick="return confirm('Are you sure?');">
                 <img src="/images/delete.png"/></a></td>
               </a></td>
           </tr>
@@ -145,7 +148,8 @@
           </a></td>
           <td class="action">
             <a title="Delete this venue"
-               href="/services/owner/deletevenue?venuekey={{ venue.key }}&ownerkey={{ owner.key }}">
+               href="/services/owner/deletevenue?venuekey={{ venue.key }}&ownerkey={{ owner.key }}"
+                   onclick="return confirm('Are you sure?');">
               <img src="/images/delete.png"/></a></td>
           </a></td>
         </tr>
