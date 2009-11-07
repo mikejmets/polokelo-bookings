@@ -30,7 +30,8 @@
             </a></td>
           <td class="action">
             <a title="Delete this owner"
-              href="/services/deleteowner?ownerkey={{ owner.key }}">
+              href="/services/deleteowner?ownerkey={{ owner.key }}"
+                   onclick="return confirm('Are you sure?');">
               <img src="/images/delete.png"/>
             </a></td>
         </tr>
