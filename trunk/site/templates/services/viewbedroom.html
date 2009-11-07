@@ -38,7 +38,8 @@
               </a></td>
             <td class="action">
               <a title="Delete this bed" 
-                href="/services/owner/deletebed?bedkey={{ bed.key }}">
+                href="/services/owner/deletebed?bedkey={{ bed.key }}"
+                onclick="return confirm('Are you sure?');">
                 <img src="/images/delete.png"/>
               </a></td>
         </tr>
