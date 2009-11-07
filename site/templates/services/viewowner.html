@@ -33,8 +33,6 @@
           <thead>
             <td>Type</td>
             <td>Number</td>
-            <td>Action</td>
-            <td>Action</td>
           </thead>
           {% for number in phonenumbers %}
           <tr>
@@ -65,8 +63,6 @@
           <thead>
             <td>Type</td>
             <td>Address</td>
-            <td>Action</td>
-            <td>Action</td>
           </thead>
           {% for email in emails %}
           <tr>
@@ -99,8 +95,6 @@
           <thead>
             <td>Type</td>
             <td>Address</td>
-            <td>Action</td>
-            <td>Action</td>
           </thead>
           {% for address in addresses %}
           <tr>
@@ -135,12 +129,10 @@
     <table class="listing">
         <thead>
           <td>Name</td>
-          <td>Action</td>
-          <td>Action</td>
         </thead>
         {% for venue in venues %}
         <tr>
-          <td><a href="/services/owner/viewvenue?venuekey={{ venue.key }}&ownerkey={{ owner.key }}">{{ venue.name }}</a></td>
+          <td><a href="/services/owner/viewvenue?venuekey={{ venue.key }}&ownerkey={{ owner.key }}">{{ venue.listing_name }}</a></td>
           <td class="action">
             <a title="Edit this venue"
                href="/services/owner/editvenue?venuekey={{ venue.key }}&ownerkey={{ owner.key }}">

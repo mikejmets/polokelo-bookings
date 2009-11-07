@@ -96,6 +96,10 @@ class Venue(db.Model):
     contractStartDate = db.DateProperty(verbose_name='Contracted Start Date')
     contractEndDate = db.DateProperty(verbose_name='Contracted End Date')
 
+    def listing_name(self):
+      return "Name:%s Class:%s Contact:%s" % (self.name, self.venueType, self.contactPerson)
+
+
     def rdelete(self):
         for r in self.venue_inspections:
             r.rdelete()
