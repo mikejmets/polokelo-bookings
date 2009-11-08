@@ -45,8 +45,10 @@ class ViewBedroom(webapp.RequestHandler):
                                         'bedroom_values':bedroom_values,
                                         'beds':beds,
                                         'auth_url':auth_url,
-                                        'auth_url_text':auth_url_text
+                                        'auth_url_text':auth_url_text,
+                                        'venuekey':self.request.get('venuekey')
                                         }))
+
 class CaptureBedroom(webapp.RequestHandler):
 
     def get(self):
@@ -108,7 +110,8 @@ class EditBedroom(webapp.RequestHandler):
                                         'containerkey': container.key,
                                         'came_from':came_from,
                                         'auth_url':auth_url,
-                                        'auth_url_text':auth_url_text
+                                        'auth_url_text':auth_url_text,
+                                        'venuekey':self.request.get('venuekey')
                                         }))
 
     def post(self):

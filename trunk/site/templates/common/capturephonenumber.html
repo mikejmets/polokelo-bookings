@@ -5,13 +5,13 @@
 {% endblock %}
 
 {% block pagecontent %}
-    <h1>Capture an Address</h1>
-    <form name="address" method="post" action="/services/owner/captureaddress">
+    <h1>Capture a Contact Number</h1>
+    <form name="phonenumber" method="post" action="{{ post_url }}">
         <input type="hidden" name="containerkey" value="{{ containerkey }}" />
         <input type="hidden" name="came_from" value="{{ came_from }}" />
         <table>
             {{ form }}
         </table>
-        <input type="submit" value="Add Address" />
+        <input type="submit" value="Add Number" />
     </form>
 {% endblock pagecontent %}

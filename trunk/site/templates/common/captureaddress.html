@@ -5,13 +5,13 @@
 {% endblock %}
 
 {% block pagecontent %}
-    <h1>Capture an Email Address</h1>
-    <form name="emailaddress" method="post" action="/services/owner/captureemail">
+    <h1>Capture an Address</h1>
+    <form name="address" method="post" action="{{ post_url }}">
         <input type="hidden" name="containerkey" value="{{ containerkey }}" />
         <input type="hidden" name="came_from" value="{{ came_from }}" />
         <table>
             {{ form }}
         </table>
-        <input type="submit" value="Add Email" />
+        <input type="submit" value="Add Address" />
     </form>
 {% endblock pagecontent %}

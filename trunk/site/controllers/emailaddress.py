@@ -30,7 +30,7 @@ class CaptureEmailAddress(webapp.RequestHandler):
         containerkey = self.request.get('containerkey')
         auth_url, auth_url_text = get_authentication_urls(self.request.uri)
         filepath = os.path.join(PROJECT_PATH, 
-                                    'templates', 'services', 'captureemail.html')
+                                    'templates', 'common', 'captureemail.html')
         self.response.out.write(template.render(filepath, 
                                     {
                                         'base_path':BASE_PATH,
@@ -38,6 +38,7 @@ class CaptureEmailAddress(webapp.RequestHandler):
                                         'auth_url':auth_url,
                                         'auth_url_text':auth_url_text,
                                         'came_from':came_from,
+                                        'post_url':self.request.uri,
                                         'containerkey':containerkey
                                         }))
 
@@ -55,7 +56,7 @@ class CaptureEmailAddress(webapp.RequestHandler):
         else:
             auth_url, auth_url_text = get_authentication_urls(self.request.uri)
             filepath = os.path.join(PROJECT_PATH, 
-                                    'templates', 'services', 'captureemail.html')
+                                    'templates', 'common', 'captureemail.html')
             self.response.out.write(template.render(filepath, 
                                     {
                                         'base_path':BASE_PATH,
@@ -63,6 +64,7 @@ class CaptureEmailAddress(webapp.RequestHandler):
                                         'auth_url_text':auth_url_text,
                                         'form':data,
                                         'came_from':came_from,
+                                        'post_url':self.request.uri,
                                         'containerkey':containerkey
                                         }))
 
@@ -75,13 +77,14 @@ class EditEmailAddress(webapp.RequestHandler):
         emailkey = self.request.get('emailkey')
         emailaddress = EmailAddress.get(emailkey)
         filepath = os.path.join(PROJECT_PATH, 
-                                    'templates', 'services', 'editemail.html')
+                                    'templates', 'common', 'editemail.html')
         self.response.out.write(template.render(filepath, 
                                     {
                                         'base_path':BASE_PATH,
                                         'emailkey':emailkey,
                                         'form':EmailForm(instance=emailaddress),
                                         'came_from':came_from,
+                                        'post_url':self.request.uri,
                                         'auth_url':auth_url,
                                         'auth_url_text':auth_url_text
                                         }))
@@ -98,13 +101,14 @@ class EditEmailAddress(webapp.RequestHandler):
             self.redirect(came_from)
         else:
             filepath = os.path.join(PROJECT_PATH, 
-                                        'templates', 'services', 'editemail.html')
+                                        'templates', 'common', 'editemail.html')
             self.response.out.write(template.render(filepath, 
                                     {
                                         'base_path':BASE_PATH,
                                         'emailkey':emailkey,
                                         'form':data,
                                         'came_from':came_from,
+                                        'post_url':self.request.uri,
                                         'auth_url':auth_url,
                                         'auth_url_text':auth_url_text
                                         }))

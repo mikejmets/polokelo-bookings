@@ -5,13 +5,13 @@
 {% endblock %}
 
 {% block pagecontent %}
-    <h1>Edit Existing Email Address</h1>
-    <form name="emailaddress" method="post" action="/services/owner/editemail">
-        <input type="hidden" name="emailkey" value="{{ emailkey }}" />
+    <h1>Edit Existing Address</h1>
+    <form name="address" method="post" action="{{ post_url }}">
+        <input type="hidden" name="addresskey" value="{{ addresskey }}" />
         <input type="hidden" name="came_from" value="{{ came_from }}" />
         <table>
             {{ form }}
         </table>
-        <input type="submit" value="Update Email" />
+        <input type="submit" value="Update Address" />
     </form>
 {% endblock pagecontent %}

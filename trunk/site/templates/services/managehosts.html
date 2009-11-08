@@ -17,17 +17,17 @@
         {% for owner in partners %}
         <tr>
           <td>
-              <a href="/services/viewowner?ownerkey={{ owner.key }}">
+              <a href="/services/owner/viewowner?ownerkey={{ owner.key }}">
                 {{ owner.referenceNumber }}</a></td>
           <td width="60%">{{ owner.surname }} {{ owner.firstNames }}</td>
           <td class="action">
             <a title="Edit this owner"
-              href="/services/editowner?ownerkey={{ owner.key }}">
+              href="/services/owner/editowner?ownerkey={{ owner.key }}">
               <img src="/images/edit.png"/>
             </a></td>
           <td class="action">
             <a title="Delete this owner"
-              href="/services/deleteowner?ownerkey={{ owner.key }}"
+              href="/services/owner/deleteowner?ownerkey={{ owner.key }}"
                    onclick="return confirm('Are you sure?');">
               <img src="/images/delete.png"/>
             </a></td>

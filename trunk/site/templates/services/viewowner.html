@@ -25,7 +25,7 @@
     <td valign="top">
       <p><strong>Contact Numbers</strong>
       <a title="Add a new contact number"
-         href="/services/owner/capturephone?containerkey={{ owner.key }}">
+         href="/services/owner/contact/capturephone?containerkey={{ owner.key }}">
           <img src="/images/add.png"/>
         </a>
       </p>
@@ -40,12 +40,12 @@
               <td>{{ number.number }}</td>
               <td class="action">
                 <a title="Edit this contact number"
-                   href="/services/owner/editphone?phonekey={{ number.key }}">
+                   href="/services/owner/contact/editphone?phonekey={{ number.key }}">
                 <img src="/images/edit.png"/></a></td>
                 </a></td>
               <td class="action">
                 <a title="Delete this contact number"
-                   href="/services/owner/deletephone?phonekey={{ number.key }}"
+                   href="/services/owner/contact/deletephone?phonekey={{ number.key }}"
                    onclick="return confirm('Are you sure?');">
                 <img src="/images/delete.png"/></a></td>
                 </a></td>
@@ -56,7 +56,7 @@
       <hr />
       <p><strong>Email Addresses</strong>
       <a title="Add a new email address"
-         href="/services/owner/captureemail?containerkey={{ owner.key }}">
+         href="/services/owner/email/captureemail?containerkey={{ owner.key }}">
           <img src="/images/add.png"/></a>
       </p>
       <table class="listing">
@@ -70,12 +70,12 @@
               <td>{{ email.email }}</td>
               <td class="action">
                 <a title="Edit this email address"
-                   href="/services/owner/editemail?emailkey={{ email.key }}">
+                   href="/services/owner/email/editemail?emailkey={{ email.key }}">
               <img src="/images/edit.png"/></a></td>
               </a></td>
               <td class="action">
                 <a title="Delete this email address"
-                   href="/services/owner/deleteemail?emailkey={{ email.key }}"
+                   href="/services/owner/email/deleteemail?emailkey={{ email.key }}"
                    onclick="return confirm('Are you sure?');">
                 <img src="/images/delete.png"/></a></td>
               </a></td>
@@ -86,7 +86,7 @@
       <hr />
       <p><strong>Addresses</strong>
       <a title="Add a new address"
-         href="/services/owner/captureaddress?containerkey={{ owner.key }}">
+         href="/services/owner/address/captureaddress?containerkey={{ owner.key }}">
           <img src="/images/add.png"/>
       </a>
       </p>
@@ -102,12 +102,12 @@
               <td>{{ address.listing_name }}</td>
               <td class="action">
                 <a title="Edit this address"
-                   href="/services/owner/editaddress?addresskey={{ address.key }}">
+                   href="/services/owner/address/editaddress?addresskey={{ address.key }}">
               <img src="/images/edit.png"/></a></td>
               </a></td>
               <td class="action">
                 <a title="Delete this address"
-                   href="/services/owner/deleteaddress?addresskey={{ address.key }}"
+                   href="/services/owner/address/deleteaddress?addresskey={{ address.key }}"
                    onclick="return confirm('Are you sure?');">
                 <img src="/images/delete.png"/></a></td>
               </a></td>
@@ -121,7 +121,7 @@
     <h2>Venues</h2>
     <p><strong>Venues</strong>
     <a title="Add a new venue"
-       href="/services/owner/capturevenue?containerkey={{ owner.key }}">
+       href="/services/owner/capturevenue?ownerkey={{ owner.key }}">
       <img src="/images/add.png"/></a></td>
     </a>
     </p>
