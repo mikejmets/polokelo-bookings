@@ -26,6 +26,10 @@ handlers:
   script: controllers/clienthandlers.py
   login: admin
 
+- url: /bookings/.*
+  script: controllers/bookinghandlers.py
+  login: admin
+
 
 - url: /unload
   script: $PYTHON_LIB/google/appengine/ext/remote_api/handler.py
