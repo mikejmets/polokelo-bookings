@@ -85,9 +85,6 @@ class Venue(db.Model):
     venueType = db.StringProperty(verbose_name='Class', 
         choices=['Backpack', 'Hostel', 'Family House', 'Guest House'])
     contactPerson = db.StringProperty(verbose_name='Contact Person')
-    # photo1 = db.BlobProperty()
-    # photo2 = db.BlobProperty()
-    # photo3 = db.BlobProperty()
     disabilityFriendly = db.BooleanProperty(default=False)
     childFriendly = db.BooleanProperty(default=False)
     addendumADate = db.DateProperty(verbose_name='Addendum A Date')
@@ -156,10 +153,6 @@ class Complaint(db.Model):
     def rdelete(self):
         self.delete()
 
-# class Photo
-#     thumbNail
-#     fullSize
-# 
 class Bedroom(db.Model):
     venue = db.ReferenceProperty(Venue, collection_name='venue_bedrooms')
     created = db.DateTimeProperty(auto_now_add=True)
@@ -209,14 +202,15 @@ class Bed(db.Model):
         return "%s" % ", ".join(fields)
 
     def rdelete(self):
+        for r in self.bed_berths:
+            r.rdelete()
         self.delete()
         
-# class Berth
-#     bed
-# 
-# 
-# class Night
-#     berth
-#     booking
-#     occupied
-#     date
+class Berth(db.Model):
+    bed = db.ReferenceProperty(Bed, collection_name='bed_berths')
+    created = db.DateTimeProperty(auto_now_add=True)
+    creator = db.UserProperty()
+
+    def rdelete(self):
+        self.delete()
+        

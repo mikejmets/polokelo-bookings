@@ -7,7 +7,7 @@ from google.appengine.ext.db import djangoforms
 from google.appengine.ext import db
 
 from controllers.home import BASE_PATH, PROJECT_PATH
-from models.hostinfo import Bed
+from models.hostinfo import Bed, Berth
 from controllers.utils import get_authentication_urls
 
 logger = logging.getLogger('BedHandler')
@@ -47,6 +47,12 @@ class CaptureBed(webapp.RequestHandler):
             entity.creator = users.get_current_user()
             entity.bedroom = container
             entity.put()
+            #Auto create a berth per capacity
+            for i in range(entity.capacity):
+                berth = Berth()
+                berth.creator = users.get_current_user()
+                berth.bed = entity
+                berth.put()
             self.redirect(came_from)
         else:
             auth_url, auth_url_text = get_authentication_urls(self.request.uri)
