@@ -64,6 +64,12 @@ class ViewVenue(webapp.RequestHandler):
                                         }))
 
 
+    def post(self):
+        venuekey = self.request.get('venuekey')
+        venue = Venue.get(venuekey)
+        venue.create_slots()
+        self.redirect('/services/owner/viewvenue?venuekey=%s' % venuekey)
+
 class CaptureVenue(webapp.RequestHandler):
 
     def get(self):

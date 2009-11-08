@@ -24,7 +24,13 @@
           </tr>
           {% endfor %}
       </table>
+
+      <form name="createSlots" method="post" action="/services/owner/viewvenue">
+        <input type="hidden" name="venuekey" value="{{ venue.key }}" />
+        <input type="submit" value="Create Slots" />
+      </form>
     </td>
+
     <td valign="top">
       <p><strong>Contact Numbers</strong>
       <a title="Add to number"
