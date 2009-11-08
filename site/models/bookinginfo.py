@@ -1,6 +1,6 @@
 from google.appengine.ext import db
 from models.clientinfo import Client
-from models.hostinfo import Berth
+from models.hostinfo import Slot
 
 class BookingRequest(db.Model):
     created = db.DateTimeProperty(auto_now_add=True)
@@ -32,20 +32,6 @@ class BookingRequest(db.Model):
         self.delete()
 
         
-class Slot(db.Model):
-    created = db.DateTimeProperty(auto_now_add=True)
-    creator = db.UserProperty()
-    berth = db.ReferenceProperty(Berth, collection_name='berth_slots')
-    occupied = db.BooleanProperty(default="False")
-    startDate = db.DateTimeProperty(required=True)
-
-    def listing_name(self):
-        return 'Room:%s Venue:%s' % \
-            (self.berth.bed.bedroom.name, self.berth.bed.bedroom.venue.name)
-
-    def rdelete(self):
-        self.delete()
-
 class ContractedBooking(db.Model):
     created = db.DateTimeProperty(auto_now_add=True)
     creator = db.UserProperty()

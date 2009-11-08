@@ -1,5 +1,11 @@
+import logging
+from datetime import datetime, time
 from google.appengine.ext import db
 from google.appengine.ext.db import polymodel
+from google.appengine.api import users
+from controllers.utils import datetimeIterator
+
+logger = logging.getLogger('HostInfo')
 
 class Address(db.Model):
     container = db.ReferenceProperty(
@@ -18,7 +24,7 @@ class Address(db.Model):
         fields = [self.streetAddress, self.suburb, self.city, 
                   self.country, self.postCode]
         fields = [f for f in fields if (f != None and f.strip() != u'')]
-        return "%s" % ", ".join(fields)
+        return '%s' % ', '.join(fields)
 
     def rdelete(self):
         self.delete()
@@ -63,7 +69,7 @@ class Owner(db.Model):
     languages = db.StringListProperty(verbose_name='Languages')
 
     def listing_name(self):
-        return "%s %s" % (self.firstNames, self.surname)
+        return '%s %s' % (self.firstNames, self.surname)
 
     def rdelete(self):
         for r in self.owner_venues:
@@ -92,10 +98,34 @@ class Venue(db.Model):
     addendumCDate = db.DateProperty(verbose_name='Addendum C Date')
     contractStartDate = db.DateProperty(verbose_name='Contracted Start Date')
     contractEndDate = db.DateProperty(verbose_name='Contracted End Date')
+    state = db.StringProperty(
+        default='draft', choices=['draft', 'open', 'close'])
 
     def listing_name(self):
-      return "Name:%s Class:%s Contact:%s" % (self.name, self.venueType, self.contactPerson)
+        return 'Name:%s Class:%s Contact:%s' % \
+            (self.name, self.venueType, self.contactPerson)
 
+    def create_slots(self):
+        for room in self.venue_bedrooms:
+            for bed in room.bedroom_beds:
+                for berth in bed.bed_berths:
+                    logging.info("Create slot for berth %s" % berth)
+                    for slot in berth.berth_slots:
+                        slot.delete()
+
+                    for d in datetimeIterator(
+                                  self.contractStartDate, 
+                                  self.contractEndDate):
+                        t = time(14, 00)
+                        logging.info("Create slot for %s", 
+                            datetime.combine(d, t))
+                        slot = Slot()
+                        slot.creator = users.get_current_user()
+                        slot.berth = berth
+                        slot.startDate = datetime.combine(d, t)
+                        slot.put()
+                        
+                        
 
     def rdelete(self):
         for r in self.venue_inspections:
@@ -132,7 +162,7 @@ class Inspection(db.Model):
     def listing_name(self):
         fields = [self.inspectionDate, self.notes]
         fields = [str(f) for f in fields]
-        return "%s" % ", ".join(fields)
+        return '%s' % ', '.join(fields)
 
     def rdelete(self):
         self.delete()
@@ -148,7 +178,7 @@ class Complaint(db.Model):
     def listing_name(self):
         fields = [self.complaintDate, self.notes]
         fields = [str(f) for f in fields]
-        return "%s" % ", ".join(fields)
+        return '%s' % ', '.join(fields)
 
     def rdelete(self):
         self.delete()
@@ -167,7 +197,7 @@ class Bedroom(db.Model):
     def listing_name(self):
         fields = [self.name, self.bathroomType, self.capacity]
         fields = [str(f) for f in fields]
-        return "%s" % ", ".join(fields)
+        return '%s' % ', '.join(fields)
 
     def rdelete(self):
         for r in self.bedroom_beds:
@@ -183,7 +213,7 @@ class Bathroom(db.Model):
     disabilityFriendly = db.BooleanProperty(default=False)
 
     def listing_name(self):
-        return "%s" % self.description
+        return '%s' % self.description
 
     def rdelete(self):
         self.delete()
@@ -199,7 +229,7 @@ class Bed(db.Model):
     def listing_name(self):
         fields = [self.bedType, self.capacity]
         fields = [str(f) for f in fields]
-        return "%s" % ", ".join(fields)
+        return '%s' % ', '.join(fields)
 
     def rdelete(self):
         for r in self.bed_berths:
@@ -214,3 +244,17 @@ class Berth(db.Model):
     def rdelete(self):
         self.delete()
         
+class Slot(db.Model):
+    created = db.DateTimeProperty(auto_now_add=True)
+    creator = db.UserProperty()
+    berth = db.ReferenceProperty(Berth, collection_name='berth_slots')
+    occupied = db.BooleanProperty(default=False)
+    startDate = db.DateTimeProperty()
+
+    def listing_name(self):
+        return 'Room:%s Venue:%s' % \
+            (self.berth.bed.bedroom.name, self.berth.bed.bedroom.venue.name)
+
+    def rdelete(self):
+        self.delete()
+
