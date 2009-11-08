@@ -107,16 +107,8 @@ class EditClient(webapp.RequestHandler):
         if data.is_valid():
             entity = data.save(commit=False)
             #Extra work for non required date fields
-            if not self.request.get('addendumADate'):
-                entity.addendumADate = None
-            if not self.request.get('addendumBDate'):
-                entity.addendumBDate = None
-            if not self.request.get('addendumCDate'):
-                entity.addendumCDate = None
-            if not self.request.get('addendumADate'):
-                entity.addendumADate = None
-            if not self.request.get('trainingSession'):
-                entity.trainingSession = None
+            if not self.request.get('dateOfDate'):
+                entity.dateOfDate = None
             #Change creator to last modified
             entity.creator = users.get_current_user()
             entity.put()

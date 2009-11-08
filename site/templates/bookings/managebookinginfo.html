@@ -1,0 +1,64 @@
+{% extends base_path %}
+
+{% block pagecontent %}
+    <h1>Bookings Management</h1>
+
+    <p><strong>Contracted Bookings</strong>
+      <a title="Add a new booking"
+         href="/bookings/capturecontractedbooking">
+          <img src="/images/add.png"/>
+      </a>
+    </p>
+    <table class="listing">
+        <thead>
+          <td>Reference</td>
+        </thead>
+        {% for contractedbooking in contractedbookings %}
+        <tr>
+          <td>{{ contractedbooking.bookingNumber }}</td>
+          <td class="action">
+            <a title="Edit this booking"
+              href="/bookings/editcontractedbooking?contractedbookingkey={{ contractedbooking.key }}">
+              <img src="/images/edit.png"/>
+            </a></td>
+          <td class="action">
+            <a title="Delete this booking"
+              href="/bookings/deletecontractedbooking?contractedbookingkey={{ contractedbooking.key }}"
+                   onclick="return confirm('Are you sure?');">
+              <img src="/images/delete.png"/>
+            </a></td>
+        </tr>
+        {% endfor %}
+    </table>
+
+    <hr />
+
+    <p><strong>Bookings Requests</strong>
+      <a title="Add a new booking request"
+         href="/bookings/capturebookingrequest">
+          <img src="/images/add.png"/>
+      </a>
+    </p>
+    <table class="listing">
+        <thead>
+          <td>Reference</td>
+        </thead>
+        {% for bookingrequest in bookingrequests %}
+        <tr>
+          <td>{{ bookingrequest.referenceNumber }}</td>
+          <td class="action">
+            <a title="Edit this bookingrequest"
+              href="/bookings/editbookingrequest?bookingrequestkey={{ bookingrequest.key }}">
+              <img src="/images/edit.png"/>
+            </a></td>
+          <td class="action">
+            <a title="Delete this bookingrequest"
+              href="/bookings/deletebookingrequest?bookingrequestkey={{ bookingrequest.key }}"
+                   onclick="return confirm('Are you sure?');">
+              <img src="/images/delete.png"/>
+            </a></td>
+        </tr>
+        {% endfor %}
+    </table>
+
+{% endblock pagecontent %}
