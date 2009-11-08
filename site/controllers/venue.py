@@ -88,7 +88,7 @@ class CaptureVenue(webapp.RequestHandler):
             entity.creator = users.get_current_user()
             entity.owner = Owner.get(ownerkey)
             entity.put()
-            self.redirect('/services/viewowner?ownerkey=%s' % ownerkey)
+            self.redirect('/services/owner/viewowner?ownerkey=%s' % ownerkey)
         else:
             auth_url, auth_url_text = get_authentication_urls(self.request.uri)
             filepath = os.path.join(PROJECT_PATH, 
@@ -132,7 +132,7 @@ class EditVenue(webapp.RequestHandler):
             entity.owner = Owner.get(ownerkey)
             entity.creator = users.get_current_user()
             entity.put()
-            self.redirect('/services/viewowner?ownerkey=%s' % ownerkey)
+            self.redirect('/services/owner/viewowner?ownerkey=%s' % ownerkey)
         else:
             auth_url, auth_url_text = get_authentication_urls(self.request.uri)
             filepath = os.path.join(PROJECT_PATH, 
@@ -158,5 +158,5 @@ class DeleteVenue(webapp.RequestHandler):
             #recursive delete
             venue.rdelete()
 
-        self.redirect('/services/viewowner?ownerkey=%s' % ownerkey)
+        self.redirect('/services/owner/viewowner?ownerkey=%s' % ownerkey)
 

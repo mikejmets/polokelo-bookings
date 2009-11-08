@@ -30,7 +30,7 @@ class CapturePhoneNumber(webapp.RequestHandler):
         containerkey = self.request.get('containerkey')
         auth_url, auth_url_text = get_authentication_urls(self.request.uri)
         filepath = os.path.join(PROJECT_PATH, 
-                                    'templates', 'services', 'capturephonenumber.html')
+                                    'templates', 'common', 'capturephonenumber.html')
         self.response.out.write(template.render(filepath, 
                                     {
                                         'base_path':BASE_PATH,
@@ -38,6 +38,7 @@ class CapturePhoneNumber(webapp.RequestHandler):
                                         'auth_url':auth_url,
                                         'auth_url_text':auth_url_text,
                                         'came_from':came_from,
+                                        'post_url':self.request.uri,
                                         'containerkey':containerkey
                                         }))
 
@@ -55,7 +56,7 @@ class CapturePhoneNumber(webapp.RequestHandler):
         else:
             auth_url, auth_url_text = get_authentication_urls(self.request.uri)
             filepath = os.path.join(PROJECT_PATH, 
-                                    'templates', 'services', 'capturephonenumber.html')
+                                    'templates', 'common', 'capturephonenumber.html')
             self.response.out.write(template.render(filepath, 
                                     {
                                         'base_path':BASE_PATH,
@@ -63,6 +64,7 @@ class CapturePhoneNumber(webapp.RequestHandler):
                                         'auth_url_text':auth_url_text,
                                         'form':data,
                                         'came_from':came_from,
+                                        'post_url':self.request.uri,
                                         'containerkey':containerkey
                                         }))
 
@@ -75,13 +77,14 @@ class EditPhoneNumber(webapp.RequestHandler):
         phonekey = self.request.get('phonekey')
         phonenumber = PhoneNumber.get(phonekey)
         filepath = os.path.join(PROJECT_PATH, 
-                                    'templates', 'services', 'editphonenumber.html')
+                                    'templates', 'common', 'editphonenumber.html')
         self.response.out.write(template.render(filepath, 
                                     {
                                         'base_path':BASE_PATH,
                                         'phonekey':phonekey,
                                         'form':PhoneNumberForm(instance=phonenumber),
                                         'came_from':came_from,
+                                        'post_url':self.request.uri,
                                         'auth_url':auth_url,
                                         'auth_url_text':auth_url_text
                                         }))
@@ -98,13 +101,14 @@ class EditPhoneNumber(webapp.RequestHandler):
             self.redirect(came_from)
         else:
             filepath = os.path.join(PROJECT_PATH, 
-                                        'templates', 'services', 'editphonenumber.html')
+                                        'templates', 'common', 'editphonenumber.html')
             self.response.out.write(template.render(filepath, 
                                     {
                                         'base_path':BASE_PATH,
                                         'phonekey':phonekey,
                                         'form':data,
                                         'came_from':came_from,
+                                        'post_url':self.request.uri,
                                         'auth_url':auth_url,
                                         'auth_url_text':auth_url_text
                                         }))

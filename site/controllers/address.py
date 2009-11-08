@@ -33,13 +33,14 @@ class CaptureAddress(webapp.RequestHandler):
         auth_url, auth_url_text = get_authentication_urls(self.request.uri)
         containerkey = self.request.get('containerkey')
         filepath = os.path.join(PROJECT_PATH, 
-                                    'templates', 'services', 'captureaddress.html')
+                                    'templates', 'common', 'captureaddress.html')
         self.response.out.write(template.render(filepath, 
                                     {
                                         'base_path':BASE_PATH,
                                         'form':AddressForm(),
                                         'containerkey':containerkey,
                                         'came_from':came_from,
+                                        'post_url':self.request.uri,
                                         'auth_url':auth_url,
                                         'auth_url_text':auth_url_text
                                         }))
@@ -58,13 +59,14 @@ class CaptureAddress(webapp.RequestHandler):
         else:
             auth_url, auth_url_text = get_authentication_urls(self.request.uri)
             filepath = os.path.join(PROJECT_PATH, 
-                                        'templates', 'services', 'captureaddress.html')
+                                        'templates', 'common', 'captureaddress.html')
             self.response.out.write(template.render(filepath, 
                                     {
                                         'base_path':BASE_PATH,
                                         'form':data,
                                         'containerkey':containerkey,
                                         'came_from':came_from,
+                                        'post_url':self.request.uri,
                                         'auth_url':auth_url,
                                         'auth_url_text':auth_url_text
                                         }))
@@ -78,7 +80,7 @@ class EditAddress(webapp.RequestHandler):
         address = Address.get(addresskey)
         container = address.container
         filepath = os.path.join(PROJECT_PATH, 
-                                    'templates', 'services', 'editaddress.html')
+                                    'templates', 'common', 'editaddress.html')
         self.response.out.write(template.render(filepath, 
                                     {
                                         'base_path':BASE_PATH,
@@ -86,6 +88,7 @@ class EditAddress(webapp.RequestHandler):
                                         'addresskey':addresskey,
                                         'containerkey': container.key,
                                         'came_from':came_from,
+                                        'post_url':self.request.uri,
                                         'auth_url':auth_url,
                                         'auth_url_text':auth_url_text
                                         }))
@@ -105,7 +108,7 @@ class EditAddress(webapp.RequestHandler):
         else:
             auth_url, auth_url_text = get_authentication_urls(self.request.uri)
             filepath = os.path.join(PROJECT_PATH, 
-                                        'templates', 'services', 'editaddress.html')
+                                        'templates', 'common', 'editaddress.html')
             self.response.out.write(template.render(filepath, 
                                     {
                                         'base_path':BASE_PATH,
@@ -113,6 +116,7 @@ class EditAddress(webapp.RequestHandler):
                                         'addresskey':addresskey,
                                         'containerkey':container.key(),
                                         'came_from':came_from,
+                                        'post_url':self.request.uri,
                                         'auth_url':auth_url,
                                         'auth_url_text':auth_url_text
                                         }))
