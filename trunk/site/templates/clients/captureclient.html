@@ -1,0 +1,15 @@
+{% extends base_path %}
+
+{% block breadcrumbs %}
+<a href="/clients/clientinfo">go back</a>
+{% endblock %}
+
+{% block pagecontent %}
+    <h1>Capture New Client</h1>
+    <form name="client" method="post" action="/clients/captureclient">
+        <table>
+            {{ form }}
+        </table>
+        <input type="submit" value="Add Client" />
+    </form>
+{% endblock pagecontent %}

@@ -1,5 +1,5 @@
 application: bookings-dev
-version: 0-3-alpha
+version: 0-4-alpha
 runtime: python
 api_version: 1
 
@@ -20,6 +20,10 @@ handlers:
 
 - url: /services/.*
   script: controllers/servicehandlers.py
+  login: admin
+
+- url: /clients/.*
+  script: controllers/clienthandlers.py
   login: admin
 
 
