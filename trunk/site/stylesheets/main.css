@@ -47,13 +47,13 @@ div.breadcrumbs {
   margin-left: 160px;
   width: auto;
   background: lightgrey;
-  color: white;
+  color: brown;
   padding: 2px;
 }
 div.breadcrumbs a,
 div.breadcrumbs a:hover,
 div.breadcrumbs a:visited {
-    color: white;
+    color: brown;
 }
 
 
@@ -121,10 +121,10 @@ div.photothumb {
 	font-size: 90%;
 	font-weight: bold; 
 	list-style: none;
-	text-align: center;
+	text-align: left;
 	line-height: 140%;
 	margin: 0;
-	padding: 1px;
+	padding: 1px 10px 1px 10px;
 	border 0;
 }
 
