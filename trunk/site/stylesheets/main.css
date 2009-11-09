@@ -38,7 +38,7 @@ div.leftNavBar {
   float: left;  
   width: 150px;
   color: white;
-  background: #D34F09;
+  background: #eaab1c;
   padding: 1.5em 0;
 }
 
@@ -132,8 +132,8 @@ div.photothumb {
 	display: block;
 	color: white; 
 	text-decoration: none;
-	background: #D34F09;
-	border: 1px solid #D34F09;
+	background: #eaab1c;
+	border: 1px solid #eaab1c;
 }
 
 .leftNavBar li a:hover {
