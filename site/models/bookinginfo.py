@@ -22,6 +22,8 @@ class BookingRequest(db.Model):
         required=True, verbose_name='Number of nights')
     quantity = db.IntegerProperty(
         required=True, verbose_name='Number of people')
+    email = db.EmailProperty(verbose_name='Email Address')
+    detail = db.TextProperty(verbose_name='Request Detail')
     state = db.StringProperty(
         default='temporary', choices=['temporary', 'confirmed'])
 
