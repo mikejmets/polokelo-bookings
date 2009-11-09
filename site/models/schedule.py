@@ -13,7 +13,8 @@ class Match(db.Model):
         required=True, verbose_name='Stadium')
 
     def listing_name(self):
-        return "%s" % self.number
+        return "%s, %s, %s, %s" %  \
+          (self.number, self.date, self.city, self.stadium)
 
     def rdelete(self):
         self.delete()
