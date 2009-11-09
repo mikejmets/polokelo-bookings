@@ -1,0 +1,16 @@
+{% extends base_path %}
+
+{% block breadcrumbs %}
+<a href="/clients/clientinfo">go back</a>
+{% endblock %}
+
+{% block pagecontent %}
+    <h1>Capture New Flight</h1>
+    <form name="flight" method="post" action="/clients/flight/captureflight">
+        <input type="hidden" name="containerkey" value="{{ containerkey }}"/>
+        <table>
+            {{ form }}
+        </table>
+        <input type="submit" value="Add Flight" />
+    </form>
+{% endblock pagecontent %}

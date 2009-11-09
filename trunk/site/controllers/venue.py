@@ -15,7 +15,7 @@ logger = logging.getLogger('VenueHandler')
 class VenueForm(djangoforms.ModelForm):
     class Meta:
         model = Venue
-        exclude = ['owner', 'created', 'creator']
+        exclude = ['owner', 'created', 'creator', 'state']
 
 class ViewVenue(webapp.RequestHandler):
 
@@ -67,7 +67,20 @@ class ViewVenue(webapp.RequestHandler):
     def post(self):
         venuekey = self.request.get('venuekey')
         venue = Venue.get(venuekey)
-        venue.create_slots()
+        state = self.request.get('state')
+        if state == 'closed':
+            #validate before transition
+            if not venue.contractStartDate or \
+               not venue.contractEndDate:
+                #Invalid
+                logger.info('invalid dates')
+            else:
+                venue.create_slots()
+                venue.state = 'open'
+                venue.put()
+        elif state == 'open':
+            venue.state = 'closed'
+            venue.put()
         self.redirect('/services/owner/viewvenue?venuekey=%s' % venuekey)
 
 class CaptureVenue(webapp.RequestHandler):
@@ -137,6 +150,15 @@ class EditVenue(webapp.RequestHandler):
             #Change creator to last modified
             entity.owner = Owner.get(ownerkey)
             entity.creator = users.get_current_user()
+            #Extra work for non required date fields
+            if not self.request.get('addendumADate'):
+                entity.addendumADate = None
+            if not self.request.get('addendumBDate'):
+                entity.addendumBDate = None
+            if not self.request.get('addendumCDate'):
+                entity.addendumCDate = None
+            if not self.request.get('addendumADate'):
+                entity.addendumADate = None
             entity.put()
             self.redirect('/services/owner/viewowner?ownerkey=%s' % ownerkey)
         else:

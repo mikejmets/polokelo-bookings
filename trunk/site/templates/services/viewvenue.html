@@ -25,9 +25,15 @@
           {% endfor %}
       </table>
 
-      <form name="createSlots" method="post" action="/services/owner/viewvenue">
+      <form name="stateWorkFlow" method="post" 
+            action="/services/owner/viewvenue">
         <input type="hidden" name="venuekey" value="{{ venue.key }}" />
-        <input type="submit" value="Create Slots" />
+        <input type="hidden" name="state" value="{{ venue.state }}" />
+        {% ifequal venue.state 'closed' %}
+            <input type="submit" value="Open For Bookings" />
+        {% else %}
+            <input type="submit" value="Close For Bookings" />
+        {% endifequal %}
       </form>
     </td>
 
