@@ -1,5 +1,5 @@
 from google.appengine.ext import db
-from google.appengine.ext.db import polymodel
+from models.schedule import Match
 
 class Client(db.Model):
     created = db.DateTimeProperty(auto_now_add=True)
@@ -12,15 +12,56 @@ class Client(db.Model):
         required=True, verbose_name='First Names')
     languages = db.StringListProperty(verbose_name='Languages')
     state = db.StringProperty(
-        default="prospect", choices=["prospect", "confirmed"])
-    dateOfBirth = db.DateProperty(verbose_name="Date of Birth")
-    identityNumber = db.StringProperty(verbose_name="Identifying Number")
+        default='prospect', verbose_name='Status',
+        choices=['prospect', 'confirmed'])
+    dateOfBirth = db.DateProperty(verbose_name='Date of Birth')
+    identityNumber = db.StringProperty(verbose_name='Identifying Number')
     identityNumberType = db.StringProperty(
-        verbose_name="Identifying Number Type", 
-        choices=["Passport", "IdentityDocument"])
+        verbose_name='Identifying Number Type', 
+        choices=['Passport', 'IdentityDocument'])
 
     def listing_name(self):
-        return "%s %s" % (self.firstNames, self.surname)
+        return '%s %s' % (self.firstNames, self.surname)
+
+    def rdelete(self):
+        for r in self.client_flights:
+            r.rdelete()
+        self.delete()
+
+class Flight(db.Model):
+    client = db.ReferenceProperty(Client, collection_name='client_flights')
+    created = db.DateTimeProperty(auto_now_add=True)
+    creator = db.UserProperty()
+    number = db.StringProperty(
+        required=True, verbose_name='Flight Number')
+    airline = db.StringProperty(
+        required=True, verbose_name='Airline')
+    airport = db.StringProperty(
+        required=True, verbose_name='Airport')
+    direction = db.StringProperty(
+        required=True, verbose_name='Direction',
+        choices=['Inbound', 'Outbound'])
+    dateAtAirport = db.DateTimeProperty(verbose_name='Date/Time At Airport')
+
+    def listing_name(self):
+        return '%s' % self.flightNumber
+
+    def rdelete(self):
+        self.delete()
+
+class MatchTicket(db.Model):
+    client = db.ReferenceProperty(Client, collection_name='client_matchtickets')
+    created = db.DateTimeProperty(auto_now_add=True)
+    creator = db.UserProperty()
+    number = db.StringProperty(
+        required=True, verbose_name='Ticket Number')
+    match = db.StringProperty(required=True, 
+        choices=['Game1', 'Game2'])
+    #match = db.ReferenceProperty(Match,
+    #    required=True, verbose_name='Match')
+
+    def listing_name(self):
+        return '%s' % self.flightNumber
 
     def rdelete(self):
         self.delete()

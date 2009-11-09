@@ -91,15 +91,17 @@ class Venue(db.Model):
     venueType = db.StringProperty(verbose_name='Class', 
         choices=['Backpack', 'Hostel', 'Family House', 'Guest House'])
     contactPerson = db.StringProperty(verbose_name='Contact Person')
-    disabilityFriendly = db.BooleanProperty(default=False)
-    childFriendly = db.BooleanProperty(default=False)
+    disabilityFriendly = db.BooleanProperty(
+        default=False, verbose_name='Disability Friendly')
+    childFriendly = db.BooleanProperty(
+        default=False, verbose_name='Child Friendly')
     addendumADate = db.DateProperty(verbose_name='Addendum A Date')
     addendumBDate = db.DateProperty(verbose_name='Addendum B Date')
     addendumCDate = db.DateProperty(verbose_name='Addendum C Date')
     contractStartDate = db.DateProperty(verbose_name='Contracted Start Date')
     contractEndDate = db.DateProperty(verbose_name='Contracted End Date')
     state = db.StringProperty(
-        default='draft', choices=['draft', 'open', 'close'])
+        default='closed', choices=['closed', 'open'])
 
     def listing_name(self):
         return 'Name:%s Class:%s Contact:%s' % \
@@ -109,7 +111,7 @@ class Venue(db.Model):
         for room in self.venue_bedrooms:
             for bed in room.bedroom_beds:
                 for berth in bed.bed_berths:
-                    logging.info("Create slot for berth %s" % berth)
+                    logging.info('Create slot for berth %s' % berth)
                     for slot in berth.berth_slots:
                         slot.delete()
 
@@ -117,7 +119,7 @@ class Venue(db.Model):
                                   self.contractStartDate, 
                                   self.contractEndDate):
                         t = time(14, 00)
-                        logging.info("Create slot for %s", 
+                        logging.info('Create slot for %s', 
                             datetime.combine(d, t))
                         slot = Slot()
                         slot.creator = users.get_current_user()
@@ -192,12 +194,16 @@ class Bedroom(db.Model):
     venue = db.ReferenceProperty(Venue, collection_name='venue_bedrooms')
     created = db.DateTimeProperty(auto_now_add=True)
     creator = db.UserProperty()
-    name = db.StringProperty(required=True)
+    name = db.StringProperty(required=True, verbose_name='Name')
     bathroomType = db.StringProperty(
-        required=True, choices=['En suite', 'Own', 'Shared'])
-    disabilityFriendly = db.BooleanProperty(default=False)
-    childFriendly = db.BooleanProperty(default=False)
-    capacity = db.IntegerProperty(required=True, default=1)
+        required=True, verbose_name='Bedroom Type',
+        choices=['En suite', 'Own', 'Shared'])
+    disabilityFriendly = db.BooleanProperty(
+        default=False, verbose_name='Disability Friendly')
+    childFriendly = db.BooleanProperty(
+        default=False, verbose_name='Child Friendly')
+    capacity = db.IntegerProperty(
+        required=True, default=1, verbose_name='Capacity')
 
     def listing_name(self):
         fields = [self.name, self.bathroomType, self.capacity]
@@ -214,8 +220,9 @@ class Bathroom(db.Model):
     venue = db.ReferenceProperty(Venue, collection_name='venue_bathrooms')
     created = db.DateTimeProperty(auto_now_add=True)
     creator = db.UserProperty()
-    description = db.TextProperty(required=True)
-    disabilityFriendly = db.BooleanProperty(default=False)
+    description = db.TextProperty(required=True, verbose_name='Description')
+    disabilityFriendly = db.BooleanProperty(
+        default=False, verbose_name='Disability Friendly')
 
     def listing_name(self):
         return '%s' % self.description

@@ -118,4 +118,72 @@
   </tr>
 </table>
 
+<hr />
+<table width="100%">
+  <tr>
+    <td>
+      <p><strong>Flights</strong>
+      <a title="Add a new flight"
+         href="/clients/flight/captureflight?containerkey={{ client.key }}">
+          <img src="/images/add.png"/>
+        </a>
+      </p>
+      <table class="listing">
+          <thead>
+            <td>Direction</td>
+            <td>Number</td>
+          </thead>
+          {% for flight in flights %}
+          <tr>
+              <td>{{ flight.direction }}</td>
+              <td>{{ flight.number }}</td>
+              <td class="action">
+                <a title="Edit this flight"
+                   href="/clients/flight/editflight?flightkey={{ flight.key }}">
+                <img src="/images/edit.png"/></a></td>
+                </a></td>
+              <td class="action">
+                <a title="Delete this flight"
+                   href="/clients/flight/deleteflight?flightkey={{ flight.key }}"
+                   onclick="return confirm('Are you sure?');">
+                <img src="/images/delete.png"/></a></td>
+                </a></td>
+          </tr>
+          {% endfor %}
+      </table>
+    </td>
+    <td>
+      <p><strong>Match Tickets</strong>
+      <a title="Add a new match ticket"
+         href="/clients/matchticket/capturematchticket?containerkey={{ client.key }}">
+          <img src="/images/add.png"/>
+        </a>
+      </p>
+      <table class="listing">
+          <thead>
+            <td>Match</td>
+            <td>Number</td>
+          </thead>
+          {% for ticket in matchtickets %}
+          <tr>
+              <td>{{ ticket.match }}</td>
+              <td>{{ ticket.number }}</td>
+              <td class="action">
+                <a title="Edit this match ticket"
+                   href="/clients/matchticket/editmatchticket?matchticketkey={{ ticket.key }}">
+                <img src="/images/edit.png"/></a></td>
+                </a></td>
+              <td class="action">
+                <a title="Delete this match ticket"
+                   href="/clients/matchticket/deletematchticket?matchticketkey={{ ticket.key }}"
+                   onclick="return confirm('Are you sure?');">
+                <img src="/images/delete.png"/></a></td>
+                </a></td>
+          </tr>
+          {% endfor %}
+      </table>
+    </td>
+  </tr>
+</table>
+
 {% endblock pagecontent %}

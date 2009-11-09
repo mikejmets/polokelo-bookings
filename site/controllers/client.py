@@ -41,6 +41,8 @@ class ViewClient(webapp.RequestHandler):
         addresses = client.entity_addresses
         phonenumbers = client.entity_phonenumbers
         emails = client.entity_emails
+        flights = client.client_flights
+        matchtickets = client.client_matchtickets
         self.response.out.write(template.render(filepath, 
                                     {
                                         'base_path':BASE_PATH,
@@ -49,6 +51,8 @@ class ViewClient(webapp.RequestHandler):
                                         'addresses':addresses,
                                         'phonenumbers':phonenumbers,
                                         'emails':emails,
+                                        'flights':flights,
+                                        'matchtickets':matchtickets,
                                         'auth_url':auth_url,
                                         'auth_url_text':auth_url_text
                                         }))
