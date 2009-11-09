@@ -142,6 +142,8 @@ class Venue(db.Model):
             r.rdelete()
         for r in self.entity_phonenumbers:
             r.rdelete()
+        for r in self.venue_photos:
+            r.rdelete()
         self.delete()
 
 class Photograph(db.Model):
@@ -151,6 +153,9 @@ class Photograph(db.Model):
     caption = db.StringProperty()
     thumbnail = db.BlobProperty()
     fullsize = db.BlobProperty()
+
+    def rdelete(self):
+        self.delete()
 
 class Inspection(db.Model):
     venue = db.ReferenceProperty(Venue, collection_name='venue_inspections')
