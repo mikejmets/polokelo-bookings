@@ -25,7 +25,7 @@ div.banner {
   vertical-align: center;
   text-align: center;
   font: normal bold normal 180% Verdana, sans-serif;
-  color: brown;
+  color: #D34F09;
 }
 .banner div.action-links {
   width: 100%;
@@ -38,7 +38,7 @@ div.leftNavBar {
   float: left;  
   width: 150px;
   color: white;
-  background: brown;
+  background: #D34F09;
   padding: 1.5em 0;
 }
 
@@ -46,14 +46,14 @@ div.leftNavBar {
 div.breadcrumbs {
   margin-left: 160px;
   width: auto;
-  background: lightgrey;
-  color: brown;
+  background: #6C8E03;
+  color: white;
   padding: 2px;
 }
 div.breadcrumbs a,
 div.breadcrumbs a:hover,
 div.breadcrumbs a:visited {
-    color: brown;
+    color: white;
 }
 
 
@@ -64,25 +64,25 @@ div.content {
 
 /* ------------------ Heading styles --------------------------------------- */
 h1 {
-  color: white; background: #8489D6;
+  color: white; background: #7D9AB8;
   font: normal bold normal 140% Verdana, sans-serif;
   text-align: center;
   padding: 5px;
 }
 h2 {
-  color: white; background: #8489D6;
+  color: white; background: #7D9AB8;
   font: normal bold normal 130% Verdana, sans-serif;
   text-align: left;
   padding: 4px;
 }
 h3 {
-  color: white; background: #8489D6;
+  color: white; background: #7D9AB8;
   font: italic bold normal 120% Verdana, sans-serif;
   text-align: left;
   padding: 4px;
 }
 h4 {
-  color: white; background: #8489D6;
+  color: white; background: #7D9AB8;
   font: normal bold normal 110% Verdana, sans-serif;
   text-align: left;
   padding: 3px;
@@ -132,17 +132,17 @@ div.photothumb {
 	display: block;
 	color: white; 
 	text-decoration: none;
-	background: brown;
-	border: 1px solid brown;
+	background: #D34F09;
+	border: 1px solid #D34F09;
 }
 
 .leftNavBar li a:hover {
-	background: #8489D6;
+	background: #7D9AB8;
 	border: 1px solid white;
 }
 
 .leftNavBar li a:active {
-	background: #8489D6;
+	background: #7D9AB8;
   border: 1;
 }
 
