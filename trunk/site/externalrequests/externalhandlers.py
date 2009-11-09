@@ -22,9 +22,9 @@ logger = logging.getLogger('externalhandlers.py')
 #     class Meta:
 #         model = BookingRequest
 #         exclude = ['created', 'creator']
-# 
-# class CheckAvailability(webapp.RequestHandler):
-# 
+ 
+class CheckAvailability(webapp.RequestHandler):
+ 
 #     def get(self):
 #         auth_url, auth_url_text = get_authentication_urls(self.request.uri)
 #         filepath = os.path.join(PROJECT_PATH, 'templates', 'externalrequests', 'availabilitycheck.html')
