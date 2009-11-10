@@ -30,9 +30,8 @@ handlers:
   script: controllers/bookinghandlers.py
   login: admin
 
-- url: /externalbookings/.*
-  script: externalrequests/externalhandlers.py
-  # login: required
+- url: /externalbookings
+  script: externalrequests/xmlrpc_bookings.py
 
 - url: /unload
   script: $PYTHON_LIB/google/appengine/ext/remote_api/handler.py
