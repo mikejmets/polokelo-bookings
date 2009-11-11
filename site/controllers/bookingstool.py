@@ -1,7 +1,7 @@
 import logging
 from datetime import datetime, timedelta
 from google.appengine.ext.db import Query
-from models.hostinfo import Slot
+from models.hostinfo import Slot, Berth
 
 logger = logging.getLogger('BookingsTool')
 
@@ -9,6 +9,13 @@ class BookingsTool():
 
   def checkAvailability(self, city, type, start, nights, people):
       return len(self.findBerths(city, type, start, nights, people)) > 0
+
+  def findVenues(self, city, type, start, nights, people):
+      berths = self.findBerths(city, type, start, nights, people)
+      venues = set()
+      for key, slots in berths:
+          venues.add(Berth.get(key).bed.bedroom.venue.name)
+      return venues
 
   def findBerths(self, city, type, start, nights, people):
         logger.info('Search for %s, %s, %s(%s), %s', \
@@ -80,7 +87,7 @@ class BookingsTool():
                 valid_berths.append((key, berths[key]['slots']))
 
         #for key, slots in valid_berths:
-        #  logger.info("valid pairing %s: %s", key, slots)
+        # logger.info("valid pairing %s: %s", key, slots)
 
         return valid_berths
 
