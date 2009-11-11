@@ -21,6 +21,13 @@
           <tr>
             <td><strong>{{ value.0 }}:</strong></td>
             <td> {{ value.1 }} </td>
+            {%if forloop.first %}
+            <td>
+              <a title="Edit this venue"
+                 href="/services/owner/editvenue?venuekey={{ venue.key }}&ownerkey={{ ownerkey }}">
+                <img src="/images/edit.png"/></a>
+            </td>
+            {% endif %}
           </tr>
           {% endfor %}
       </table>
