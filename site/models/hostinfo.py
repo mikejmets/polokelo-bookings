@@ -16,7 +16,11 @@ class Address(db.Model):
         choices=['Physical', 'Postal', 'Key Collection', 'Other'])
     streetAddress = db.StringProperty(required=True)
     suburb = db.StringProperty(required=True)
-    city = db.StringProperty()
+    city = db.StringProperty(
+        required=True,
+        choices=['Potchefstroom', 'Polokwane', 'Cape Town', 'Johannesberg', 
+                 'Pretoria', 'Bloemfontein', 'Rustenburg', 'Nelspruit',
+                 'Durban', 'Port Elizabeth'])
     country = db.StringProperty(default='South Africa')
     postCode = db.StringProperty()
 
@@ -95,23 +99,31 @@ class Venue(db.Model):
         default=False, verbose_name='Disability Friendly')
     childFriendly = db.BooleanProperty(
         default=False, verbose_name='Child Friendly')
-    addendumADate = db.DateProperty(verbose_name='Addendum A Date')
-    addendumBDate = db.DateProperty(verbose_name='Addendum B Date')
-    addendumCDate = db.DateProperty(verbose_name='Addendum C Date')
+    registrationFeePaid = db.BooleanProperty(
+        default=False, verbose_name='Registration Fee Paid')
     contractStartDate = db.DateProperty(verbose_name='Contracted Start Date')
     contractEndDate = db.DateProperty(verbose_name='Contracted End Date')
     state = db.StringProperty(
         default='closed', choices=['closed', 'open'])
+
+    def get_city(self):
+        q = Address.all()
+        q.filter('addressType =', 'Physical')
+        q.filter('container =', self)
+        results = q.fetch(1)
+        if results:
+            return results[0].city
 
     def listing_name(self):
         return 'Name:%s Class:%s Contact:%s' % \
             (self.name, self.venueType, self.contactPerson)
 
     def create_slots(self):
+        logging.info('Create slots for venue %s', self.name)
         for room in self.venue_bedrooms:
             for bed in room.bedroom_beds:
                 for berth in bed.bed_berths:
-                    logging.info('Create slot for berth %s' % berth)
+                    logging.info('Create slot for berth %s', berth)
                     for slot in berth.berth_slots:
                         slot.delete()
 
@@ -124,7 +136,9 @@ class Venue(db.Model):
                         slot = Slot()
                         slot.creator = users.get_current_user()
                         slot.berth = berth
-                        slot.startDate = datetime.combine(d, t)
+                        slot.startDate = d #datetime.combine(d, t)
+                        slot.city = berth.bed.bedroom.venue.get_city()
+                        slot.type = berth.bed.bedroom.venue.venueType
                         slot.put()
                         
                         
@@ -261,7 +275,9 @@ class Slot(db.Model):
     creator = db.UserProperty()
     berth = db.ReferenceProperty(Berth, collection_name='berth_slots')
     occupied = db.BooleanProperty(default=False)
-    startDate = db.DateTimeProperty()
+    startDate = db.DateProperty()
+    city = db.StringProperty()
+    type = db.StringProperty()
 
     def listing_name(self):
         return 'Room:%s Venue:%s' % \
