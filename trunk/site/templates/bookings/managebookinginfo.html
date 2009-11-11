@@ -1,7 +1,47 @@
 {% extends base_path %}
 
+
+
 {% block pagecontent %}
     <h1>Bookings Management</h1>
+
+    <form name="findAccommodation" method="post" 
+          action="/bookings/findaccommodation">
+      <p><strong>Search</strong></p>
+      <table>
+        <tr>
+          <td>City</td>
+          <td> <input type="text" name="city" value="{{ city }}" /> <td>
+        </tr>
+        <tr>
+          <td>Type</td>
+          <td> <input type="text" name="type" value="{{ type }}" /> <td>
+        </tr>
+        <tr>
+          <td>Start Date</td>
+          <td> <input type="text" name="start" value="{{ start }}" /> <td>
+        </tr>
+        <tr>
+          <td>Number of nights</td>
+          <td> <input type="text" name="nights" value="{{ nights }}" /> <td>
+        </tr>
+        <tr>
+          <td>Number of people</td>
+          <td> <input type="text" name="people" value="{{ people }}" /> <td>
+        </tr>
+        <tr>
+      </table>
+      <input title="Find accommodation"
+             type="submit" value="Find Accommodation" />
+    </form>
+    <ul>
+      {% for result in results %}
+      <li>
+        {{ result }}
+      </li>
+      {% endfor %}
+    </ul>
+    <hr />
 
     <p><strong>Contracted Bookings</strong>
       <a title="Add a new booking"
