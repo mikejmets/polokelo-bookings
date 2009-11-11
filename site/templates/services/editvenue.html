@@ -9,6 +9,7 @@
     <form name="venue" method="post" action="/services/owner/editvenue">
         <input type="hidden" name="venuekey" value="{{ venuekey }}" />
         <input type="hidden" name="ownerkey" value="{{ ownerkey }}" />
+        <input type="hidden" name="came_from" value="{{ came_from }}" />
         <table>
             {{ form }}
         </table>
