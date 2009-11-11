@@ -1,12 +1,14 @@
 import os
 import logging
+from datetime import datetime
 from google.appengine.ext import webapp
 from google.appengine.ext.webapp.util import run_wsgi_app
 from google.appengine.ext.webapp import template
 
 from controllers.home import BASE_PATH, PROJECT_PATH
-from controllers.contractedbooking \
-    import CaptureContractedBooking, EditContractedBooking, DeleteContractedBooking
+from controllers.contractedbooking import \
+    CaptureContractedBooking, EditContractedBooking, DeleteContractedBooking
+from controllers.bookingstool import BookingsTool
 from controllers.bookingrequest \
     import CaptureBookingRequest, EditBookingRequest, DeleteBookingRequest
 from models.bookinginfo import ContractedBooking, BookingRequest
@@ -29,15 +31,35 @@ class ManageBookings(webapp.RequestHandler):
                         'auth_url_text':auth_url_text
                         }))
 
+class BookingsToolFindAccommodation(webapp.RequestHandler):
+    def get(self):
+        tool = BookingsTool()
+        city = 'Cape Town'
+        type = 'Family House'
+        start = datetime.strptime('2010-06-11', '%Y-%m-%d').date()
+        nights = 8
+        people = 6
+        tool.findberths(city, type, start, nights, people)
+        auth_url, auth_url_text = get_authentication_urls(self.request.uri)
+        filepath = os.path.join(
+            PROJECT_PATH, 'templates', 'bookings', 'managebookinginfo.html')
+        self.response.out.write(template.render(filepath, 
+                    {
+                        'base_path':BASE_PATH,
+                        'auth_url':auth_url,
+                        'auth_url_text':auth_url_text
+                        }))
+
 application = webapp.WSGIApplication([
-                  ('/bookings/bookinginfo', ManageBookings),
-                  ('/bookings/capturecontractedbooking', CaptureContractedBooking),
-                  ('/bookings/editcontractedbooking', EditContractedBooking),
-                  ('/bookings/deletecontractedbooking', DeleteContractedBooking),
-                  ('/bookings/capturebookingrequest', CaptureBookingRequest),
-                  ('/bookings/editbookingrequest', EditBookingRequest),
-                  ('/bookings/deletebookingrequest', DeleteBookingRequest),
-                  ], debug=True)
+      ('/bookings/bookinginfo', ManageBookings),
+      ('/bookings/findaccommodation', BookingsToolFindAccommodation),
+      ('/bookings/capturecontractedbooking', CaptureContractedBooking),
+      ('/bookings/editcontractedbooking', EditContractedBooking),
+      ('/bookings/deletecontractedbooking', DeleteContractedBooking),
+      ('/bookings/capturebookingrequest', CaptureBookingRequest),
+      ('/bookings/editbookingrequest', EditBookingRequest),
+      ('/bookings/deletebookingrequest', DeleteBookingRequest),
+      ], debug=True)
 
 
 def main():

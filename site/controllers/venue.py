@@ -68,6 +68,7 @@ class ViewVenue(webapp.RequestHandler):
         venuekey = self.request.get('venuekey')
         venue = Venue.get(venuekey)
         state = self.request.get('state')
+        logger.info('post booking state %s', state)
         if state == 'closed':
             #validate before transition
             if not venue.contractStartDate or \
@@ -124,10 +125,11 @@ class CaptureVenue(webapp.RequestHandler):
 class EditVenue(webapp.RequestHandler):
 
     def get(self):
+        came_from = self.request.referer
         auth_url, auth_url_text = get_authentication_urls(self.request.uri)
         venuekey = self.request.get('venuekey')
-        ownerkey = self.request.get('ownerkey')
         venue = Venue.get(venuekey)
+        ownerkey = self.request.get('ownerkey')
         filepath = os.path.join(PROJECT_PATH, 
                                     'templates', 'services', 'editvenue.html')
         self.response.out.write(template.render(filepath, 
@@ -136,11 +138,13 @@ class EditVenue(webapp.RequestHandler):
                                         'form':VenueForm(instance=venue),
                                         'venuekey':venuekey,
                                         'ownerkey':ownerkey,
+                                        'came_from':came_from,
                                         'auth_url':auth_url,
                                         'auth_url_text':auth_url_text
                                         }))
 
     def post(self):
+        came_from = self.request.get('came_from')
         venuekey = self.request.get('venuekey')
         venue = Venue.get(venuekey)
         ownerkey = self.request.get('ownerkey')
@@ -150,17 +154,8 @@ class EditVenue(webapp.RequestHandler):
             #Change creator to last modified
             entity.owner = Owner.get(ownerkey)
             entity.creator = users.get_current_user()
-            #Extra work for non required date fields
-            if not self.request.get('addendumADate'):
-                entity.addendumADate = None
-            if not self.request.get('addendumBDate'):
-                entity.addendumBDate = None
-            if not self.request.get('addendumCDate'):
-                entity.addendumCDate = None
-            if not self.request.get('addendumADate'):
-                entity.addendumADate = None
             entity.put()
-            self.redirect('/services/owner/viewowner?ownerkey=%s' % ownerkey)
+            self.redirect(came_from)
         else:
             auth_url, auth_url_text = get_authentication_urls(self.request.uri)
             filepath = os.path.join(PROJECT_PATH, 
@@ -171,6 +166,7 @@ class EditVenue(webapp.RequestHandler):
                                         'form':data,
                                         'venuekey':venuekey,
                                         'ownerkey':ownerkey,
+                                        'came_from':came_from,
                                         'auth_url':auth_url,
                                         'auth_url_text':auth_url_text
                                         }))
