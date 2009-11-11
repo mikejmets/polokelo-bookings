@@ -3,6 +3,7 @@ import logging
 from google.appengine.ext import webapp
 from google.appengine.ext.webapp.util import run_wsgi_app
 from google.appengine.ext.webapp import template
+from google.appengine.api import users
 
 from controllers.home import BASE_PATH, PROJECT_PATH
 from controllers.address import CaptureAddress, EditAddress, DeleteAddress
@@ -27,8 +28,32 @@ from models.hostinfo import Owner
 from controllers.utils import get_authentication_urls
 
 
+#from acl import Acl, AclRules
+#Acl.roles_map = {
+#    'admin': [
+#        ('*', '*', True),
+#    ],
+#    'host': [
+#        ('*', '*', True),
+#    ],
+#}
+#
+## Assign users to the 'host' role.
+#AclRules.insert_or_update(
+#    area='ownerinfo',
+#    user='test@example.com', 
+#    roles=['host'])
+#AclRules.insert_or_update(
+#    area='*',
+#    user='mike@example.com', 
+#    roles=['admin'])
+
 class ManageHosts(webapp.RequestHandler):
     def get(self):
+        #acl = Acl(area='hostinfo',
+        #          user=users.get_current_user())
+        #assert acl.has_access(topic='ManageHosts', name='get') is True
+
         auth_url, auth_url_text = get_authentication_urls(self.request.uri)
         partners = Owner.all().order('surname')
         filepath = os.path.join(PROJECT_PATH, 'templates', 'services', 'managehosts.html')
@@ -36,6 +61,7 @@ class ManageHosts(webapp.RequestHandler):
                                     {
                                         'base_path':BASE_PATH,
                                         'partners':partners,
+                                        'user':users.get_current_user(),
                                         'auth_url':auth_url,
                                         'auth_url_text':auth_url_text
                                         }))

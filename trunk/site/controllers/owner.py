@@ -24,10 +24,14 @@ class OwnerForm(djangoforms.ModelForm):
         model = Owner
         exclude = ['created', 'creator']
 
+#from acl import Acl
 
 class ViewOwner(webapp.RequestHandler):
 
     def get(self):
+        #acl = Acl(area='ownerinfo',
+        #          user=users.get_current_user())
+        #assert acl.has_access(topic='ViewOwner', name='get') is True
         auth_url, auth_url_text = get_authentication_urls(self.request.uri)
         filepath = os.path.join(PROJECT_PATH, 
                                     'templates', 'services', 'viewowner.html')
