@@ -6,21 +6,27 @@ from models.hostinfo import Slot
 logger = logging.getLogger('BookingsTool')
 
 class BookingsTool():
-  def findberths(self, city, type, start, nights, people):
+
+  def checkAvailability(self, city, type, start, nights, people):
+      return len(findBerths(city, type, start, nights, people)) > 0
+
+  def findBerths(self, city, type, start, nights, people):
         logger.info('Search for %s, %s, %s(%s), %s', \
             city, type, start, nights, people)
-        berths = self.findvalidberths(city, type, start, nights)
+        berths = self.findValidBerths(city, type, start, nights)
 
         #for key, slots in berths:
         #  logger.info("valid pairing %s: %s", key, slots)
         if len(berths) >= people:
             logger.info("Found %s pairings for %s people", 
                 len(berths), people)
+            return berths
         else:
             logger.info("Sorry, only found %s pairings for %s people", 
                 len(berths), people)
+            return []
 
-  def findvalidberths(self, city, type, start, nights):
+  def findValidBerths(self, city, type, start, nights):
         end = start + timedelta(days = (nights-1))
         #logger.info('Search for %s, %s, %s -> %s(%s)', \
         #    city, type, start, end, nights)
