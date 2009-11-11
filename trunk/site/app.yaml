@@ -31,7 +31,7 @@ handlers:
   login: admin
 
 - url: /externalbookings
-  script: externalrequests/xmlrpc_bookings.py
+  script: externalrequests/externalhandlers.py
 
 - url: /unload
   script: $PYTHON_LIB/google/appengine/ext/remote_api/handler.py

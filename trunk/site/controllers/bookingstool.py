@@ -8,7 +8,7 @@ logger = logging.getLogger('BookingsTool')
 class BookingsTool():
 
   def checkAvailability(self, city, type, start, nights, people):
-      return len(findBerths(city, type, start, nights, people)) > 0
+      return len(self.findBerths(city, type, start, nights, people)) > 0
 
   def findBerths(self, city, type, start, nights, people):
         logger.info('Search for %s, %s, %s(%s), %s', \
