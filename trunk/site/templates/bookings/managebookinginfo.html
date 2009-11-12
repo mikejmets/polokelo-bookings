@@ -36,28 +36,34 @@
     </form>
 
     {% if results %}
-    <table class="listing">
-        <thead>
-          <td>Select</td>
-          <td>Owner</td>
-          <td>Venue</td>
-          <td>Room</td>
-          <td>Bed</td>
-          <td>Type</td>
-          <td>Capacity</td>
-        </thead>
-        {% for result in results %}
-        <tr>
-          <td> <input type="checkbox" name="{{ result.0 }}" /> </td>
-          <td>{{ result.1 }} </td>
-          <td>{{ result.2 }} </td>
-          <td>{{ result.3 }} </td>
-          <td>{{ result.4 }} </td>
-          <td>{{ result.5 }} </td>
-          <td>{{ result.6 }} </td>
-        </tr>
-        {% endfor %}
-    </table>
+    <form name="reserveAccommodation" method="post" 
+          action="/bookings/reserveaccommodation">
+      <table class="listing">
+          <thead>
+            <td>Select</td>
+            <td>Owner</td>
+            <td>Venue</td>
+            <td>Room</td>
+            <td>Bed</td>
+            <td>Type</td>
+            <td>Capacity</td>
+          </thead>
+          {% for result in results %}
+          <tr>
+            <td> <input type="checkbox" name="{{ result.0 }}" /> </td>
+            <td>{{ result.1 }} </td>
+            <td>{{ result.2 }} </td>
+            <td>{{ result.3 }} </td>
+            <td>{{ result.4 }} </td>
+            <td>{{ result.5 }} </td>
+            <td>{{ result.6 }} </td>
+          </tr>
+          {% endfor %}
+      </table>
+      <input type="hidden" name="elementkey" value="{{ elementkey }}" />
+      <input title="Reserve accommodation"
+             type="submit" value="Reserve Accommodation" />
+    </form>
     {% else %}
         <p> No Results </p>
     {% endif %}
