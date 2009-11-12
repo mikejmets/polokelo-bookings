@@ -157,6 +157,7 @@ div.photothumb {
 }
 .listing td {
   border: 1px solid lightblue;
+  padding: 3px;
 }
 
 form th {
