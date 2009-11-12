@@ -10,10 +10,10 @@ from controllers.home import BASE_PATH, PROJECT_PATH
 from controllers.contractedbooking import \
     CaptureContractedBooking, EditContractedBooking, DeleteContractedBooking
 from controllers.bookingstool import BookingsTool
-from controllers.bookingrequest \
-    import CaptureBookingRequest, EditBookingRequest, DeleteBookingRequest
+from controllers.enquiry \
+    import CaptureEnquiry, EditEnquiry, DeleteEnquiry
 from models.hostinfo import Berth
-from models.bookinginfo import ContractedBooking, BookingRequest
+from models.bookinginfo import ContractedBooking, Enquiry
 from controllers.utils import get_authentication_urls
 
 
@@ -21,7 +21,7 @@ class ManageBookings(webapp.RequestHandler):
     def get(self):
         auth_url, auth_url_text = get_authentication_urls(self.request.uri)
         contractedbookings = ContractedBooking.all().order('bookingNumber')
-        bookingrequests = BookingRequest.all().order('referenceNumber')
+        enquiries = Enquiry.all().order('referenceNumber')
         results = []
         key_str = self.request.get('results')
         city = self.request.get('city', 'Potchefstroom')
@@ -57,7 +57,7 @@ class ManageBookings(webapp.RequestHandler):
                         'nights':nights,
                         'people':people,
                         'results':results,
-                        'bookingrequests':bookingrequests,
+                        'enquiries':enquiries,
                         'auth_url':auth_url,
                         'auth_url_text':auth_url_text
                         }))
@@ -97,9 +97,9 @@ application = webapp.WSGIApplication([
       ('/bookings/capturecontractedbooking', CaptureContractedBooking),
       ('/bookings/editcontractedbooking', EditContractedBooking),
       ('/bookings/deletecontractedbooking', DeleteContractedBooking),
-      ('/bookings/capturebookingrequest', CaptureBookingRequest),
-      ('/bookings/editbookingrequest', EditBookingRequest),
-      ('/bookings/deletebookingrequest', DeleteBookingRequest),
+      ('/bookings/captureenquiry', CaptureEnquiry),
+      ('/bookings/editenquiry', EditEnquiry),
+      ('/bookings/deleteenquiry', DeleteEnquiry),
       ], debug=True)
 
 
