@@ -26,11 +26,13 @@
 
     <table class="listing">
         <thead>
+          <td>Name</td>
           <td>Type</td>
           <td>Capacity</td>
         </thead>
         {% for bed in beds %}
         <tr>
+            <td>{{ bed.name }}</td>
             <td>{{ bed.bedType }}</td>
             <td>{{ bed.capacity }}</td>
             <td class="action">
