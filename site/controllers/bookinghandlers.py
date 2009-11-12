@@ -8,7 +8,8 @@ from google.appengine.ext.webapp import template
 
 from controllers.home import BASE_PATH, PROJECT_PATH
 from controllers.contractedbooking import \
-    CaptureContractedBooking, EditContractedBooking, DeleteContractedBooking
+    ViewContractedBooking, CaptureContractedBooking, \
+    EditContractedBooking, DeleteContractedBooking
 from controllers.bookingstool import \
     BookingsTool, BookingsToolReserveAccommodation, \
     BookingsToolFindAccommodation
@@ -22,6 +23,8 @@ logger = logging.getLogger('BookingHandlers')
 
 class ManageBookings(webapp.RequestHandler):
     def get(self):
+        people = self.request.get('people', 'zip')
+        logger.info('----------%s', people)
         auth_url, auth_url_text = get_authentication_urls(self.request.uri)
         contractedbookings = ContractedBooking.all().order('bookingNumber')
         enquiries = Enquiry.all().order('referenceNumber')
@@ -47,11 +50,11 @@ class ManageBookings(webapp.RequestHandler):
                       berth.bed.capacity,
                       ))
         else:
-            city =  'Potchefstroom'
-            type =  'Family House'
-            start = '2010-06-11'
-            nights = 6
-            people = 5
+            city =  self.request.get('city', 'Potchefstroom')
+            type =  self.request.get('type', 'Family House')
+            start = self.request.get('start', '2010-06-11')
+            nights = self.request.get('nights', 7)
+            people = self.request.get('people', 5)
         #sort
         results.sort()
 
@@ -78,6 +81,7 @@ application = webapp.WSGIApplication([
       ('/bookings/bookinginfo', ManageBookings),
       ('/bookings/findaccommodation', BookingsToolFindAccommodation),
       ('/bookings/reserveaccommodation', BookingsToolReserveAccommodation),
+      ('/bookings/viewcontractedbooking', ViewContractedBooking),
       ('/bookings/capturecontractedbooking', CaptureContractedBooking),
       ('/bookings/editcontractedbooking', EditContractedBooking),
       ('/bookings/deletecontractedbooking', DeleteContractedBooking),

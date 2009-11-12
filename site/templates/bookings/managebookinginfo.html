@@ -61,6 +61,11 @@
           {% endfor %}
       </table>
       <input type="hidden" name="elementkey" value="{{ elementkey }}" />
+      <input type="hidden" name="city" value="{{ city }}" /> 
+      <input type="hidden" name="type" value="{{ type }}" />
+      <input type="hidden" name="start" value="{{ start }}" />
+      <input type="hidden" name="nights" value="{{ nights }}" />
+      <input type="hidden" name="people" value="{{ people }}" />
       <input title="Reserve accommodation"
              type="submit" value="Reserve Accommodation" />
     </form>
@@ -81,7 +86,7 @@
         </thead>
         {% for contractedbooking in contractedbookings %}
         <tr>
-          <td>{{ contractedbooking.bookingNumber }}</td>
+          <td><a href="/bookings/viewcontractedbooking?bookingkey={{ contractedbooking.key }}">{{ contractedbooking.bookingNumber }}</a></td>
           <td class="action">
             <a title="Edit this booking"
               href="/bookings/editcontractedbooking?contractedbookingkey={{ contractedbooking.key }}">

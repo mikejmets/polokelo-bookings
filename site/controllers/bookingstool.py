@@ -153,6 +153,11 @@ class BookingsToolReserveAccommodation(webapp.RequestHandler):
             if enquiry.state == 'temporary':
                 enquiry.rdelete()
         params = {}
+        params['city'] =  self.request.get('city')
+        params['type'] =  self.request.get('type')
+        params['start'] = self.request.get('start')
+        params['nights'] = self.request.get('nights')
+        params['people'] = self.request.get('people')
         params = urllib.urlencode(params)
         self.redirect("%s?%s" % (came_from, params))
 
