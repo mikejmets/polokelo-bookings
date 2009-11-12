@@ -13,8 +13,6 @@ from xml.etree.ElementTree import XML
 from models.bookinginfo import BookingRequest
 from controllers.bookingstool import BookingsTool
 
-logger = logging.getLogger('externalhandlers.py')
-
 
 class ExternalBookings(webapp.RequestHandler):
 
@@ -28,7 +26,7 @@ class ExternalBookings(webapp.RequestHandler):
         result['numadults'] = int(booking.findtext('numadults'))
         result['numchildren'] = int(booking.findtext('numchildren'))
         result['numinfants'] = int(booking.findtext('numinfants'))
-        logger.info(result)
+        logging.info(result)
         return result
 
     def _checkAvailability(self, node):
@@ -55,7 +53,7 @@ class ExternalBookings(webapp.RequestHandler):
 
     def post(self):
         xml = self.request.body
-        logger.info(xml)
+        logging.info(xml)
 
         # find out what to do
         xmlroot = XML(xml)
