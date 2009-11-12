@@ -16,7 +16,7 @@ logger = logging.getLogger('ContractedBookingHandler')
 class ContractedBookingForm(djangoforms.ModelForm):
     class Meta:
         model = ContractedBooking
-        exclude = ['created', 'creator']
+        exclude = ['created', 'creator', 'client', 'enquiry']
 
 
 class CaptureContractedBooking(webapp.RequestHandler):

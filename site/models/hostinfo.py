@@ -1,8 +1,11 @@
 import logging
 from datetime import datetime, time
+
 from google.appengine.ext import db
 from google.appengine.ext.db import polymodel
 from google.appengine.api import users
+
+from models.bookinginfo import ContractedBooking
 from controllers.utils import datetimeIterator
 
 logger = logging.getLogger('HostInfo')
@@ -276,6 +279,8 @@ class Slot(db.Model):
     creator = db.UserProperty()
     berth = db.ReferenceProperty(Berth, collection_name='berth_slots')
     occupied = db.BooleanProperty(default=False)
+    contracted_booking = db.ReferenceProperty(
+        ContractedBooking, collection_name="slots")
     startDate = db.DateProperty()
     city = db.StringProperty()
     type = db.StringProperty()
