@@ -14,5 +14,6 @@ bulkloader.py --dump --app_id=bookings-dev --email=mikejmets@gmail.com --kind=Co
 bulkloader.py --dump --app_id=bookings-dev --email=mikejmets@gmail.com --kind=Bedroom --url=$HOST/unload --filename=$DATA_DIR/bedrooms $APP_DIR
 bulkloader.py --dump --app_id=bookings-dev --email=mikejmets@gmail.com --kind=Bathroom --url=$HOST/unload --filename=$DATA_DIR/bathrooms $APP_DIR
 bulkloader.py --dump --app_id=bookings-dev --email=mikejmets@gmail.com --kind=Bed --url=$HOST/unload --filename=$DATA_DIR/beds $APP_DIR
+bulkloader.py --dump --app_id=bookings-dev --email=mikejmets@gmail.com --kind=Berth --url=$HOST/unload --filename=$DATA_DIR/berths $APP_DIR
 bulkloader.py --dump --app_id=bookings-dev --email=mikejmets@gmail.com --kind=Photograph --url=$HOST/unload --filename=$DATA_DIR/photos $APP_DIR
 rm -rf bulkloader-*
