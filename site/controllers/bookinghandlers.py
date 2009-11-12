@@ -33,11 +33,14 @@ class ManageBookings(webapp.RequestHandler):
             keys = key_str.split(';')
             for key in keys:
                 berth = Berth.get(key)
-                results.append('%s, %s, %s, %s' % (
+                results.append((
+                  key,
                   berth.bed.bedroom.venue.owner.listing_name(),
                   berth.bed.bedroom.venue.name,
                   berth.bed.bedroom.name,
+                  berth.bed.name,
                   berth.bed.bedType,
+                  berth.bed.capacity,
                   ))
         #sort
         results.sort()
