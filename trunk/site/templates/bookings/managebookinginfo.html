@@ -34,13 +34,19 @@
       <input title="Find accommodation"
              type="submit" value="Find Accommodation" />
     </form>
-    <ul>
-      {% for result in results %}
-      <li>
-        {{ result }}
-      </li>
-      {% endfor %}
-    </ul>
+    <table>
+      {% if results %}
+        {% for result in results %}
+        <tr>
+          <td> <input type="checkbox" value="{{ result }}" /> </td>
+          <td>{{ result }} </td>
+        </tr>
+        {% endfor %}
+      {% else %}
+        <tr><td> No Results </td></tr>
+      {% endif %}
+    </table>
+
     <hr />
 
     <p><strong>Contracted Bookings</strong>
