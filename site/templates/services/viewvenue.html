@@ -144,36 +144,6 @@
 </table>
 
 
-    <hr />
-      <p><strong>Photographs</strong>
-      <a title="Add a Photograph"
-        href="/services/owner/venue/capturephotograph?venuekey={{ venue.key }}">
-        <img src="/images/add.png"/>
-      </a>
-      </p>
-
-    <table cellspacing="15">
-        <tr>
-            {% for photo in photographs %}
-            <td valign="bottom">
-                <a href="/viewer/fullsize?photokey={{photo.key}}">
-                        <img src="/viewer/thumbnail?photokey={{photo.key}}" 
-                        alt="{{photo.caption}}" /></a>
-                <br />
-                <a title="Edit this Photograph"
-                  href="/services/owner/venue/editphotograph?photokey={{ photo.key }}">
-                  <img src="/images/edit.png"/>
-                </a>
-                &nbsp;
-                <a title="Delete this Photograph"
-                  href="/services/owner/venue/deletephotograph?photokey={{ photo.key }}"
-                   onclick="return confirm('Are you sure?');">
-                  <img src="/images/delete.png"/>
-                </a>
-            </td>
-            {% endfor %}
-        </tr>
-    </table>
 
       <h3>Rooms</h3>
       <p><strong>Bedrooms</strong>
@@ -234,6 +204,37 @@
       </table>
 
       <h3>Other Information</h3>
+      <p><strong>Photographs</strong>
+      <a title="Add a Photograph"
+        href="/services/owner/venue/capturephotograph?venuekey={{ venue.key }}">
+        <img src="/images/add.png"/>
+      </a>
+      </p>
+
+    <table cellspacing="15">
+        <tr>
+            {% for photo in photographs %}
+            <td valign="bottom">
+                <a href="/viewer/fullsize?photokey={{photo.key}}">
+                        <img src="/viewer/thumbnail?photokey={{photo.key}}" 
+                        alt="{{photo.caption}}" /></a>
+                <br />
+                <a title="Edit this Photograph"
+                  href="/services/owner/venue/editphotograph?photokey={{ photo.key }}">
+                  <img src="/images/edit.png"/>
+                </a>
+                &nbsp;
+                <a title="Delete this Photograph"
+                  href="/services/owner/venue/deletephotograph?photokey={{ photo.key }}"
+                   onclick="return confirm('Are you sure?');">
+                  <img src="/images/delete.png"/>
+                </a>
+            </td>
+            {% endfor %}
+        </tr>
+    </table>
+
+    <hr />
       <p><strong>Inspection Records</strong>
       <a title="Add an Inspection Record"
         href="/services/owner/venue/captureinspection?containerkey={{ venue.key }}">
