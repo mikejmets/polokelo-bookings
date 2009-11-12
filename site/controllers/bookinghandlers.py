@@ -24,13 +24,11 @@ class ManageBookings(webapp.RequestHandler):
         bookingrequests = BookingRequest.all().order('referenceNumber')
         results = []
         key_str = self.request.get('results')
-        city = self.request.get('city')
-        if not city:
-            city = 'Cape Town'
-        type = self.request.get('type')
-        start = self.request.get('start')
-        nights = self.request.get('nights')
-        people = self.request.get('people')
+        city = self.request.get('city', 'Potchefstroom')
+        type = self.request.get('type', 'Family House')
+        start = self.request.get('start', '2010-06-11')
+        nights = self.request.get('nights', 6)
+        people = self.request.get('people', 5)
         if key_str:
             keys = key_str.split(';')
             for key in keys:
@@ -41,6 +39,9 @@ class ManageBookings(webapp.RequestHandler):
                   berth.bed.bedroom.name,
                   berth.bed.bedType,
                   ))
+        #sort
+        results.sort()
+
         filepath = os.path.join(
             PROJECT_PATH, 'templates', 'bookings', 'managebookinginfo.html')
         self.response.out.write(template.render(filepath, 
