@@ -248,6 +248,7 @@ class Bed(db.Model):
     bedroom = db.ReferenceProperty(Bedroom, collection_name='bedroom_beds')
     created = db.DateTimeProperty(auto_now_add=True)
     creator = db.UserProperty()
+    name = db.StringProperty(required=True)
     bedType = db.StringProperty(
         required=True, choices=['Single', 'Double', 'Bunk'])
     capacity = db.IntegerProperty(required=True, default=1)
