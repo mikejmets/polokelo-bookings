@@ -1,0 +1,83 @@
+{% extends base_path %}
+
+{% block breadcrumbs %}
+<a href="/admin/home">go back</a>
+{% endblock %}
+
+{% block pagecontent %}
+    <h1>Lookup Tables</h1>
+
+    <p><strong>Lookup Table</strong>
+      <a title="Add a new lookup table"
+         href="/admin/lookups/capturelookuptable">
+          <img src="/images/add.png"/>
+      </a>
+    </p>
+    <table class="listing">
+        <thead>
+          <td colspan="3">Lookup Tables Listing</td>
+          <td colspan="2">Items</td>
+        </thead>
+        {% for lookup in lookuptables %}
+        <tr valign="top">
+          <td>
+            <a href="/admin/lookups/viewlookuptable?lookupkey={{ lookup.key }}">
+                {{ lookup.shortcode }}
+            </a>
+            : {{ lookup.description }}
+          </td>
+          <td class="action">
+            <a title="Edit this lookup table"
+              href="/admin/lookups/editlookuptable?lookupkey={{ lookup.key }}">
+              <img src="/images/edit.png"/>
+            </a>
+          </td>
+          <td class="action">
+            <a title="Delete this lookup table"
+              href="/admin/lookups/deletelookuptable?lookupkey={{ lookup.key }}"
+                   onclick="return confirm('Are you sure?');">
+              <img src="/images/delete.png"/>
+            </a>
+          </td>
+          <td style="padding: 0;">
+              {%if lookup.lookupItems %}
+                  <table style="width: 100%; border: 0; margin: 0">
+                  {% for item in lookup.lookupItems %}
+                  <tr>
+                      <td>
+                          <a href="/admin/lookups/editlookupitem?itemkey={{ item.key }}">
+                              {{ item.shortcode }}
+                          </a>
+                          : {{ item.description }}
+                      </td>
+                      <td>
+                          <a title="Edit this lookup table"
+                            href="/admin/lookups/editlookupitem?itemkey={{ item.key }}">
+                            <img src="/images/edit.png"/>
+                          </a>
+                      </td>
+                      <td>
+                          <a title="Delete this item"
+                            href="/admin/lookups/deletelookupitem?itemkey={{ item.key }}"
+                                 onclick="return confirm('Are you sure?');">
+                            <img src="/images/delete.png"/>
+                          </a>
+                      </td>
+                  {% endfor %}
+                  </table>
+              {% else %}
+                  No items yet
+              {% endif %}
+          </td>
+          <td>
+            <a title="Add an item to the table"
+              href="/admin/lookups/capturelookupitem?container_code={{ lookup.shortcode }}">
+                <img src="/images/add.png"/>
+            </a>
+          </td>
+        </tr>
+        {% endfor %}
+    </table>
+
+{% endblock pagecontent %}
+
