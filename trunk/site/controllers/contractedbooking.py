@@ -19,6 +19,22 @@ class ContractedBookingForm(djangoforms.ModelForm):
         exclude = ['created', 'creator', 'client', 'enquiry']
 
 
+class ViewContractedBooking(webapp.RequestHandler):
+
+    def get(self):
+        auth_url, auth_url_text = get_authentication_urls(self.request.uri)
+        bookingkey = self.request.get('bookingkey')
+        booking = ContractedBooking.get(bookingkey)
+        filepath = os.path.join(PROJECT_PATH, 
+                      'templates', 'bookings', 'viewcontractedbooking.html')
+        self.response.out.write(template.render(filepath, 
+                    {
+                        'base_path':BASE_PATH,
+                        'booking':booking,
+                        'auth_url':auth_url,
+                        'auth_url_text':auth_url_text
+                        }))
+
 class CaptureContractedBooking(webapp.RequestHandler):
 
     def get(self):
