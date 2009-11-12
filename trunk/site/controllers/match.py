@@ -13,6 +13,21 @@ from controllers.utils import get_authentication_urls
 logger = logging.getLogger('MatchHandler')
 
 
+class MatchSchedule(webapp.RequestHandler):
+
+    def get(self):
+        auth_url, auth_url_text = get_authentication_urls(self.request.uri)
+        matches = Match.all().order('number')
+        filepath = os.path.join(PROJECT_PATH, 'templates', 'admin', 'matchschedule.html')
+        self.response.out.write(template.render(filepath, 
+                                    {
+                                        'base_path':BASE_PATH,
+                                        'matches':matches,
+                                        'auth_url':auth_url,
+                                        'auth_url_text':auth_url_text
+                                        }))
+
+
 class MatchForm(djangoforms.ModelForm):
     class Meta:
         model = Match
