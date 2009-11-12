@@ -93,9 +93,9 @@
 
     <hr />
 
-    <p><strong>Bookings Requests</strong>
-      <a title="Add a new booking request"
-         href="/bookings/capturebookingrequest">
+    <p><strong>Enquiries</strong>
+      <a title="Add a new enquiry"
+         href="/bookings/captureenquiry">
           <img src="/images/add.png"/>
       </a>
     </p>
@@ -103,17 +103,17 @@
         <thead>
           <td>Reference</td>
         </thead>
-        {% for bookingrequest in bookingrequests %}
+        {% for enquiry in enquiries %}
         <tr>
-          <td>{{ bookingrequest.referenceNumber }}</td>
+          <td>{{ enquiry.referenceNumber }}</td>
           <td class="action">
-            <a title="Edit this bookingrequest"
-              href="/bookings/editbookingrequest?bookingrequestkey={{ bookingrequest.key }}">
+            <a title="Edit this enquiry"
+              href="/bookings/editenquiry?enquirykey={{ enquiry.key }}">
               <img src="/images/edit.png"/>
             </a></td>
           <td class="action">
-            <a title="Delete this bookingrequest"
-              href="/bookings/deletebookingrequest?bookingrequestkey={{ bookingrequest.key }}"
+            <a title="Delete this enquiry"
+              href="/bookings/deleteenquiry?enquirykey={{ enquiry.key }}"
                    onclick="return confirm('Are you sure?');">
               <img src="/images/delete.png"/>
             </a></td>
