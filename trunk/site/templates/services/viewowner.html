@@ -29,10 +29,11 @@
           <img src="/images/add.png"/>
         </a>
       </p>
-      <table class="listing">
+      <table class="listing" cellspacing="0">
           <thead>
             <td>Type</td>
             <td>Number</td>
+            <td colspan="2">&nbsp;</td>
           </thead>
           {% for number in phonenumbers %}
           <tr>
@@ -59,10 +60,11 @@
          href="/services/owner/email/captureemail?containerkey={{ owner.key }}">
           <img src="/images/add.png"/></a>
       </p>
-      <table class="listing">
+      <table class="listing" cellspacing="0">
           <thead>
             <td>Type</td>
             <td>Address</td>
+            <td colspan="2">&nbsp;</td>
           </thead>
           {% for email in emails %}
           <tr>
@@ -91,10 +93,11 @@
       </a>
       </p>
 
-      <table class="listing">
+      <table class="listing" cellspacing="0">
           <thead>
             <td>Type</td>
             <td>Address</td>
+            <td colspan="2">&nbsp;</td>
           </thead>
           {% for address in addresses %}
           <tr>
@@ -126,9 +129,10 @@
     </a>
     </p>
 
-    <table class="listing">
+    <table class="listing" cellspacing="0">
         <thead>
           <td>Name</td>
+          <td colspan="2">&nbsp;</td>
         </thead>
         {% for venue in venues %}
         <tr>

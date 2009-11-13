@@ -8,7 +8,7 @@
     <form name="findAccommodation" method="post" 
           action="/bookings/findaccommodation">
       <p><strong>Search</strong></p>
-      <table>
+      <table class="listing" cellspacing="0">
         <tr>
           <td>City</td>
           <td> <input type="text" name="city" value="{{ city }}" /> <td>
@@ -38,7 +38,7 @@
     {% if results %}
     <form name="reserveAccommodation" method="post" 
           action="/bookings/reserveaccommodation">
-      <table class="listing">
+      <table class="listing" cellspacing="0">
           <thead>
             <td>Select</td>
             <td>Owner</td>
@@ -80,9 +80,9 @@
           <img src="/images/add.png"/>
       </a>
     </p>
-    <table class="listing">
+    <table class="listing" cellspacing="0">
         <thead>
-          <td>Reference</td>
+          <td colspan="3">Reference</td>
         </thead>
         {% for contractedbooking in contractedbookings %}
         <tr>
@@ -110,9 +110,9 @@
           <img src="/images/add.png"/>
       </a>
     </p>
-    <table class="listing">
+    <table class="listing" cellspacing="0">
         <thead>
-          <td>Reference</td>
+          <td colspan="3">Reference</td>
         </thead>
         {% for enquiry in enquiries %}
         <tr>
