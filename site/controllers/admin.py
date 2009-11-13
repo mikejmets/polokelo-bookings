@@ -7,7 +7,7 @@ from google.appengine.ext.webapp import template
 from controllers.home import BASE_PATH, PROJECT_PATH
 from controllers.match import MatchSchedule, CaptureMatch, EditMatch, DeleteMatch
 from controllers.codelookup import \
-        LookupTablesRoot, CaptureLookupTable, EditLookupTable, \
+        LookupTablesRoot, CaptureLookupTable, EditLookupTable, DeleteLookupTable, \
         ViewLookupTable, CaptureLookupItem, EditLookupItem, DeleteLookupItem
 from controllers.utils import get_authentication_urls
 from models.schedule import Match
@@ -34,6 +34,7 @@ application = webapp.WSGIApplication([
                             ('/admin/lookups', LookupTablesRoot),
                             ('/admin/lookups/capturelookuptable', CaptureLookupTable),
                             ('/admin/lookups/editlookuptable', EditLookupTable),
+                            ('/admin/lookups/deletelookuptable', DeleteLookupTable),
                             ('/admin/lookups/viewlookuptable', ViewLookupTable),
                             ('/admin/lookups/capturelookupitem', CaptureLookupItem),
                             ('/admin/lookups/editlookupitem', EditLookupItem),

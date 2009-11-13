@@ -146,17 +146,24 @@ div.photothumb {
   border: 1;
 }
 
-.listing table {
-  border: 1px solid black;
+table.listing {
+  border-right: 1px solid lightblue;
+  border-bottom: 1px solid lightblue;
+  margin: none;
+  padding: none;
 }
 .listing thead {
-	font-weight: bold; 
+  border-left: 1px solid lightblue;
+  border-top: 1px solid lightblue;
+  font-weight: bold; 
 }
 .action {
   text-align: center !important;
 }
 .listing td {
-  border: 1px solid lightblue;
+  border-left: 1px solid lightblue;
+  border-top: 1px solid lightblue;
+  margin: none;
   padding: 3px;
 }
 
