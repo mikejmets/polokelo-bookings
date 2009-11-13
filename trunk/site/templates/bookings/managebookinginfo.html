@@ -11,11 +11,27 @@
       <table class="listing" cellspacing="0">
         <tr>
           <td>City</td>
-          <td> <input type="text" name="city" value="{{ city }}" /> <td>
+          <td> 
+              <select name="city">
+                  {% for description in cities %}
+                      <option{%ifequal city description %} selected="1"{%endifequal%}>
+                      {{description}}
+                      </option>
+                  {% endfor %}
+              </select>
+          <td>
         </tr>
         <tr>
           <td>Type</td>
-          <td> <input type="text" name="type" value="{{ type }}" /> <td>
+          <td> 
+              <select name="type">
+                  {% for description in accomtypes %}
+                      <option{%ifequal type description %} selected="1"{%endifequal%}>
+                      {{description}}
+                      </option>
+                  {% endfor %}
+              </select>
+          <td>
         </tr>
         <tr>
           <td>Start Date</td>

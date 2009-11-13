@@ -17,12 +17,17 @@ from controllers.enquiry \
     import CaptureEnquiry, EditEnquiry, DeleteEnquiry
 from models.hostinfo import Berth
 from models.bookinginfo import ContractedBooking, Enquiry, AccommodationElement
+
+from models.codelookup import getChoices
+
 from controllers.utils import get_authentication_urls
 
 logger = logging.getLogger('BookingHandlers')
 
 class ManageBookings(webapp.RequestHandler):
     def get(self):
+        cityList = getChoices('CTY')
+        accommodationTypes = getChoices('ACTYP')
         people = self.request.get('people', 'zip')
         logger.info('----------%s', people)
         auth_url, auth_url_text = get_authentication_urls(self.request.uri)
@@ -64,7 +69,9 @@ class ManageBookings(webapp.RequestHandler):
                     {
                         'base_path':BASE_PATH,
                         'elementkey':elementkey,
+                        'cities':cityList,
                         'city':city,
+                        'accomtypes':accommodationTypes,
                         'type':type,
                         'start':start,
                         'nights':nights,
