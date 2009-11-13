@@ -146,25 +146,27 @@ div.photothumb {
   border: 1;
 }
 
+table {
+    margin: 0;
+    padding: 0;
+}
 table.listing {
-  border-right: 1px solid lightblue;
-  border-bottom: 1px solid lightblue;
-  margin: none;
-  padding: none;
+    border-right: 1px solid lightblue;
+    border-bottom: 1px solid lightblue;
 }
 .listing thead {
-  border-left: 1px solid lightblue;
-  border-top: 1px solid lightblue;
-  font-weight: bold; 
-}
-.action {
-  text-align: center !important;
+    border-left: 1px solid lightblue;
+    border-top: 1px solid lightblue;
+    font-weight: bold; 
 }
 .listing td {
-  border-left: 1px solid lightblue;
-  border-top: 1px solid lightblue;
-  margin: none;
-  padding: 3px;
+    border-left: 1px solid lightblue;
+    border-top: 1px solid lightblue;
+    margin: 0;
+    padding: 3px 5px;
+}
+.action {
+    text-align: center !important;
 }
 
 form th {
