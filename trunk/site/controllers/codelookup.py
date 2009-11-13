@@ -29,7 +29,6 @@ class LookupTableForm(djangoforms.ModelForm):
         model = CodeLookup
         exclude = ['created', 'creator', 'container', 'sort_order']
 
-
 class CaptureLookupTable(webapp.RequestHandler):
 
     def get(self):
@@ -111,6 +110,17 @@ class EditLookupTable(webapp.RequestHandler):
                                         'auth_url':auth_url,
                                         'auth_url_text':auth_url_text
                                         }))
+
+class DeleteLookupTable(webapp.RequestHandler):
+
+    def get(self):
+        came_from = self.request.referer
+        key = self.request.get('lookupkey')
+        item = CodeLookup.get(key)
+        if item:
+            #recursive delete
+            item.rdelete()
+        self.redirect(came_from)
 
 
 class ViewLookupTable(webapp.RequestHandler):
