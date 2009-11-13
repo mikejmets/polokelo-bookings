@@ -5,25 +5,21 @@ from google.appengine.ext import db
 from google.appengine.ext.db import polymodel
 from google.appengine.api import users
 
+from models.codelookup import getChoices
+
 from models.bookinginfo import ContractedBooking
 from controllers.utils import datetimeIterator
 
 logger = logging.getLogger('HostInfo')
 
 class Address(db.Model):
-    container = db.ReferenceProperty(
-        db.Model, collection_name='entity_addresses')
+    container = db.ReferenceProperty(db.Model, collection_name='entity_addresses')
     created = db.DateTimeProperty(auto_now_add=True)
     creator = db.UserProperty()
-    addressType = db.StringProperty(required=True,
-        choices=['Physical', 'Postal', 'Key Collection', 'Other'])
+    addressType = db.StringProperty(required=True, choices=getChoices('ADRTYP'))
     streetAddress = db.StringProperty(required=True)
     suburb = db.StringProperty(required=True)
-    city = db.StringProperty(
-        required=True,
-        choices=['Potchefstroom', 'Polokwane', 'Cape Town', 'Johannesberg', 
-                 'Pretoria', 'Bloemfontein', 'Rustenburg', 'Nelspruit',
-                 'Durban', 'Port Elizabeth'])
+    city = db.StringProperty(required=True, choices=getChoices('CTY'))
     country = db.StringProperty(default='South Africa')
     postCode = db.StringProperty()
 
@@ -41,10 +37,8 @@ class PhoneNumber(db.Model):
     container = db.ReferenceProperty(db.Model, collection_name='entity_phonenumbers')
     created = db.DateTimeProperty(auto_now_add=True)
     creator = db.UserProperty()
-    numberType = db.StringProperty(
-            verbose_name = 'Number Type',
-            required=True,
-            choices=['Home', 'Work', 'Fax', 'Mobile', 'Other'])
+    numberType = db.StringProperty(verbose_name = 'Number Type',
+                            required=True, choices=getChoices('NUMTP'))
     number = db.PhoneNumberProperty(verbose_name='Number', required=True)
 
     def rdelete(self):
@@ -58,7 +52,7 @@ class EmailAddress(db.Model):
     emailType = db.StringProperty(
             verbose_name = 'Email Type',
             required=True,
-            choices=['Personal', 'Office', 'Venue', 'Other'])
+            choices=getChoices('EMLTP'))
     email = db.EmailProperty(verbose_name='Email Address', required=True)
 
     def rdelete(self):
@@ -96,7 +90,7 @@ class Venue(db.Model):
     creator = db.UserProperty()
     name = db.StringProperty(verbose_name='Venue Name')
     venueType = db.StringProperty(verbose_name='Class', 
-        choices=['Backpack', 'Hostel', 'Family House', 'Guest House'])
+        choices=getChoices('ACTYP'))
     contactPerson = db.StringProperty(verbose_name='Contact Person')
     disabilityFriendly = db.BooleanProperty(
         default=False, verbose_name='Disability Friendly')
@@ -106,8 +100,7 @@ class Venue(db.Model):
         default=False, verbose_name='Registration Fee Paid')
     contractStartDate = db.DateProperty(verbose_name='Contracted Start Date')
     contractEndDate = db.DateProperty(verbose_name='Contracted End Date')
-    state = db.StringProperty(
-        default='closed', choices=['closed', 'open'])
+    state = db.StringProperty(default='Closed', choices=getChoices('VNSTA'))
 
     def get_city(self):
         q = Address.all()
@@ -212,9 +205,8 @@ class Bedroom(db.Model):
     created = db.DateTimeProperty(auto_now_add=True)
     creator = db.UserProperty()
     name = db.StringProperty(required=True, verbose_name='Name')
-    bathroomType = db.StringProperty(
-        required=True, verbose_name='Bedroom Type',
-        choices=['En suite', 'Own', 'Shared'])
+    bathroomType = db.StringProperty(required=True, verbose_name='Bedroom Type',
+                                        choices=getChoices('BRTYP'))
     disabilityFriendly = db.BooleanProperty(
         default=False, verbose_name='Disability Friendly')
     childFriendly = db.BooleanProperty(
@@ -252,8 +244,7 @@ class Bed(db.Model):
     created = db.DateTimeProperty(auto_now_add=True)
     creator = db.UserProperty()
     name = db.StringProperty(required=True)
-    bedType = db.StringProperty(
-        required=True, choices=['Single', 'Double', 'Bunk'])
+    bedType = db.StringProperty(required=True, choices=getChoices('BEDTP'))
     capacity = db.IntegerProperty(required=True, default=1)
 
     def listing_name(self):

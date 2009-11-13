@@ -63,3 +63,13 @@ class CodeLookup(db.Model):
         items.filter('state =', 'active')
         items.order('sort_order')
         return items
+
+def getChoices(container):
+    """ retrieve values to go into choices attributes of properties
+    """
+    items = CodeLookup.all()
+    items.filter('container =', container)
+    items.filter('state =', 'active')
+    items.order('sort_order')
+    items.order('description')
+    return [item.description for item in items]
