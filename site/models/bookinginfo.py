@@ -1,13 +1,14 @@
 from google.appengine.ext import db
 from models.clientinfo import Client
 
+from models.codelookup import getChoices
+
 class Enquiry(db.Model):
     created = db.DateTimeProperty(auto_now_add=True)
     creator = db.UserProperty()
     referenceNumber = db.StringProperty(
         required=True, verbose_name='Reference Number')
-    state = db.StringProperty(
-        default='temporary', choices=['temporary', 'confirmed'])
+    state = db.StringProperty(default='Temporary', choices=getChoices('EQSTA'))
     xmlSource = db.TextProperty(verbose_name='Source Detail')
 
     def listing_name(self):
@@ -25,15 +26,12 @@ class AccommodationElement(db.Model):
     creator = db.UserProperty()
     enquiry = db.ReferenceProperty(
         Enquiry, collection_name='accommodation_elements')
-    city = db.StringProperty(
-        required=True, 
-        verbose_name='City',
-        default='Potchefstroom',
-        choices=['Potchefstroom', 'Cape Town'])
+    city = db.StringProperty(required=True, verbose_name='City',
+        default='Potchefstroom', choices=getChoices('CTY'))
     type = db.StringProperty(
         required=True, 
         verbose_name='Accommodation Class',
-        choices=['Backpackers', 'Guest House', 'Family House', 'Hostel'])
+        choices=getChoices('ACTYP'))
     start = db.DateProperty(
         required=True, verbose_name='Start Date')
     nights = db.IntegerProperty(
@@ -73,8 +71,8 @@ class ContractedBooking(db.Model):
         Client, collection_name='contraced_bookings')
     enquiry = db.ReferenceProperty(
         Enquiry, collection_name='contracted_bookings')
-    state = db.StringProperty(
-        default='temporary', choices=['temporary', 'confirmed'])
+    state = db.StringProperty(default='Temporary', 
+            choices=getChoices('CBSTA'))
 
     def listing_name(self):
         return '%s' % self.bookingNumber
