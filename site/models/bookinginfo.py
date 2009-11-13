@@ -67,6 +67,8 @@ class ContractedBooking(db.Model):
     created = db.DateTimeProperty(auto_now_add=True)
     creator = db.UserProperty()
     bookingNumber = db.StringProperty(required=True)
+    people = db.IntegerProperty(default=1)
+    duration = db.IntegerProperty()
     client = db.ReferenceProperty(
         Client, collection_name='contraced_bookings')
     enquiry = db.ReferenceProperty(

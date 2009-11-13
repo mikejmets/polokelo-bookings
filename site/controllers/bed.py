@@ -43,15 +43,16 @@ class CaptureBed(webapp.RequestHandler):
         containerkey = self.request.get('containerkey')
         container = db.Model.get(containerkey)
         if data.is_valid():
-            entity = data.save(commit=False)
-            entity.creator = users.get_current_user()
-            entity.bedroom = container
-            entity.put()
+            bed = data.save(commit=False)
+            bed.creator = users.get_current_user()
+            bed.bedroom = container
+            bed._parent = container
+            bed.put()
             #Auto create a berth per capacity
-            for i in range(entity.capacity):
-                berth = Berth()
+            for i in range(bed.capacity):
+                berth = Berth(parent=bed)
                 berth.creator = users.get_current_user()
-                berth.bed = entity
+                berth.bed = bed
                 berth.put()
             self.redirect(came_from)
         else:

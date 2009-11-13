@@ -85,8 +85,6 @@
       <input title="Reserve accommodation"
              type="submit" value="Reserve Accommodation" />
     </form>
-    {% else %}
-        <p> No Results </p>
     {% endif %}
     <hr />
 
@@ -129,10 +127,12 @@
     <table class="listing" cellspacing="0">
         <thead>
           <td colspan="3">Reference</td>
+          <td>Status</td>
         </thead>
         {% for enquiry in enquiries %}
         <tr>
           <td>{{ enquiry.referenceNumber }}</td>
+          <td>{{ enquiry.state }}</td>
           <td class="action">
             <a title="Edit this enquiry"
               href="/bookings/editenquiry?enquirykey={{ enquiry.key }}">
