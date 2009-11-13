@@ -7,17 +7,17 @@ from google.appengine.ext.webapp.util import run_wsgi_app
 from google.appengine.ext.webapp import template
 
 from controllers.home import BASE_PATH, PROJECT_PATH
+from controllers.utils import get_authentication_urls
 from controllers.contractedbooking import \
     ViewContractedBooking, CaptureContractedBooking, \
     EditContractedBooking, DeleteContractedBooking
 from controllers.bookingstool import \
     BookingsTool, BookingsToolReserveAccommodation, \
-    BookingsToolFindAccommodation
+    BookingsToolFindAccommodation, BookingError
 from controllers.enquiry \
     import CaptureEnquiry, EditEnquiry, DeleteEnquiry
 from models.hostinfo import Berth
 from models.bookinginfo import ContractedBooking, Enquiry, AccommodationElement
-
 from models.codelookup import getChoices
 
 from controllers.utils import get_authentication_urls
@@ -28,8 +28,6 @@ class ManageBookings(webapp.RequestHandler):
     def get(self):
         cityList = getChoices('CTY')
         accommodationTypes = getChoices('ACTYP')
-        people = self.request.get('people', 'zip')
-        logger.info('----------%s', people)
         auth_url, auth_url_text = get_authentication_urls(self.request.uri)
         contractedbookings = ContractedBooking.all().order('bookingNumber')
         enquiries = Enquiry.all().order('referenceNumber')
@@ -57,9 +55,9 @@ class ManageBookings(webapp.RequestHandler):
         else:
             city =  self.request.get('city', 'Potchefstroom')
             type =  self.request.get('type', 'Family House')
-            start = self.request.get('start', '2010-06-11')
-            nights = self.request.get('nights', 7)
-            people = self.request.get('people', 5)
+            start = self.request.get('start', '2010-06-01')
+            nights = self.request.get('nights', 2)
+            people = self.request.get('people', 2)
         #sort
         results.sort()
 
@@ -86,6 +84,7 @@ class ManageBookings(webapp.RequestHandler):
 
 application = webapp.WSGIApplication([
       ('/bookings/bookinginfo', ManageBookings),
+      ('/bookings/bookingerror', BookingError),
       ('/bookings/findaccommodation', BookingsToolFindAccommodation),
       ('/bookings/reserveaccommodation', BookingsToolReserveAccommodation),
       ('/bookings/viewcontractedbooking', ViewContractedBooking),

@@ -129,7 +129,7 @@ class Venue(db.Model):
                         t = time(14, 00)
                         logging.info('Create slot for %s', 
                             datetime.combine(d, t))
-                        slot = Slot()
+                        slot = Slot(parent=berth)
                         slot.creator = users.get_current_user()
                         slot.berth = berth
                         slot.startDate = d #datetime.combine(d, t)
@@ -263,6 +263,8 @@ class Berth(db.Model):
     creator = db.UserProperty()
 
     def rdelete(self):
+        for r in self.berth_slots:
+            r.rdelete()
         self.delete()
         
 class Slot(db.Model):
