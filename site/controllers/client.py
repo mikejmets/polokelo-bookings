@@ -65,20 +65,22 @@ class CaptureClient(webapp.RequestHandler):
         filepath = os.path.join(PROJECT_PATH, 
                                     'templates', 'clients', 'captureclient.html')
         self.response.out.write(template.render(filepath, 
-                                    {
-                                        'base_path':BASE_PATH,
-                                        'form':ClientForm(),
-                                        'auth_url':auth_url,
-                                        'auth_url_text':auth_url_text
-                                        }))
+                        {
+                            'base_path':BASE_PATH,
+                            'form':ClientForm(),
+                            'came_from':self.request.get('came_from'),
+                            'auth_url':auth_url,
+                            'auth_url_text':auth_url_text
+                            }))
 
     def post(self):
         data = ClientForm(data=self.request.POST)
+        came_from = self.request.get('came_from')
         if data.is_valid():
             entity = data.save(commit=False)
             entity.creator = users.get_current_user()
             entity.put()
-            self.redirect('/clients/clientinfo')
+            self.redirect(came_from)
         else:
             filepath = os.path.join(PROJECT_PATH, 
                                         'templates', 'clients', 'captureclient.html')

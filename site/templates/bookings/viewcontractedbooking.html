@@ -13,6 +13,19 @@
 <p>Booking Status: {{ booking.state }} </p>
 <p>Number of People: {{ booking.people }} </p>
 <p>Number of Nights: {{ booking.duration }} </p>
+{%if client %}
+<p>Guest: {{ client.surname }} {{ client.firstNames}} 
+<a title="Assign Guest to booking"
+  href="/bookings/assignclient?bookingkey={{ booking.key}}&clientkey={{ client.key }}">
+    <img src="/images/add.png"/></a>
+</p>
+{% else %}
+<p>Guest: ------- 
+<a title="Assign Guest to booking"
+    href="/bookings/assignclient?bookingkey={{ booking.key }}">
+    <img src="/images/add.png"/></a>
+</p>
+{% endif %}
 
 <table width="100%">
   <tr>

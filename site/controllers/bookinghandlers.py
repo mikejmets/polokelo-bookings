@@ -9,6 +9,7 @@ from google.appengine.ext.webapp import template
 from controllers.home import BASE_PATH, PROJECT_PATH
 from controllers.utils import get_authentication_urls
 from controllers.contractedbooking import \
+    AssignClientToBooking, \
     ViewContractedBooking, CaptureContractedBooking, \
     EditContractedBooking, DeleteContractedBooking
 from controllers.bookingstool import \
@@ -85,6 +86,7 @@ class ManageBookings(webapp.RequestHandler):
 application = webapp.WSGIApplication([
       ('/bookings/bookinginfo', ManageBookings),
       ('/bookings/bookingerror', BookingError),
+      ('/bookings/assignclient', AssignClientToBooking),
       ('/bookings/findaccommodation', BookingsToolFindAccommodation),
       ('/bookings/reserveaccommodation', BookingsToolReserveAccommodation),
       ('/bookings/viewcontractedbooking', ViewContractedBooking),
