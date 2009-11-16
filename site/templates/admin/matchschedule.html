@@ -15,11 +15,15 @@
     </p>
     <table class="listing" cellspacing="0">
         <thead>
-          <td>Match and Venue Listing</td>
+          <td colspan="7">Match and Venue Listing</td>
         </thead>
         {% for match in matches %}
         <tr>
-          <td>{{ match.listing_name }}</td>
+          <td>{{match.number}}</td>
+          <td>{{match.date}}</td>
+          <td>{{match.city}}</td>
+          <td>{{match.stadium}}</td>
+          <td>{{match.groupTeams}}</td>
           <td class="action">
             <a title="Edit this match"
               href="/admin/schedule/editmatch?matchkey={{ match.key }}">
