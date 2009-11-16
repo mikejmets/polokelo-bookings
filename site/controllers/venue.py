@@ -69,7 +69,7 @@ class ViewVenue(webapp.RequestHandler):
         venue = Venue.get(venuekey)
         state = self.request.get('state')
         logger.info('post booking state %s', state)
-        if state == 'closed':
+        if state == 'Closed':
             #validate before transition
             if not venue.contractStartDate or \
                not venue.contractEndDate:
@@ -77,10 +77,10 @@ class ViewVenue(webapp.RequestHandler):
                 logger.info('invalid dates')
             else:
                 venue.create_slots()
-                venue.state = 'open'
+                venue.state = 'Open'
                 venue.put()
-        elif state == 'open':
-            venue.state = 'closed'
+        elif state == 'Open':
+            venue.state = 'Closed'
             venue.put()
         self.redirect('/services/owner/viewvenue?venuekey=%s' % venuekey)
 

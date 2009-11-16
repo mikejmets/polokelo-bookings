@@ -103,12 +103,12 @@ class Venue(db.Model):
     state = db.StringProperty(default='Closed', choices=getChoices('VNSTA'))
 
     def get_city(self):
-        q = Address.all()
-        q.filter('addressType =', 'Physical')
-        q.filter('container =', self)
-        results = q.fetch(1)
-        if results:
-            return results[0].city
+        results = Address.all()
+        results.filter('addressType =', 'Physical Address')
+        results.filter('container =', self)
+        address = results.fetch(1)
+        if address:
+            return address[0].city
 
     def listing_name(self):
         return 'Name:%s Class:%s Contact:%s' % \

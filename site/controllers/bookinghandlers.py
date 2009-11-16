@@ -54,7 +54,7 @@ class ManageBookings(webapp.RequestHandler):
                       ))
         else:
             city =  self.request.get('city', 'Potchefstroom')
-            type =  self.request.get('type', 'Family House')
+            type =  self.request.get('type', 'Family Home')
             start = self.request.get('start', '2010-06-01')
             nights = self.request.get('nights', 2)
             people = self.request.get('people', 2)
