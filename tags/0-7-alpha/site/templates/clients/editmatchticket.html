@@ -1,0 +1,17 @@
+{% extends base_path %}
+
+{% block breadcrumbs %}
+<a href="{{came_from}}">go back</a>
+{% endblock %}
+
+{% block pagecontent %}
+    <h1>Edit Existing Match Ticket</h1>
+    <form name="matchticket" method="post" action="/clients/matchticket/editmatchticket">
+        <input type="hidden" name="matchticketkey" value="{{ matchticketkey }}" />
+        <input type="hidden" name="came_from" value="{{ came_from }}" />
+        <table>
+            {{ form }}
+        </table>
+        <input type="submit" value="Update Match Ticket" />
+    </form>
+{% endblock pagecontent %}

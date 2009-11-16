@@ -1,0 +1,38 @@
+{% extends base_path %}
+
+{% block pagecontent %}
+    <h1>Client Management</h1>
+
+    <p><strong>Clients</strong>
+      <a title="Add a new client"
+         href="/clients/captureclient">
+          <img src="/images/add.png"/>
+      </a>
+    </p>
+    <table class="listing" cellspacing="0">
+        <thead>
+          <td>Reference</td>
+          <td>Details</td>
+        </thead>
+        {% for client in clients %}
+        <tr>
+          <td>
+              <a href="/clients/viewclient?clientkey={{ client.key }}">
+                {{ client.clientNumber }}</a></td>
+          <td width="60%">{{ client.surname }} {{ client.firstNames }}</td>
+          <td class="action">
+            <a title="Edit this client"
+              href="/clients/editclient?clientkey={{ client.key }}">
+              <img src="/images/edit.png"/>
+            </a></td>
+          <td class="action">
+            <a title="Delete this client"
+              href="/clients/deleteclient?clientkey={{ client.key }}"
+                   onclick="return confirm('Are you sure?');">
+              <img src="/images/delete.png"/>
+            </a></td>
+        </tr>
+        {% endfor %}
+    </table>
+
+{% endblock pagecontent %}

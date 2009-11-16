@@ -1,0 +1,17 @@
+{% extends base_path %}
+
+{% block breadcrumbs %}
+<a href="{{ came_from }}">go back</a>
+{% endblock %}
+
+{% block pagecontent %}
+    <h1>Edit Lookup Table Item</h1>
+    <form name="lookupitem" method="post" action="/admin/lookups/editlookupitem">
+        <input type="hidden" name="came_from" value="{{ came_from }}" />
+        <input type="hidden" name="itemkey" value="{{ itemkey }}" />
+        <table>
+            {{ form }}
+        </table>
+        <input type="submit" value="Update Lookup Table Item" />
+    </form>
+{% endblock pagecontent %}

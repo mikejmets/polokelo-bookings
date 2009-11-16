@@ -1,0 +1,19 @@
+{% extends base_path %}
+
+
+
+{% block pagecontent %}
+    <h1>Booking Error</h1>
+
+    <form name="bookingerror" method="post" 
+          action="/bookings/bookingerror">
+          <p><strong>Error: {{ error }}</strong></p>
+          <input type="hidden" name="city" value="{{ city }}" />
+          <input type="hidden" name="type" value="{{ type }}" />
+          <input type="hidden" name="start" value="{{ start }}" />
+          <input type="hidden" name="nights" value="{{ nights }}" />
+          <input type="hidden" name="people" value="{{ people }}" />
+      <input type="submit" name="Continue" value="Continue" />
+    </form>
+
+{% endblock pagecontent %}
