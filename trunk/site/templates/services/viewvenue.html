@@ -36,7 +36,7 @@
             action="/services/owner/viewvenue">
         <input type="hidden" name="venuekey" value="{{ venue.key }}" />
         <input type="hidden" name="state" value="{{ venue.state }}" />
-        {% ifequal venue.state 'closed' %}
+        {% ifequal venue.state 'Closed' %}
             <input type="submit" value="Open For Bookings" />
         {% else %}
             <input type="submit" value="Close For Bookings" />

@@ -57,10 +57,14 @@ class BookingsTool():
         slots.filter('startDate <=', end)
         slots.order('startDate')
 
+        #Hack for logging
+        getslotsforlogger = [s for s in slots]
+        logger.info('Found %s slots', len(getslotsforlogger))
+
         #group by berth
         berths = {}
         for slot in slots:
-            #logger.info('Found berth %s', slot.berth.key())
+            logger.info('Found berth %s', slot.berth.key())
             berthkey = str(slot.berth.key())
             if berths.has_key(berthkey):
                 berths[berthkey]['slots'].append(str(slot.key()))
@@ -194,7 +198,7 @@ class BookingsToolReserveAccommodation(webapp.RequestHandler):
                         slotkeys, 
                         booking)
             if people:
-                enquiry.state = 'inprocess'
+                enquiry.state = 'In Progress'
                 enquiry.put()
         except BookingConflictError, error:
             logger.error("BookingConflict: %s", error) 
