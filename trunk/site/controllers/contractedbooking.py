@@ -8,6 +8,7 @@ from google.appengine.ext import db
 
 from controllers.home import BASE_PATH, PROJECT_PATH
 from models.bookinginfo import ContractedBooking
+from models.clientinfo import Client
 from controllers.utils import get_authentication_urls
 
 logger = logging.getLogger('ContractedBookingHandler')
@@ -25,12 +26,15 @@ class ViewContractedBooking(webapp.RequestHandler):
         auth_url, auth_url_text = get_authentication_urls(self.request.uri)
         bookingkey = self.request.get('bookingkey')
         booking = ContractedBooking.get(bookingkey)
+        client = booking.client
+
         filepath = os.path.join(PROJECT_PATH, 
                       'templates', 'bookings', 'viewcontractedbooking.html')
         self.response.out.write(template.render(filepath, 
                     {
                         'base_path':BASE_PATH,
                         'booking':booking,
+                        'client':client,
                         'auth_url':auth_url,
                         'auth_url_text':auth_url_text
                         }))
@@ -118,3 +122,47 @@ class DeleteContractedBooking(webapp.RequestHandler):
 
         self.redirect('/bookings/bookinginfo')
 
+class AssignClientToBooking(webapp.RequestHandler):
+
+    def get(self):
+        auth_url, auth_url_text = get_authentication_urls(self.request.uri)
+        came_from = self.request.referer
+        bookingkey = self.request.get('bookingkey')
+        booking = ContractedBooking.get(bookingkey)
+        clientkey = None
+        if booking.client:
+            clientkey = booking.client.key()
+        clientlist = [(g.key(), "%s %s" % (g.surname, g.firstNames)) for g in Client.all()]
+        clientlist.insert(0, (None, '-----'))
+
+        filepath = os.path.join(PROJECT_PATH, 
+                      'templates', 'bookings', 'assignclient.html')
+        self.response.out.write(template.render(filepath, 
+                    {
+                        'base_path':BASE_PATH,
+                        'booking':booking,
+                        'clientkey':clientkey,
+                        'clientlist':clientlist,
+                        'came_from':came_from,
+                        'auth_url':auth_url,
+                        'auth_url_text':auth_url_text
+                        }))
+
+    def post(self):
+        came_from = self.request.get('came_from')
+        bookingkey = self.request.get('bookingkey')
+        booking = ContractedBooking.get(bookingkey)
+        clientkey = self.request.get('clientkey')
+        if clientkey:
+            client = Client.get(clientkey)
+            booking.client = client
+            booking.put()
+            self.redirect(came_from)
+        else:
+            filepath = os.path.join(PROJECT_PATH, 
+                          'templates', 'bookings', 'assignclient.html')
+            self.response.out.write(template.render(filepath, 
+                          {
+                              'base_path':BASE_PATH,
+                              'bookingkey':bookingkey
+                              }))
