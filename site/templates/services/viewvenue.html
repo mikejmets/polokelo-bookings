@@ -36,11 +36,15 @@
             action="/services/owner/viewvenue">
         <input type="hidden" name="venuekey" value="{{ venue.key }}" />
         <input type="hidden" name="state" value="{{ venue.state }}" />
-        {% ifequal venue.state 'Closed' %}
-            <input type="submit" value="Open For Bookings" />
+        {% if venue.isValid %}
+          {% ifequal venue.state 'Closed' %}
+              <input type="submit" name="workflow" value="Open For Bookings" />
+          {% else %}
+              <input type="submit" name="workflow" value="Close For Bookings" />
+          {% endifequal %}
         {% else %}
-            <input type="submit" value="Close For Bookings" />
-        {% endifequal %}
+          <input type="submit" name="validate" value="Validate" />
+        {% endif %}
       </form>
     </td>
 

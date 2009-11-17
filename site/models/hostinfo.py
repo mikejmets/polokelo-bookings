@@ -114,6 +114,10 @@ class Venue(db.Model):
         return 'Name:%s Class:%s Contact:%s' % \
             (self.name, self.venueType, self.contactPerson)
 
+    def isValid(self):
+        
+        return True
+
     def create_slots(self):
         logging.info('Create slots for venue %s', self.name)
         for room in self.venue_bedrooms:
