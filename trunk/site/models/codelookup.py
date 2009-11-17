@@ -1,4 +1,5 @@
 from google.appengine.ext import db
+from google.appengine.api import memcache
 
 class CodeLookup(db.Model):
     """ implements a simple lookup mechanism based on codes
@@ -67,9 +68,13 @@ class CodeLookup(db.Model):
 def getChoices(container):
     """ retrieve values to go into choices attributes of properties
     """
-    items = CodeLookup.all()
-    items.filter('container =', container)
-    items.filter('state =', 'active')
-    items.order('sort_order')
-    items.order('description')
-    return [item.description for item in items]
+    result = memcache.get(container)
+    if result is None:
+        items = CodeLookup.all()
+        items.filter('container =', container)
+        items.filter('state =', 'active')
+        items.order('sort_order')
+        items.order('description')
+        result = [item.description for item in items] 
+        memcache.add(container, result)
+    return result

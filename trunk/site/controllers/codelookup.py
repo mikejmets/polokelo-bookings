@@ -1,5 +1,6 @@
 import os
 from google.appengine.api import users
+from google.appengine.api import memcache
 from google.appengine.ext import webapp
 from google.appengine.ext.webapp import template
 from google.appengine.ext.db import djangoforms
@@ -96,6 +97,7 @@ class EditLookupTable(webapp.RequestHandler):
             entity = data.save(commit=False)
             entity.creator = users.get_current_user()
             entity.put()
+            memcache.delete(entity.shortcode)
             self.redirect(came_from)
         else:
             auth_url, auth_url_text = get_authentication_urls(self.request.uri)
@@ -120,6 +122,7 @@ class DeleteLookupTable(webapp.RequestHandler):
         if item:
             #recursive delete
             item.rdelete()
+        memcache.delete(item.shortcode)
         self.redirect(came_from)
 
 
