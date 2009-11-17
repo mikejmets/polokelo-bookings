@@ -115,8 +115,43 @@ class Venue(db.Model):
             (self.name, self.venueType, self.contactPerson)
 
     def isValid(self):
+        is_valid, err = self.validate()
+        if not is_valid:
+            logger.info("Validation failed: %s", err)
+        return is_valid
+
+    def validate(self):
+        #Check bedrooms
+        for b in self.venue_bedrooms:
+            is_valid, err = b.validate()
+            if not is_valid:
+                return False, err
+
+        #Check bathrooms
+        if len(self.venue_bathrooms.fetch(1)) == 0:
+            return False, "No bathrooms"
         
-        return True
+        #Check physical address exists
+        has_address = False
+        for a in self.entity_addresses:
+            if a.addressType == 'Physical Address':
+                has_address = True
+                break
+        if not has_address:
+            return False, "No physical address"
+
+        #Ensure contact
+        #has_email = len(self.entity_emails.fetch(1)) > 0
+        #has_number = len(self.entity_phonenumbers.fetch(1)) > 0
+        #if not has_email and not has_number:
+        #    return False, "No contactable"
+
+        #Check photos
+        #if len(self.venue_photos.fetch(1)) == 0:
+        #    return False, "No Photos"
+
+        #Otherwise
+        return True, ""
 
     def create_slots(self):
         logging.info('Create slots for venue %s', self.name)
@@ -222,6 +257,24 @@ class Bedroom(db.Model):
         fields = [self.name, self.bathroomType, self.capacity]
         fields = [str(f) for f in fields]
         return '%s' % ', '.join(fields)
+
+    def validate(self):
+        #Check beds exist
+        if len(self.bedroom_beds.fetch(1)) == 0:
+            return False, "No Beds"
+
+        #Check bedroom capacity > 0
+        if self.capacity == 0:
+            return False, "No capacity"
+
+        #Check capacity matches
+        bed_cap = 0
+        for b in self.bedroom_beds:
+            bed_cap += b.capacity
+        if bed_cap != self.capacity:
+            return False, "Capacity mismatch"
+
+        return True, ""
 
     def rdelete(self):
         for r in self.bedroom_beds:
