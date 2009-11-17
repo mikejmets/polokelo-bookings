@@ -107,10 +107,12 @@ class CaptureVenue(webapp.RequestHandler):
     def post(self):
         data = VenueForm(data=self.request.POST)
         ownerkey = self.request.get('ownerkey')
+        owner = Owner.get(ownerkey)
         if data.is_valid():
             entity = data.save(commit=False)
             entity.creator = users.get_current_user()
-            entity.owner = Owner.get(ownerkey)
+            entity.owner = owner
+            entity._parent = owner
             entity.put()
             self.redirect('/services/owner/viewowner?ownerkey=%s' % ownerkey)
         else:
@@ -156,7 +158,6 @@ class EditVenue(webapp.RequestHandler):
         if data.is_valid():
             entity = data.save(commit=False)
             #Change creator to last modified
-            entity.owner = Owner.get(ownerkey)
             entity.creator = users.get_current_user()
             entity.put()
             self.redirect(came_from)

@@ -94,15 +94,14 @@ class EditBed(webapp.RequestHandler):
         came_from = self.request.get('came_from')
         bedkey = self.request.get('bedkey')
         bed = Bed.get(bedkey)
-        container = bed.bedroom
         data = BedForm(data=self.request.POST, instance=bed)
         if data.is_valid():
             entity = data.save(commit=False)
             entity.creator = users.get_current_user()
-            entity.container = container
             entity.put()
             self.redirect(came_from)
         else:
+            container = bed.bedroom
             auth_url, auth_url_text = get_authentication_urls(self.request.uri)
             filepath = os.path.join(PROJECT_PATH, 
                                         'templates', 'services', 'editbed.html')
@@ -124,7 +123,6 @@ class DeleteBed(webapp.RequestHandler):
         came_from = self.request.referer
         key = self.request.get('bedkey')
         bed = Bed.get(key)
-        container = bed.bedroom
         if bed:
             #recursive delete
             bed.rdelete()

@@ -76,6 +76,7 @@ class CaptureBedroom(webapp.RequestHandler):
             entity = data.save(commit=False)
             entity.creator = users.get_current_user()
             entity.venue = container
+            entity._parent = container
             entity.put()
             self.redirect(came_from)
         else:
@@ -118,15 +119,14 @@ class EditBedroom(webapp.RequestHandler):
         came_from = self.request.get('came_from')
         bedroomkey = self.request.get('bedroomkey')
         bedroom = Bedroom.get(bedroomkey)
-        container = bedroom.venue
         data = BedroomForm(data=self.request.POST, instance=bedroom)
         if data.is_valid():
             entity = data.save(commit=False)
             entity.creator = users.get_current_user()
-            entity.container = container
             entity.put()
             self.redirect(came_from)
         else:
+            container = bedroom.venue
             auth_url, auth_url_text = get_authentication_urls(self.request.uri)
             filepath = os.path.join(PROJECT_PATH, 
                                         'templates', 'services', 'editbedroom.html')
@@ -148,7 +148,6 @@ class DeleteBedroom(webapp.RequestHandler):
         came_from = self.request.referer
         key = self.request.get('bedroomkey')
         bedroom = Bedroom.get(key)
-        container = bedroom.venue
         if bedroom:
             #recursive delete
             bedroom.rdelete()
