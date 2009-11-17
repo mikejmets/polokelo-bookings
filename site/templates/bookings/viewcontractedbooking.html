@@ -14,15 +14,18 @@
 <p>Number of People: {{ booking.people }} </p>
 <p>Number of Nights: {{ booking.duration }} </p>
 {%if client %}
-<p>Guest: {{ client.surname }} {{ client.firstNames}} 
+<p>Guest: 
+<a title="View Guest"
+  href="/clients/viewclient?clientkey={{ client.key }}">
+{{ client.surname }} {{ client.firstNames}} </a>
 <a title="Assign Guest to booking"
-  href="/bookings/assignclient?bookingkey={{ booking.key}}&clientkey={{ client.key }}">
+  href="/bookings/assignclient?bookingkey={{ booking.key}}&clientkey={{ client.key }}&came_from=/bookings/viewcontractedbooking?bookingkey={{ booking.key }}">
     <img src="/images/add.png"/></a>
 </p>
 {% else %}
 <p>Guest: ------- 
 <a title="Assign Guest to booking"
-    href="/bookings/assignclient?bookingkey={{ booking.key }}">
+  href="/bookings/assignclient?bookingkey={{ booking.key }}&came_from=/bookings/viewcontractedbooking?bookingkey={{ booking.key }}">
     <img src="/images/add.png"/></a>
 </p>
 {% endif %}

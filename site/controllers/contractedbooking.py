@@ -126,13 +126,16 @@ class AssignClientToBooking(webapp.RequestHandler):
 
     def get(self):
         auth_url, auth_url_text = get_authentication_urls(self.request.uri)
-        came_from = self.request.referer
+        came_from = self.request.get('came_from')
         bookingkey = self.request.get('bookingkey')
         booking = ContractedBooking.get(bookingkey)
-        clientkey = None
-        if booking.client:
+        clientkey = self.request.get('clientkey', None)
+        if not clientkey and booking.client:
             clientkey = booking.client.key()
-        clientlist = [(g.key(), "%s %s" % (g.surname, g.firstNames)) for g in Client.all()]
+        clientlist = []
+        for client in Client.all():
+            clientlist.append(
+                (str(client.key()), "%s %s" % (client.surname, client.firstNames)))
         clientlist.insert(0, (None, '-----'))
 
         filepath = os.path.join(PROJECT_PATH, 
