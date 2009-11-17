@@ -46,6 +46,7 @@ class CaptureBathroom(webapp.RequestHandler):
             entity = data.save(commit=False)
             entity.creator = users.get_current_user()
             entity.venue = container
+            entity._parent = container
             entity.put()
             self.redirect(came_from)
         else:
@@ -87,15 +88,14 @@ class EditBathroom(webapp.RequestHandler):
         came_from = self.request.get('came_from')
         bathroomkey = self.request.get('bathroomkey')
         bathroom = Bathroom.get(bathroomkey)
-        container = bathroom.venue
         data = BathroomForm(data=self.request.POST, instance=bathroom)
         if data.is_valid():
             entity = data.save(commit=False)
             entity.creator = users.get_current_user()
-            entity.container = container
             entity.put()
             self.redirect(came_from)
         else:
+            container = bathroom.venue
             auth_url, auth_url_text = get_authentication_urls(self.request.uri)
             filepath = os.path.join(PROJECT_PATH, 
                                         'templates', 'services', 'editbathroom.html')
@@ -117,7 +117,6 @@ class DeleteBathroom(webapp.RequestHandler):
         came_from = self.request.referer
         key = self.request.get('bathroomkey')
         bathroom = Bathroom.get(key)
-        container = bathroom.venue
         if bathroom:
             #recursive delete
             bathroom.rdelete()

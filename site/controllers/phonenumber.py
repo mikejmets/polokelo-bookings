@@ -51,6 +51,7 @@ class CapturePhoneNumber(webapp.RequestHandler):
             entity = data.save(commit=False)
             entity.creator = users.get_current_user()
             entity.container = container
+            entity._parent = container
             entity.put()
             self.redirect(came_from)
         else:

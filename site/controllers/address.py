@@ -54,6 +54,7 @@ class CaptureAddress(webapp.RequestHandler):
             entity = data.save(commit=False)
             entity.creator = users.get_current_user()
             entity.container = container
+            entity._parent = container
             entity.put()
             self.redirect(came_from)
         else:
@@ -97,15 +98,14 @@ class EditAddress(webapp.RequestHandler):
         came_from = self.request.get('came_from')
         addresskey = self.request.get('addresskey')
         address = Address.get(addresskey)
-        container = address.container
         data = AddressForm(data=self.request.POST, instance=address)
         if data.is_valid():
             entity = data.save(commit=False)
             entity.creator = users.get_current_user()
-            entity.container = container
             entity.put()
             self.redirect(came_from)
         else:
+            container = address.container
             auth_url, auth_url_text = get_authentication_urls(self.request.uri)
             filepath = os.path.join(PROJECT_PATH, 
                                         'templates', 'common', 'editaddress.html')
@@ -128,7 +128,6 @@ class DeleteAddress(webapp.RequestHandler):
         came_from = self.request.referer
         key = self.request.get('addresskey')
         address = Address.get(key)
-        container = address.container
         if address:
             #recursive delete
             address.rdelete()

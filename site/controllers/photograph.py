@@ -41,7 +41,8 @@ class CapturePhotograph(webapp.RequestHandler):
             if caption:
                 photo = Photograph.get_or_insert(caption)
                 photo.creator = users.get_current_user()
-                photo.venue = venue.key()
+                photo.venue = venue
+                photo._parent = venue
                 photo.caption = caption
                 rawphoto = self.request.get('fullsize')
                 photo.thumbnail = db.Blob(images.resize(rawphoto, 132, 132))
