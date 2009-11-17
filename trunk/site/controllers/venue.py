@@ -68,20 +68,24 @@ class ViewVenue(webapp.RequestHandler):
         venuekey = self.request.get('venuekey')
         venue = Venue.get(venuekey)
         state = self.request.get('state')
-        logger.info('post booking state %s', state)
-        if state == 'Closed':
-            #validate before transition
-            if not venue.contractStartDate or \
-               not venue.contractEndDate:
-                #Invalid
-                logger.info('invalid dates')
-            else:
-                venue.create_slots()
-                venue.state = 'Open'
+        workflow = self.request.get('workflow')
+        validate = self.request.get('validate')
+        if validate:
+            logger.info("------%s", venue.isValid())
+        if workflow:
+            if state == 'Closed':
+                #validate before transition
+                if not venue.contractStartDate or \
+                   not venue.contractEndDate:
+                    #Invalid
+                    logger.info('invalid dates')
+                else:
+                    venue.create_slots()
+                    venue.state = 'Open'
+                    venue.put()
+            elif state == 'Open':
+                venue.state = 'Closed'
                 venue.put()
-        elif state == 'Open':
-            venue.state = 'Closed'
-            venue.put()
         self.redirect('/services/owner/viewvenue?venuekey=%s' % venuekey)
 
 class CaptureVenue(webapp.RequestHandler):
