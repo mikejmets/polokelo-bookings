@@ -80,6 +80,8 @@ class CaptureClient(webapp.RequestHandler):
             entity = data.save(commit=False)
             entity.creator = users.get_current_user()
             entity.put()
+            if came_from.startswith('/bookings/assignclient'):
+                came_from = "%s&clientkey=%s" % (came_from, entity.key())
             self.redirect(came_from)
         else:
             filepath = os.path.join(PROJECT_PATH, 
