@@ -152,7 +152,6 @@ class AssignClientToBooking(webapp.RequestHandler):
                         }))
 
     def post(self):
-        came_from = self.request.get('came_from')
         bookingkey = self.request.get('bookingkey')
         booking = ContractedBooking.get(bookingkey)
         clientkey = self.request.get('clientkey')
@@ -160,7 +159,8 @@ class AssignClientToBooking(webapp.RequestHandler):
             client = Client.get(clientkey)
             booking.client = client
             booking.put()
-            self.redirect(came_from)
+            self.redirect(
+                '/bookings/viewcontractedbooking?bookingkey=%s' % bookingkey)
         else:
             filepath = os.path.join(PROJECT_PATH, 
                           'templates', 'bookings', 'assignclient.html')
