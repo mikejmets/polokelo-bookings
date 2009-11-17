@@ -88,14 +88,15 @@ class EditInspection(webapp.RequestHandler):
         came_from = self.request.get('came_from')
         inspectionkey = self.request.get('inspectionkey')
         inspection = Inspection.get(inspectionkey)
+        container = inspection.venue
         data = InspectionForm(data=self.request.POST, instance=inspection)
         if data.is_valid():
             entity = data.save(commit=False)
             entity.creator = users.get_current_user()
+            entity._parent = container
             entity.put()
             self.redirect(came_from)
         else:
-            container = inspection.venue
             auth_url, auth_url_text = get_authentication_urls(self.request.uri)
             filepath = os.path.join(PROJECT_PATH, 
                                         'templates', 'services', 'editinspection.html')

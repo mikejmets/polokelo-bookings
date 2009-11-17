@@ -159,6 +159,7 @@ class EditVenue(webapp.RequestHandler):
             entity = data.save(commit=False)
             #Change creator to last modified
             entity.creator = users.get_current_user()
+            entity._parent = venue.owner
             entity.put()
             self.redirect(came_from)
         else:

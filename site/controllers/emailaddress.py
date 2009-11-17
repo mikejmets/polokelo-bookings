@@ -98,6 +98,7 @@ class EditEmailAddress(webapp.RequestHandler):
         if data.is_valid():
             entity = data.save(commit=False)
             entity.creator = users.get_current_user()
+            entity._parent = emailaddress.container
             entity.put()
             self.redirect(came_from)
         else:
