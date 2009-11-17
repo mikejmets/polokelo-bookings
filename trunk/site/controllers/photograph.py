@@ -99,6 +99,7 @@ class EditPhotograph(webapp.RequestHandler):
                 # rawphoto = self.request.get('fullsize')
                 # photo.thumbnail = db.Blob(images.resize(rawphoto, 132, 132))
                 # photo.fullsize = db.Blob(images.resize(rawphoto, 640, 640))
+                photo._parent = photo.venue
                 photo.put()
 
             self.redirect(came_from)
