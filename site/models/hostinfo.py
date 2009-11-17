@@ -18,7 +18,7 @@ class Address(db.Model):
     creator = db.UserProperty()
     addressType = db.StringProperty(required=True, choices=getChoices('ADRTYP'))
     streetAddress = db.StringProperty(required=True)
-    suburb = db.StringProperty(required=True)
+    suburb = db.StringProperty()
     city = db.StringProperty(required=True, choices=getChoices('CTY'))
     country = db.StringProperty(default='South Africa')
     postCode = db.StringProperty()
