@@ -58,13 +58,13 @@ class BookingsTool():
         slots.order('startDate')
 
         #Hack for logging
-        getslotsforlogger = [s for s in slots]
-        logger.info('Found %s slots', len(getslotsforlogger))
+        #getslotsforlogger = [s for s in slots]
+        #logger.info('Found %s slots', len(getslotsforlogger))
 
         #group by berth
         berths = {}
         for slot in slots:
-            logger.info('Found berth %s', slot.berth.key())
+            #logger.info('Found berth %s', slot.berth.key())
             berthkey = str(slot.berth.key())
             if berths.has_key(berthkey):
                 berths[berthkey]['slots'].append(str(slot.key()))
@@ -76,7 +76,7 @@ class BookingsTool():
             valid = True #until proven otherwise
             #Check completeness
             if len(berths[key]['slots']) != nights:
-                logger.info('INVALID: Pairing for %s is incomplete', key)
+                #logger.info('INVALID: Pairing for %s is incomplete', key)
                 break #it remains false
             if valid:
                 berths[key]['valid'] = True
@@ -190,7 +190,7 @@ class BookingsToolReserveAccommodation(webapp.RequestHandler):
                         duration=element.nights)
                     booking.put()
                     bookings.append(booking)
-                    logger.error("Create booking: %s", booking) 
+                    #logger.info("Create booking: %s", booking) 
                     people += 1
                     run_in_transaction(
                         self._assignBookingToSlots, 
@@ -216,11 +216,11 @@ class BookingsToolReserveAccommodation(webapp.RequestHandler):
                 slot.contracted_booking = booking
                 slot.put()
             else:
-                logger.info(
-                  'LOGGER Conflict on enquiry %s (bed %s, date %s)' \
-                      % (enquiry.referenceNumber,
-                         slot.berth.bed.name,
-                         slot.startDate))
+                #logger.info(
+                #  'LOGGER Conflict on enquiry %s (bed %s, date %s)' \
+                #      % (enquiry.referenceNumber,
+                #         slot.berth.bed.name,
+                #         slot.startDate))
                 raise BookingConflictError(
                   'Conflict on enquiry %s (bed %s, date %s)' \
                       % (enquiry.referenceNumber,
