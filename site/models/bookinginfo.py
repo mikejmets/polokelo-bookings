@@ -70,9 +70,9 @@ class ContractedBooking(db.Model):
     people = db.IntegerProperty(default=1)
     duration = db.IntegerProperty()
     client = db.ReferenceProperty(
-        Client, collection_name='contraced_bookings')
+        Client, collection_name='contracted_bookings')
     enquiry = db.ReferenceProperty(
-        Enquiry, collection_name='contracted_bookings')
+        Enquiry, collection_name='enquiries')
     state = db.StringProperty(default='Temporary', 
             choices=getChoices('CBSTA'))
 
