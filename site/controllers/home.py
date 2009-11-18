@@ -30,9 +30,29 @@ class HomePage(webapp.RequestHandler):
                                         'auth_url_text':auth_url_text
                                         }))
 
+class CommonError(webapp.RequestHandler):
+    def get(self):
+        auth_url, auth_url_text = get_authentication_urls(self.request.uri)
+        filepath = os.path.join(
+            PROJECT_PATH, 'templates', 'common', 'commonerror.html')
+        error = self.request.get('error')
+        came_from = self.request.get('came_from')
+        self.response.out.write(template.render(filepath, 
+                                    {
+                                        'base_path':BASE_PATH,
+                                        'error':error,
+                                        'came_from':came_from,
+                                        'auth_url':auth_url,
+                                        'auth_url_text':auth_url_text
+                                        }))
+
+    def post(self):
+        came_from = self.request.get('came_from')
+        self.redirect(came_from)
 
 application = webapp.WSGIApplication([
                             ('/index', HomePage),
+                            ('/home/showerror', CommonError),
                             ], debug=True)
 
 def main():

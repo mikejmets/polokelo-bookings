@@ -18,35 +18,38 @@
 
     <hr />
       <p><strong>Beds</strong>
-      <a title="Add a new bed"
-         href="/services/owner/venue/capturebed?containerkey={{ bedroom.key }}">
-          <img src="/images/add.png"/></a></td>
-        </a>
+      {% if bedroom.venue.canModify %}
+        <a title="Add a new bed"
+           href="/services/owner/venue/capturebed?containerkey={{ bedroom.key }}">
+            <img src="/images/add.png"/></a></td>
+          </a>
+      {% endif %}
       </p>
 
-    <table class="listing" cellspacing="0">
+    <table class="listing">
         <thead>
           <td>Name</td>
           <td>Type</td>
           <td>Capacity</td>
-          <td colspan="2">&nbsp;</td>
         </thead>
         {% for bed in beds %}
         <tr>
             <td>{{ bed.name }}</td>
             <td>{{ bed.bedType }}</td>
             <td>{{ bed.capacity }}</td>
-            <td class="action">
-              <a title="Edit this bed"
-                href="/services/owner/venue/editbed?bedkey={{ bed.key }}">
-                <img src="/images/edit.png"/>
-              </a></td>
-            <td class="action">
-              <a title="Delete this bed" 
-                href="/services/owner/venue/deletebed?bedkey={{ bed.key }}"
-                onclick="return confirm('Are you sure?');">
-                <img src="/images/delete.png"/>
-              </a></td>
+            {% if bedroom.venue.canModify %}
+              <td class="action">
+                <a title="Edit this bed"
+                  href="/services/owner/venue/editbed?bedkey={{ bed.key }}">
+                  <img src="/images/edit.png"/>
+                </a></td>
+              <td class="action">
+                <a title="Delete this bed" 
+                  href="/services/owner/venue/deletebed?bedkey={{ bed.key }}"
+                  onclick="return confirm('Are you sure?');">
+                  <img src="/images/delete.png"/>
+                </a></td>
+            {% endif %}
         </tr>
         {% endfor %}
     </table>

@@ -116,11 +116,20 @@ class Venue(db.Model):
 
     def isValid(self):
         is_valid, err = self.validate()
-        if not is_valid:
-            logger.info("Validation failed: %s", err)
+        #if not is_valid:
+        #    logger.info("Validation failed: %s", err)
         return is_valid
 
+    def canModify(self):
+        return self.state != 'Open'
+
     def validate(self):
+        #Check venue fields
+        if not self.registrationFeePaid:
+            return False, "Registration fee not received"
+        if not (self.contractStartDate and self.contractEndDate):
+            return False, "Missing contract dates"
+
         #Check bedrooms
         for b in self.venue_bedrooms:
             is_valid, err = b.validate()
