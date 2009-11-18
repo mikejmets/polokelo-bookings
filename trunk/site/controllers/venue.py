@@ -79,7 +79,6 @@ class ViewVenue(webapp.RequestHandler):
                 params['came_from'] = self.request.referer
                 params = urllib.urlencode(params)
                 url = '/home/showerror?%s' % params
-                logger.info('8888888888 %s', url)
                 self.redirect(url)
                 return
         if workflow:
