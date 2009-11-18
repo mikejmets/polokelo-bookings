@@ -43,19 +43,21 @@ class ViewClient(webapp.RequestHandler):
         emails = client.entity_emails
         flights = client.client_flights
         matchtickets = client.client_matchtickets
+        contractedbookings = client.contracted_bookings
         self.response.out.write(template.render(filepath, 
-                                    {
-                                        'base_path':BASE_PATH,
-                                        'client':client,
-                                        'client_values':client_values,
-                                        'addresses':addresses,
-                                        'phonenumbers':phonenumbers,
-                                        'emails':emails,
-                                        'flights':flights,
-                                        'matchtickets':matchtickets,
-                                        'auth_url':auth_url,
-                                        'auth_url_text':auth_url_text
-                                        }))
+                      {
+                          'base_path':BASE_PATH,
+                          'client':client,
+                          'client_values':client_values,
+                          'addresses':addresses,
+                          'phonenumbers':phonenumbers,
+                          'emails':emails,
+                          'flights':flights,
+                          'matchtickets':matchtickets,
+                          'contractedbookings':contractedbookings,
+                          'auth_url':auth_url,
+                          'auth_url_text':auth_url_text
+                          }))
 
 
 class CaptureClient(webapp.RequestHandler):

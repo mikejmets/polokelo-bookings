@@ -132,22 +132,27 @@
     <table class="listing" cellspacing="0">
         <thead>
           <td>Name</td>
-          <td colspan="2">&nbsp;</td>
+          <td colspan="2">&nbsp</td>
         </thead>
         {% for venue in venues %}
         <tr>
           <td><a href="/services/owner/viewvenue?venuekey={{ venue.key }}&ownerkey={{ owner.key }}">{{ venue.listing_name }}</a></td>
-          <td class="action">
-            <a title="Edit this venue"
-               href="/services/owner/editvenue?venuekey={{ venue.key }}&ownerkey={{ owner.key }}">
-              <img src="/images/edit.png"/></a></td>
-          </a></td>
-          <td class="action">
-            <a title="Delete this venue"
-               href="/services/owner/deletevenue?venuekey={{ venue.key }}&ownerkey={{ owner.key }}"
-                   onclick="return confirm('Are you sure?');">
-              <img src="/images/delete.png"/></a></td>
-          </a></td>
+          {% if venue.canModify %}
+            <td class="action">
+              <a title="Edit this venue"
+                 href="/services/owner/editvenue?venuekey={{ venue.key }}&ownerkey={{ owner.key }}">
+                <img src="/images/edit.png"/></a></td>
+            </a></td>
+            <td class="action">
+              <a title="Delete this venue"
+                 href="/services/owner/deletevenue?venuekey={{ venue.key }}&ownerkey={{ owner.key }}"
+                     onclick="return confirm('Are you sure?');">
+                <img src="/images/delete.png"/></a></td>
+            </a></td>
+          {% else %}
+            <td>&nbsp</td>
+            <td>&nbsp</td>
+          {% endif %}
         </tr>
         {% endfor %}
     </table>

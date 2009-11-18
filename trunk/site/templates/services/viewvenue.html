@@ -21,12 +21,14 @@
           <tr>
             <td><strong>{{ value.0 }}:</strong></td>
             <td> {{ value.1 }} </td>
-            {%if forloop.first %}
-            <td>
-              <a title="Edit this venue"
-                 href="/services/owner/editvenue?venuekey={{ venue.key }}&ownerkey={{ ownerkey }}">
-                <img src="/images/edit.png"/></a>
-            </td>
+            {% if venue.canModify %}
+                {%if forloop.first %}
+                <td>
+                  <a title="Edit this venue"
+                     href="/services/owner/editvenue?venuekey={{ venue.key }}&ownerkey={{ ownerkey }}">
+                    <img src="/images/edit.png"/></a>
+                </td>
+                {% endif %}
             {% endif %}
           </tr>
           {% endfor %}
@@ -60,7 +62,7 @@
           <thead>
             <td>Type</td>
             <td>Number</td>
-            <td colspan="2">&nbsp;</td>
+            <td colspan="2">&nbsp</td>
           </thead>
           {% for number in phonenumbers %}
           <tr>
@@ -93,7 +95,7 @@
           <thead>
             <td>Type</td>
             <td>Email</td>
-            <td colspan="2">&nbsp;</td>
+            <td colspan="2">&nbsp</td>
           </thead>
           {% for email in emails %}
           <tr>
@@ -116,32 +118,39 @@
 
       <hr />
       <p><strong>Addresses</strong>
-      <a title="Add a new address"
-        href="/services/owner/venue/address/captureaddress?containerkey={{ venue.key }}">
-        <img src="/images/add.png"/>
-      </a></p>
+      {% if venue.canModify %}
+        <a title="Add a new address"
+          href="/services/owner/venue/address/captureaddress?containerkey={{ venue.key }}">
+          <img src="/images/add.png"/>
+        </a>
+      {% endif %}
+      </p>
 
       <table class="listing" cellspacing="0">
           <thead>
             <td>Type</td>
             <td>Address</td>
-            <td colspan="2">&nbsp;</td>
+            {% if venue.canModify %}
+            <td colspan="2">&nbsp</td>
+            {% endif %}
           </thead>
           {% for address in addresses %}
           <tr>
               <td>{{ address.addressType }}</td>
               <td>{{ address.listing_name }}</td>
-              <td class="action">
-                <a title="Edit this address"
-                   href="/services/owner/venue/address/editaddress?addresskey={{ address.key }}">
-                    <img src="/images/edit.png"/>
+              {% if venue.canModify %}
+                <td class="action">
+                  <a title="Edit this address"
+                     href="/services/owner/venue/address/editaddress?addresskey={{ address.key }}">
+                      <img src="/images/edit.png"/>
+                  </a></td>
+                <td class="action">
+                  <a title="Delete this address"
+                     href="/services/owner/venue/address/deleteaddress?addresskey={{ address.key }}"
+                     onclick="return confirm('Are you sure?');">
+                      <img src="/images/delete.png"/>
                 </a></td>
-              <td class="action">
-                <a title="Delete this address"
-                   href="/services/owner/venue/address/deleteaddress?addresskey={{ address.key }}"
-                   onclick="return confirm('Are you sure?');">
-                    <img src="/images/delete.png"/>
-              </a></td>
+              {% endif %}
           </tr>
           {% endfor %}
       </table>
@@ -154,60 +163,72 @@
 
       <h3>Rooms</h3>
       <p><strong>Bedrooms</strong>
-       <a title="Add a new room"
-          href="/services/owner/venue/capturebedroom?containerkey={{ venue.key }}">
-         <img src="/images/add.png"/>
-       </a>
+      {% if venue.canModify %}
+         <a title="Add a new room"
+            href="/services/owner/venue/capturebedroom?containerkey={{ venue.key }}">
+           <img src="/images/add.png"/>
+         </a>
+      {% endif %}
       </p>
       <table class="listing" cellspacing="0">
           <thead>
             <td>Name</td>
             <td>Bathroom</td>
             <td>Capacity</td>
-            <td colspan="2">&nbsp;</td>
+            {% if venue.canModify %}
+              <td colspan="2">&nbsp</td>
+            {% endif %}
           </thead>
           {% for bedroom in bedrooms %}
           <tr>
               <td><a href="/services/owner/venue/viewbedroom?bedroomkey={{ bedroom.key }}&venuekey={{ venue.key }}">{{ bedroom.name }}</a></td>
               <td>{{ bedroom.bathroomType }}</td>
               <td>{{ bedroom.capacity }}</td>
-              <td class="action"><a title="Edit this room" 
-                     href="/services/owner/venue/editbedroom?bedroomkey={{ bedroom.key }}&venuekey={{ venue.key }}">
-                  <img src="/images/edit.png"/></a></td>
-              <td class="action">
-                <a title="Delete this room" 
-                   href="/services/owner/venue/deletebedroom?bedroomkey={{ bedroom.key }}&venuekey={{ venue.key }}"
-                   onclick="return confirm('Are you sure?');">
-                  <img src="/images/delete.png"/></a></td>
+              {% if venue.canModify %}
+                <td class="action"><a title="Edit this room" 
+                       href="/services/owner/venue/editbedroom?bedroomkey={{ bedroom.key }}&venuekey={{ venue.key }}">
+                    <img src="/images/edit.png"/></a></td>
+                <td class="action">
+                  <a title="Delete this room" 
+                     href="/services/owner/venue/deletebedroom?bedroomkey={{ bedroom.key }}&venuekey={{ venue.key }}"
+                     onclick="return confirm('Are you sure?');">
+                    <img src="/images/delete.png"/></a></td>
+              {% endif %}
           </tr>
           {% endfor %}
       </table>
 
       <hr />
       <p><strong>Bathrooms</strong>
-      <a title="Add a new bathroom"
-        href="/services/owner/venue/capturebathroom?containerkey={{ venue.key }}">
-                  <img src="/images/add.png"/></a></td>
-      </a>
+      {% if venue.canModify %}
+        <a title="Add a new bathroom"
+          href="/services/owner/venue/capturebathroom?containerkey={{ venue.key }}">
+                    <img src="/images/add.png"/></a></td>
+        </a>
+      {% endif %}
       </p>
 
-      <table class="listing" cellspacing="0">
+      <table class="listing"  cellspacing="0">
           <thead>
             <td>Description</td>
-            <td colspan="2">&nbsp;</td>
+            {% if venue.canModify %}
+              <td colspan="2">&nbsp</td>
+            {% endif %}
           </thead>
           {% for bathroom in bathrooms %}
           <tr>
               <td width="60%">{{ bathroom.listing_name }}</td>
-              <td class="action"><a title="Edit this bathroom"
-                  href="/services/owner/venue/editbathroom?bathroomkey={{ bathroom.key }}&venuekey={{ venue.key }}">
-                  <img src="/images/edit.png"/></a></td>
-              </a></td>
-              <td class="action"><a title="Delete this bathroom"
-                  href="/services/owner/venue/deletebathroom?bathroomkey={{ bathroom.key }}&venuekey={{ venue.key }}"
-                   onclick="return confirm('Are you sure?');">
-                  <img src="/images/delete.png"/></a></td>
-              </a></td>
+              {% if venue.canModify %}
+                <td class="action"><a title="Edit this bathroom"
+                    href="/services/owner/venue/editbathroom?bathroomkey={{ bathroom.key }}&venuekey={{ venue.key }}">
+                    <img src="/images/edit.png"/></a></td>
+                </a></td>
+                <td class="action"><a title="Delete this bathroom"
+                    href="/services/owner/venue/deletebathroom?bathroomkey={{ bathroom.key }}&venuekey={{ venue.key }}"
+                     onclick="return confirm('Are you sure?');">
+                    <img src="/images/delete.png"/></a></td>
+                </a></td>
+              {% endif %}
           </tr>
           {% endfor %}
       </table>
@@ -251,11 +272,11 @@
       </a>
       </p>
 
-      <table class="listing" cellspacing="0">
+      <table class="listing"  cellspacing="0">
           <thead>
             <td>Date</td>
             <td>Details</td>
-            <td colspan="2">&nbsp;</td>
+            <td colspan="2">&nbsp</td>
           </thead>
           {% for inspection in inspections %}
           <tr>
@@ -282,11 +303,11 @@
       </a>
       </p>
 
-      <table class="listing" cellspacing="0">
+      <table class="listing"  cellspacing="0">
           <thead>
             <td>Date</td>
             <td>Details</td>
-            <td colspan="2">&nbsp;</td>
+            <td colspan="2">&nbsp</td>
           </thead>
           {% for complaint in complaints %}
           <tr>

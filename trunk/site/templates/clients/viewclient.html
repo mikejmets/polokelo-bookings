@@ -20,7 +20,21 @@
           </tr>
           {% endfor %}
       </table>
-
+    
+      <p><strong>Contracted Bookings</strong></p>
+      <table class="listing" cellspacing="0">
+          <thead>
+            <td>Number</td>
+            <td>Status</td>
+          </thead>
+          {% for booking in contractedbookings %}
+          <tr>
+            <td> <a href="/bookings/viewcontractedbooking?bookingkey={{booking.key}}">
+                {{ booking.bookingNumber }} </a></td>
+            <td>{{ booking.state }}</td>
+          </tr>
+          {% endfor %}
+      </table>
     </td>
     <td valign="top">
       <p><strong>Contact Numbers</strong>

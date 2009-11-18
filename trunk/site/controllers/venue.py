@@ -1,5 +1,6 @@
 import os
 import logging
+import urllib
 from google.appengine.api import users
 from google.appengine.ext import webapp
 from google.appengine.ext.webapp import template
@@ -71,7 +72,16 @@ class ViewVenue(webapp.RequestHandler):
         workflow = self.request.get('workflow')
         validate = self.request.get('validate')
         if validate:
-            logger.info("------%s", venue.isValid())
+            is_valid, err = venue.validate()
+            if not is_valid:
+                params = {}
+                params['error'] = err
+                params['came_from'] = self.request.referer
+                params = urllib.urlencode(params)
+                url = '/home/showerror?%s' % params
+                logger.info('8888888888 %s', url)
+                self.redirect(url)
+                return
         if workflow:
             if state == 'Closed':
                 #validate before transition
@@ -157,6 +167,10 @@ class EditVenue(webapp.RequestHandler):
         data = VenueForm(data=self.request.POST, instance=venue)
         if data.is_valid():
             entity = data.save(commit=False)
+            if not self.request.get('contractStartDate'):
+                entity.contractStartDate = None
+            if not self.request.get('contractEndDate'):
+                entity.contractEndDate = None
             #Change creator to last modified
             entity.creator = users.get_current_user()
             entity._parent = venue.owner
