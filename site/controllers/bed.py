@@ -48,7 +48,7 @@ class CaptureBed(webapp.RequestHandler):
             bed.bedroom = container
             bed._parent = container
             bed.put()
-            #Auto create a berth per capacity
+            #auto create a berth per capacity
             for i in range(bed.capacity):
                 berth = Berth(parent=bed)
                 berth.creator = users.get_current_user()
@@ -97,10 +97,18 @@ class EditBed(webapp.RequestHandler):
         container = bed.bedroom
         data = BedForm(data=self.request.POST, instance=bed)
         if data.is_valid():
-            entity = data.save(commit=False)
-            entity.creator = users.get_current_user()
-            entity._parent = container
-            entity.put()
+            bed = data.save(commit=False)
+            bed.creator = users.get_current_user()
+            bed._parent = container
+            bed.put()
+            #Auto delete and recreate all berths
+            for i in bed.bed_berths:
+                i.rdelete()
+            for i in range(bed.capacity):
+                berth = Berth(parent=bed)
+                berth.creator = users.get_current_user()
+                berth.bed = bed
+                berth.put()
             self.redirect(came_from)
         else:
             auth_url, auth_url_text = get_authentication_urls(self.request.uri)
