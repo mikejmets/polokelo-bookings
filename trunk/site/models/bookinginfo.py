@@ -1,3 +1,4 @@
+from datetime import datetime
 from google.appengine.ext import db
 from models.clientinfo import Client
 
@@ -26,20 +27,24 @@ class AccommodationElement(db.Model):
     creator = db.UserProperty()
     enquiry = db.ReferenceProperty(
         Enquiry, collection_name='accommodation_elements')
-    city = db.StringProperty(required=True, verbose_name='City',
+    city = db.StringProperty(verbose_name='City',
         default='Potchefstroom', choices=getChoices('CTY'))
-    type = db.StringProperty(
-        required=True, 
+    type = db.StringProperty(default='Family Home', 
         verbose_name='Accommodation Class',
         choices=getChoices('ACTYP'))
     start = db.DateProperty(
-        required=True, verbose_name='Start Date')
-    nights = db.IntegerProperty(
-        required=True, verbose_name='Number of nights')
-    people = db.IntegerProperty(
-        required=True, verbose_name='Number of people')
+        default=datetime(2010, 6, 1),
+        verbose_name='Start Date')
+    nights = db.IntegerProperty(default=0)
+    genderSensitive = db.BooleanProperty(default=False)
+    adultMales = db.IntegerProperty(default=0)
+    adultFemales = db.IntegerProperty(default=0)
+    childMales = db.IntegerProperty(default=0)
+    childFemales = db.IntegerProperty(default=0)
+    wheelchair = db.BooleanProperty(default=False)
+    speicalneeds = db.BooleanProperty(default=False)
     xmlSource = db.TextProperty(verbose_name='Source Detail')
-    available_berths = db.TextProperty()
+    availableBerths = db.TextProperty()
 
     def listing_name(self):
         return '%s' % self.city
