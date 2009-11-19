@@ -1,6 +1,8 @@
 from google.appengine.ext import db
 from google.appengine.api import memcache
 
+import logging
+
 class CodeLookup(db.Model):
     """ implements a simple lookup mechanism based on codes
         mainly used to populate drop down items and inter
@@ -23,17 +25,6 @@ class CodeLookup(db.Model):
         items.filter('container =', self.shortcode)
         items.order('sort_order')
         return items
-
-    def lookupItemDescription(self, parentcode, itemcode):
-        """ retrieve the long description of any item or lookuptable 
-            in active or obsolete state
-            for external use.
-        """
-        items = CodeLookup.all()
-        items.filter('container =', parentcode)
-        items.filter('shortcode =', itemcode)
-        items.filter('state in', ['active', 'obsolete'])
-        return '|'.join([item.description for item in items])
 
     def rdelete(self):
         """ use in the admin system to flag item as obsolete
@@ -77,4 +68,23 @@ def getChoices(container):
         items.order('description')
         result = [item.description for item in items] 
         memcache.add(container, result)
+    return result
+
+def getItemDescription(itemcode):
+    """ retrieve the long description of any item
+        in active or obsolete state
+        for external use.
+    """
+    result = memcache.get(itemcode, namespace='codelookup-description')
+    if result is None:
+        items = CodeLookup.all()
+        items.filter('shortcode =', itemcode)
+        items.filter('state in', ['active', 'obsolete'])
+        logging.info('getItemDescription: items: %s', 
+                ''.join([item.description for item in items]))
+        item_set = items.fetch(1)
+        if item_set:
+            return item_set[0].description
+        result = '**unknown**'
+        memcache.add(itemcode, result, namespace='codelookup-description')
     return result
