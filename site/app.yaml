@@ -1,5 +1,5 @@
 application: bookings-dev
-version: 0-8-alpha
+version: 0-9-alpha
 runtime: python
 api_version: 1
 
