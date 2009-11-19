@@ -119,10 +119,10 @@ class DeleteLookupTable(webapp.RequestHandler):
         came_from = self.request.referer
         key = self.request.get('lookupkey')
         item = CodeLookup.get(key)
+        memcache.delete(item.shortcode)
         if item:
             #recursive delete
             item.rdelete()
-        memcache.delete(item.shortcode)
         self.redirect(came_from)
 
 
@@ -179,6 +179,7 @@ class CaptureLookupItem(webapp.RequestHandler):
             entity.creator = users.get_current_user()
             entity.container = container_code
             entity.put()
+            memcache.delete(container_code)
             self.redirect(came_from)
         else:
             auth_url, auth_url_text = get_authentication_urls(self.request.uri)
@@ -222,6 +223,8 @@ class EditLookupItem(webapp.RequestHandler):
             entity = data.save(commit=False)
             entity.creator = users.get_current_user()
             entity.put()
+            memcache.delete(item.container)
+            memcache.delete(item.shortcode, namespace='codelookup-description')
             self.redirect(came_from)
         else:
             auth_url, auth_url_text = get_authentication_urls(self.request.uri)
@@ -243,6 +246,8 @@ class DeleteLookupItem(webapp.RequestHandler):
         key = self.request.get('itemkey')
         item = CodeLookup.get(key)
         if item:
+            memcache.delete(item.container)
+            memcache.delete(item.shortcode, namespace='codelookup-description')
             #recursive delete
             item.rdelete()
         self.redirect(came_from)
