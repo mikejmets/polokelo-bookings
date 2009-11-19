@@ -92,10 +92,11 @@ class Venue(db.Model):
     venueType = db.StringProperty(verbose_name='Class', 
         choices=getChoices('ACTYP'))
     contactPerson = db.StringProperty(verbose_name='Contact Person')
-    disabilityFriendly = db.BooleanProperty(
-        default=False, verbose_name='Disability Friendly')
     childFriendly = db.BooleanProperty(
-        default=False, verbose_name='Child Friendly')
+        default=True, verbose_name='Child Friendly')
+    wheelchairAccess = db.BooleanProperty(
+        default=False, verbose_name='Wheelchair Access')
+    specialNeeds = db.StringProperty(verbose_name='Special Needs')
     registrationFeePaid = db.BooleanProperty(
         default=False, verbose_name='Registration Fee Paid')
     contractStartDate = db.DateProperty(verbose_name='Contracted Start Date')
@@ -138,7 +139,7 @@ class Venue(db.Model):
 
         #Check bathrooms
         if len(self.venue_bathrooms.fetch(1)) == 0:
-            return False, "No bathrooms"
+            return False, "No bathrooms in venue"
         
         #Check physical address exists
         has_address = False
@@ -147,7 +148,7 @@ class Venue(db.Model):
                 has_address = True
                 break
         if not has_address:
-            return False, "No physical address"
+            return False, "No physical address for venue"
 
         #Ensure contact
         #has_email = len(self.entity_emails.fetch(1)) > 0
@@ -182,6 +183,13 @@ class Venue(db.Model):
                         slot.berth = berth
                         slot.startDate = d #datetime.combine(d, t)
                         slot.city = berth.bed.bedroom.venue.get_city()
+                        slot.type = berth.bed.bedroom.venue.venueType
+                        slot.childFriendly = \
+                            berth.bed.bedroom.venue.childFriendly or \
+                            berth.bed.bedroom.childFriendly 
+                        slot.wheelchairAccess = \
+                            berth.bed.bedroom.venue.wheelchairAccess or \
+                            berth.bed.bedroom.wheelchairAccess 
                         slot.type = berth.bed.bedroom.venue.venueType
                         slot.put()
                         
@@ -255,10 +263,11 @@ class Bedroom(db.Model):
     name = db.StringProperty(required=True, verbose_name='Name')
     bathroomType = db.StringProperty(required=True, verbose_name='Bedroom Type',
                                         choices=getChoices('BRTYP'))
-    disabilityFriendly = db.BooleanProperty(
-        default=False, verbose_name='Disability Friendly')
     childFriendly = db.BooleanProperty(
-        default=False, verbose_name='Child Friendly')
+        default=True, verbose_name='Child Friendly')
+    wheelchairAccess = db.BooleanProperty(
+        default=False, verbose_name='Wheelchair Access')
+    specialNeeds = db.StringProperty(verbose_name='Special Needs')
     capacity = db.IntegerProperty(
         required=True, default=1, verbose_name='Capacity')
 
@@ -270,7 +279,7 @@ class Bedroom(db.Model):
     def validate(self):
         #Check beds exist
         if len(self.bedroom_beds.fetch(1)) == 0:
-            return False, "No Beds"
+            return False, "No Beds in bedroom %s" % self.name
 
         #Check bedroom capacity > 0
         if self.capacity == 0:
@@ -281,7 +290,7 @@ class Bedroom(db.Model):
         for b in self.bedroom_beds:
             bed_cap += b.capacity
         if bed_cap != self.capacity:
-            return False, "Capacity mismatch"
+            return False, "Capacity mismatch in bedroom %s" % self.name
 
         return True, ""
 
@@ -296,8 +305,8 @@ class Bathroom(db.Model):
     created = db.DateTimeProperty(auto_now_add=True)
     creator = db.UserProperty()
     description = db.TextProperty(required=True, verbose_name='Description')
-    disabilityFriendly = db.BooleanProperty(
-        default=False, verbose_name='Disability Friendly')
+    wheelchairAccess = db.BooleanProperty(
+        default=False, verbose_name='Wheelchair Access')
 
     def listing_name(self):
         return '%s' % self.description
@@ -343,6 +352,8 @@ class Slot(db.Model):
     startDate = db.DateProperty()
     city = db.StringProperty()
     type = db.StringProperty()
+    childFriendly = db.BooleanProperty()
+    wheelchairAccess = db.BooleanProperty()
 
     def listing_name(self):
         return 'Room:%s Venue:%s' % \
