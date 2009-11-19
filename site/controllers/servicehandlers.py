@@ -48,6 +48,7 @@ from controllers.utils import get_authentication_urls
 #    user='mike@example.com', 
 #    roles=['admin'])
 
+PAGESIZE = 15
 class ManageHosts(webapp.RequestHandler):
     def get(self):
         #acl = Acl(area='hostinfo',
@@ -55,12 +56,17 @@ class ManageHosts(webapp.RequestHandler):
         #assert acl.has_access(topic='ManageHosts', name='get') is True
 
         auth_url, auth_url_text = get_authentication_urls(self.request.uri)
-        partners = Owner.all().order('surname')
+        start = self.request.get('start', ' ')
+        query = Owner.all().order('surname')
+        owners = query.filter('surname >=', start).fetch(PAGESIZE+1)
+        new_start = owners[-1].surname
+
         filepath = os.path.join(PROJECT_PATH, 'templates', 'services', 'managehosts.html')
         self.response.out.write(template.render(filepath, 
                                     {
                                         'base_path':BASE_PATH,
-                                        'partners':partners,
+                                        'start':new_start,
+                                        'owners':owners[:-1],
                                         'user':users.get_current_user(),
                                         'auth_url':auth_url,
                                         'auth_url_text':auth_url_text
