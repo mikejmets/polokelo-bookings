@@ -11,7 +11,7 @@
       <table class="listing" cellspacing="0">
         <tr>
           <td>City</td>
-          <td> 
+          <td colspan="2"> 
               <select name="city">
                   {% for description in cities %}
                       <option{%ifequal city description %} selected="1"{%endifequal%}>
@@ -23,7 +23,7 @@
         </tr>
         <tr>
           <td>Type</td>
-          <td> 
+          <td colspan="2"> 
               <select name="type">
                   {% for description in accomtypes %}
                       <option{%ifequal type description %} selected="1"{%endifequal%}>
@@ -35,15 +35,35 @@
         </tr>
         <tr>
           <td>Start Date</td>
-          <td> <input type="text" name="start" value="{{ start }}" /> </td>
+          <td colspan="2"> 
+           <input type="text" name="start" value="{{ start }}" /> </td>
         </tr>
         <tr>
           <td>Number of nights</td>
-          <td> <input type="text" name="nights" value="{{ nights }}" /> </td>
+          <td colspan="2"> 
+           <input type="text" name="nights" value="{{ nights }}" /> </td>
         </tr>
         <tr>
-          <td>Number of people</td>
-          <td> <input type="text" name="people" value="{{ people }}" /> </td>
+          <td>Gender Sensitive</td>
+          <td colspan="2"> 
+            <input type="checkbox" name="genderSensitive" 
+            {% if genderSensitive %} checked {% endif %} />
+          </td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>Male</td>
+          <td>Female</td>
+        </tr>
+        <tr>
+          <td>Number of adults</td>
+          <td> <input type="text" name="adultMales" value="{{ adultMales }}" /> </td>
+          <td> <input type="text" name="adultFemales" value="{{ adultFemales }}" /> </td>
+        </tr>
+        <tr>
+          <td>Number of children</td>
+          <td> <input type="text" name="childMales" value="{{ childMales }}" /> </td>
+          <td> <input type="text" name="childFemales" value="{{ childFemales }}" /> </td>
         </tr>
       </table>
       <input title="Find accommodation"
@@ -80,7 +100,12 @@
       <input type="hidden" name="type" value="{{ type }}" />
       <input type="hidden" name="start" value="{{ start }}" />
       <input type="hidden" name="nights" value="{{ nights }}" />
-      <input type="hidden" name="people" value="{{ people }}" />
+      <input type="hidden" name="genderSensitive" 
+          {% if genderSensitive %} checked {% endif %} />
+      <input type="hidden" name="adultMales" value="{{ adultMales }}" />
+      <input type="hidden" name="adultFemales" value="{{ adultFemales }}" />
+      <input type="hidden" name="childMales" value="{{ childMales }}" />
+      <input type="hidden" name="childFemales" value="{{ childFemales }}" />
       <input title="Reserve accommodation"
              type="submit" value="Reserve Accommodation" />
     </form>

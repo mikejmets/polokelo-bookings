@@ -12,7 +12,12 @@
           <input type="hidden" name="type" value="{{ type }}" />
           <input type="hidden" name="start" value="{{ start }}" />
           <input type="hidden" name="nights" value="{{ nights }}" />
-          <input type="hidden" name="people" value="{{ people }}" />
+          <input type="hidden" name="genderSensitive" 
+          {% if genderSensitive %} value="on" {% endif %} />
+          <input type="hidden" name="adultMales" value="{{ adultMales }}" />
+          <input type="hidden" name="adultFemales" value="{{ adultFemales }}" />
+          <input type="hidden" name="childMales" value="{{ childMales }}" />
+          <input type="hidden" name="childFemales" value="{{ childFemales }}" />
       <input type="submit" name="Continue" value="Continue" />
     </form>
 
