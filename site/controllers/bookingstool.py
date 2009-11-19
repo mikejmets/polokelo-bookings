@@ -18,8 +18,17 @@ logger = logging.getLogger('BookingsTool')
 
 class BookingsTool():
 
-  def checkAvailability(self, city, type, start, nights, people):
-      return len(self.findBerths(city, type, start, nights, people)) > 0
+  def checkAvailability(self, enquiry_number, guest_email,
+                              city, type, start, nights, gender_sensitive,
+                              adult_male, adult_female,
+                              children_male, children_female,
+                              wheelchair, spcecialneeds):
+      quote_amount = 4356.78
+      expiry_date = datetime.now()
+      people = adult_male + adult_female + children_male + children_female,
+      return (len(self.findBerths(city, type, start, nights, people)) > 0,
+              quote_amount, 
+              expiry_date)
 
   def findVenues(self, city, type, start, nights, people):
       berths = self.findBerths(city, type, start, nights, people)
