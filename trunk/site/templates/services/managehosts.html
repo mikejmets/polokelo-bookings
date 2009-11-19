@@ -9,13 +9,18 @@
           <img src="/images/add.png"/>
       </a>
     </p>
+    {% if start %}
+    <p><a href="javascript:history.back()">Previous</a>
+       <a href="?start={{ start }}">Next</a></p>
+    {% endif %}
+
     <table class="listing" cellspacing="0">
         <thead>
           <td>Reference</td>
           <td>Details</td>
           <td colspan="2">&nbsp;</td>
         </thead>
-        {% for owner in partners %}
+        {% for owner in owners %}
         <tr>
           <td>
               <a href="/services/owner/viewowner?ownerkey={{ owner.key }}">
