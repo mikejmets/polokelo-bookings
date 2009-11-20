@@ -4,6 +4,14 @@ from models.clientinfo import Client
 
 from models.codelookup import getChoices
 
+
+class BookingNumberSequence(db.Model):
+    """ generate a booking number
+    """
+    created = db.DateTimeProperty(auto_now_add=True)
+    creator = db.UserProperty()
+    sequence = db.IntegerProperty(default=0)
+
 class Enquiry(db.Model):
     created = db.DateTimeProperty(auto_now_add=True)
     creator = db.UserProperty()
