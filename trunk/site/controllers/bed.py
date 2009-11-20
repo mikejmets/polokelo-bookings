@@ -46,6 +46,7 @@ class CaptureBed(webapp.RequestHandler):
             bed = data.save(commit=False)
             bed.creator = users.get_current_user()
             bed.bedroom = container
+            bed._parent_key = containerkey
             bed._parent = container
             bed.put()
             #auto create a berth per capacity
@@ -99,6 +100,7 @@ class EditBed(webapp.RequestHandler):
         if data.is_valid():
             bed = data.save(commit=False)
             bed.creator = users.get_current_user()
+            bed._parent_key = container.key()
             bed._parent = container
             bed.put()
             #Auto delete and recreate all berths

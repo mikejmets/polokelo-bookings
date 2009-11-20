@@ -51,6 +51,7 @@ class CaptureEmailAddress(webapp.RequestHandler):
             entity = data.save(commit=False)
             entity.creator = users.get_current_user()
             entity.container = container
+            entity._parent_key = containerkey
             entity._parent = container
             entity.put()
             self.redirect(came_from)
@@ -98,6 +99,7 @@ class EditEmailAddress(webapp.RequestHandler):
         if data.is_valid():
             entity = data.save(commit=False)
             entity.creator = users.get_current_user()
+            entity._parent_key = emailaddress.container.key()
             entity._parent = emailaddress.container
             entity.put()
             self.redirect(came_from)

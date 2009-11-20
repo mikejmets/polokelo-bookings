@@ -121,6 +121,7 @@ class CaptureVenue(webapp.RequestHandler):
             entity = data.save(commit=False)
             entity.creator = users.get_current_user()
             entity.owner = owner
+            entity._parent_key = ownerkey
             entity._parent = owner
             entity.put()
             self.redirect('/services/owner/viewowner?ownerkey=%s' % ownerkey)
@@ -172,6 +173,7 @@ class EditVenue(webapp.RequestHandler):
                 entity.contractEndDate = None
             #Change creator to last modified
             entity.creator = users.get_current_user()
+            entity._parent_key = ownerkey
             entity._parent = venue.owner
             entity.put()
             self.redirect(came_from)
