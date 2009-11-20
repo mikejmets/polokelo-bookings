@@ -44,6 +44,13 @@
            <input type="text" name="nights" value="{{ nights }}" /> </td>
         </tr>
         <tr>
+          <td>Requires Wheelchair Access</td>
+          <td colspan="2"> 
+            <input type="checkbox" name="wheelchairAccess" 
+            {% if wheelchairAccess %} checked {% endif %} />
+          </td>
+        </tr>
+        <tr>
           <td>Gender Sensitive</td>
           <td colspan="2"> 
             <input type="checkbox" name="genderSensitive" 
@@ -70,7 +77,7 @@
              type="submit" value="Find Accommodation" />
     </form>
 
-    {% if results %}
+    {% if berths %}
     <form name="reserveAccommodation" method="post" 
           action="/bookings/reserveaccommodation">
       <table class="listing" cellspacing="0">
@@ -83,15 +90,15 @@
             <td>Type</td>
             <td>Capacity</td>
           </thead>
-          {% for result in results %}
+          {% for berth in berths %}
           <tr>
-            <td> <input type="checkbox" name="{{ result.0 }}" /> </td>
-            <td>{{ result.1 }} </td>
-            <td>{{ result.2 }} </td>
-            <td>{{ result.3 }} </td>
-            <td>{{ result.4 }} </td>
-            <td>{{ result.5 }} </td>
-            <td>{{ result.6 }} </td>
+            <td> <input type="checkbox" name="{{ berth.key }}" /> </td>
+            <td>{{ berth.bed.bedroom.venue.owner.listing_name }}</td>
+            <td>{{ berth.bed.bedroom.venue.name }}</td>
+            <td>{{ berth.bed.bedroom.name }}</td>
+            <td>{{ berth.bed.name }}</td>
+            <td>{{ berth.bed.bedType }}</td>
+            <td>{{ berth.bed.capacity }}</td>
           </tr>
           {% endfor %}
       </table>
@@ -100,8 +107,12 @@
       <input type="hidden" name="type" value="{{ type }}" />
       <input type="hidden" name="start" value="{{ start }}" />
       <input type="hidden" name="nights" value="{{ nights }}" />
-      <input type="hidden" name="genderSensitive" 
-          {% if genderSensitive %} checked {% endif %} />
+      {% if wheelchairAccess %}
+        <input type="hidden" name="wheelchairAccess" checked /> 
+      {% endif %} 
+      {% if genderSensitive %}
+        <input type="hidden" name="genderSensitive" checked /> 
+      {% endif %} 
       <input type="hidden" name="adultMales" value="{{ adultMales }}" />
       <input type="hidden" name="adultFemales" value="{{ adultFemales }}" />
       <input type="hidden" name="childMales" value="{{ childMales }}" />
