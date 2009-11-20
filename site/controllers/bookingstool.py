@@ -18,7 +18,7 @@ class BookingsTool():
                               city, type, start, nights, gender_sensitive,
                               adult_male, adult_female,
                               children_male, children_female,
-                              wheelchair, spcecialneeds):
+                              wheelchair, special_needs):
       quote_amount = 4356.78
       expiry_date = datetime.now()
       people = adult_male + adult_female + children_male + children_female,
@@ -35,7 +35,7 @@ class BookingsTool():
 
     def findBerths(self, element):
         h1 = SimpleAccommodationSearch()
-        h2 = GenderSensitiveAccommodationSearch()
+        h2 = WheelchairAccommodationSearch()
         h1.successor = h2
         
         return h1.findBerths(element)
@@ -111,7 +111,7 @@ class AccommodationSearch():
 
     def searchNext(self, element):
         if self.successor:
-            self.successor.findBerths(element)
+            return self.successor.findBerths(element)
         else:
             return []
 
@@ -121,13 +121,16 @@ class SimpleAccommodationSearch(AccommodationSearch):
         logger.info('SimpleAccommodationSearch for %s, %s, %s(%s)', 
             element.city, element.type, element.start, element.nights)
 
+        if element.wheelchairAccess:
+            return self.searchNext(element)
+
         berths = self._findValidBerths(element)
 
-        for key, slots in berths:
-          logger.info('valid pairing %s: %s', key, slots)
+        #for key, slots in berths:
+        #  logger.info('valid pairing %s: %s', key, slots)
         people = element.adultMales + element.adultFemales + element.childMales + element.childFemales
         if len(berths) >= people:
-            logger.info('Found %s pairings for %s people', 
+            logger.info('Found %s simple pairings for %s people', 
                 len(berths), people)
             return berths
         else:
@@ -148,8 +151,8 @@ class SimpleAccommodationSearch(AccommodationSearch):
         slots.order('startDate')
 
         #Hack for logging
-        getslotsforlogger = [s for s in slots]
-        logger.info('Found %s slots', len(getslotsforlogger))
+        #getslotsforlogger = [s for s in slots]
+        #logger.info('Found %s slots', len(getslotsforlogger))
 
         #group by berth
         berths = {}
@@ -182,14 +185,14 @@ class SimpleAccommodationSearch(AccommodationSearch):
         # logger.info('valid pairing %s: %s', key, slots)
         return valid_berths
 
-class GenderSensitiveAccommodationSearch(AccommodationSearch):
+class WheelchairAccommodationSearch(AccommodationSearch):
 
     def findBerths(self, element):
-        logger.info('GenderSensitiveAccommodationSearch for %s, %s, %s(%s)', 
+        logger.info('WheelchairAccommodationSearch for %s, %s, %s(%s)', 
             element.city, element.type, element.start, 
             element.nights)
 
-        if not element.genderSensitive:
+        if not element.wheelchairAccess:
             return self.searchNext(element)
 
         berths = self._findValidBerths(element)
@@ -198,7 +201,7 @@ class GenderSensitiveAccommodationSearch(AccommodationSearch):
         #  logger.info('valid pairing %s: %s', key, slots)
         people = element.adultMales + element.adultFemales + element.childMales + element.childFemales
         if len(berths) >= people:
-            logger.info('Found %s pairings for %s people', 
+            logger.info('Found %s wheelchair pairings for %s people', 
                 len(berths), people)
             return berths
         else:
@@ -212,6 +215,7 @@ class GenderSensitiveAccommodationSearch(AccommodationSearch):
 
         slots = Slot.all()
         slots.filter('occupied =', False)
+        slots.filter('wheelchairAccess =', True)
         slots.filter('city =', element.city)
         slots.filter('type =', element.type)
         slots.filter('startDate >=', element.start)

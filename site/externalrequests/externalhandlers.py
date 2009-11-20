@@ -46,7 +46,7 @@ class ExternalBookings(webapp.RequestHandler):
         children_female = int(children.findtext('female'))
         disability = node.find('disability')
         wheelchair = disability.findtext('wheelchairaccess') == 'yes'
-        spcecialneeds = disability.findtext('otherspecialneeds') == 'yes'
+        specialneeds = disability.findtext('otherspecialneeds') == 'yes'
 
         # do the availability check
         available, amount, expiry = bt.checkAvailability(
@@ -56,7 +56,7 @@ class ExternalBookings(webapp.RequestHandler):
                 gender_sensitive,
                 adult_male, adult_female,
                 children_male, children_female,
-                wheelchair, spcecialneeds)
+                wheelchair, specialneeds)
         available = available and 'available' or 'not available'
 
         # append the result as a sub element to the node element

@@ -36,13 +36,13 @@ class AccommodationElement(db.Model):
         default=datetime(2010, 6, 1),
         verbose_name='Start Date')
     nights = db.IntegerProperty(default=0)
+    wheelchairAccess = db.BooleanProperty(default=False)
+    specialNeeds = db.BooleanProperty(default=False)
     genderSensitive = db.BooleanProperty(default=False)
     adultMales = db.IntegerProperty(default=0)
     adultFemales = db.IntegerProperty(default=0)
     childMales = db.IntegerProperty(default=0)
     childFemales = db.IntegerProperty(default=0)
-    wheelchair = db.BooleanProperty(default=False)
-    speicalneeds = db.BooleanProperty(default=False)
     xmlSource = db.TextProperty(verbose_name='Source Detail')
     availableBerths = db.TextProperty()
 

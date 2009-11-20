@@ -30,7 +30,7 @@ class ManageBookings(webapp.RequestHandler):
         auth_url, auth_url_text = get_authentication_urls(self.request.uri)
         contractedbookings = ContractedBooking.all().order('bookingNumber')
         enquiries = Enquiry.all().order('referenceNumber')
-        results = []
+        berths = []
         elementkey = self.request.get('elementkey')
         if elementkey:
             element = AccommodationElement.get(elementkey)
@@ -38,6 +38,7 @@ class ManageBookings(webapp.RequestHandler):
             type = element.type
             start = element.start
             nights = element.nights
+            wheelchairAccess = element.wheelchairAccess
             genderSensitive = element.genderSensitive
             adultMales = element.adultMales
             adultFemales = element.adultFemales
@@ -46,52 +47,53 @@ class ManageBookings(webapp.RequestHandler):
             if element.availableBerths:
                 for key, slots in eval(element.availableBerths):
                     berth = Berth.get(key)
-                    results.append(( 
-                      'berth_%s' %key,
-                      berth.bed.bedroom.venue.owner.listing_name(),
-                      berth.bed.bedroom.venue.name,
-                      berth.bed.bedroom.name,
-                      berth.bed.name,
-                      berth.bed.bedType,
-                      berth.bed.capacity,
-                      ))
+                    berths.append(berth)
         else:
             city =  self.request.get('city', 'Potchefstroom')
             type =  self.request.get('type', 'Family Home')
             start = self.request.get('start', '2010-06-01')
             nights = self.request.get('nights', 2)
+            wheelchairAccess = \
+                self.request.get('wheelchairAccess', 'off') != 'off'
             genderSensitive = \
-                self.request.get('genderSensitive', 'False') != 'False'
+                self.request.get('genderSensitive', 'off') != 'off'
             adultMales = self.request.get('adultMales', 2)
             adultFemales = self.request.get('adultFemales', 2)
             childMales = self.request.get('childMales', 0)
             childFemales = self.request.get('childFemales', 0)
         #sort
-        results.sort()
+        berths.sort(key=lambda x: "%s %s %s %s" % (
+            x.bed.bedroom.venue.owner.listing_name(),
+            x.bed.bedroom.venue.name,
+            x.bed.bedroom.name,
+            x.bed.name))
 
         filepath = os.path.join(
             PROJECT_PATH, 'templates', 'bookings', 'managebookinginfo.html')
-        self.response.out.write(template.render(filepath, 
-                    {
-                        'base_path':BASE_PATH,
-                        'elementkey':elementkey,
-                        'cities':cityList,
-                        'city':city,
-                        'accomtypes':accommodationTypes,
-                        'type':type,
-                        'start':start,
-                        'nights':nights,
-                        'genderSensitive':genderSensitive,
-                        'adultMales':adultMales,
-                        'adultFemales':adultFemales,
-                        'childMales':childMales,
-                        'childFemales':childFemales,
-                        'results':results,
-                        'contractedbookings':contractedbookings,
-                        'enquiries':enquiries,
-                        'auth_url':auth_url,
-                        'auth_url_text':auth_url_text
-                        }))
+        extras = {'base_path':BASE_PATH,
+                  'elementkey':elementkey,
+                  'cities':cityList,
+                  'city':city,
+                  'accomtypes':accommodationTypes,
+                  'type':type,
+                  'start':start,
+                  'nights':nights,
+                  'adultMales':adultMales,
+                  'adultFemales':adultFemales,
+                  'childMales':childMales,
+                  'childFemales':childFemales,
+                  'berths':berths,
+                  'contractedbookings':contractedbookings,
+                  'enquiries':enquiries,
+                  'auth_url':auth_url,
+                  'auth_url_text':auth_url_text
+                  }
+        if wheelchairAccess:
+            extras['wheelchairAccess'] = 'on'
+        if genderSensitive:
+            extras['genderSensitive'] = 'on'
+
+        self.response.out.write(template.render(filepath, extras))
 
 
 class BookingsToolFindAccommodation(webapp.RequestHandler):
@@ -107,8 +109,10 @@ class BookingsToolFindAccommodation(webapp.RequestHandler):
         nights = self.request.get('nights')
         if nights:
             nights = int(nights)
+        wheelchairAccess = \
+            self.request.get('wheelchairAccess', 'off') != 'off'
         genderSensitive = \
-            self.request.get('genderSensitive', 'False') != 'False'
+            self.request.get('genderSensitive', 'off') != 'off'
         adultMales = int(self.request.get('adultMales', "0"))
         adultFemales = int(self.request.get('adultFemales', "0"))
         childMales = int(self.request.get('childMales', "0"))
@@ -122,6 +126,7 @@ class BookingsToolFindAccommodation(webapp.RequestHandler):
             type=type,
             start=start,
             nights=nights,
+            wheelchairAccess=wheelchairAccess,
             genderSensitive=genderSensitive,
             adultMales=adultMales,
             adultFemales=adultFemales,
@@ -136,7 +141,10 @@ class BookingsToolFindAccommodation(webapp.RequestHandler):
         params['type'] = type
         params['start'] = start
         params['nights'] = nights
-        params['genderSensitive'] = genderSensitive
+        if wheelchairAccess:
+            params['wheelchairAccess'] = 'on'
+        if genderSensitive:
+            params['genderSensitive'] = 'on'
         params['adultMales'] = adultMales
         params['adultFemales'] = adultFemales
         params['childMales'] = childMales
@@ -179,8 +187,10 @@ class BookingsToolReserveAccommodation(webapp.RequestHandler):
         params['type'] =  self.request.get('type')
         params['start'] = self.request.get('start')
         params['nights'] = self.request.get('nights')
-        params['genderSensitive'] = \
-            self.request.get('genderSensitive', 'False') != 'False'
+        if self.request.get('wheelchairAccess', 'off') != 'off':
+            params['wheelchairAccess'] = 'on'
+        if self.request.get('genderSensitive', 'off') != 'off':
+            params['genderSensitive'] = 'on'
         params['adultMales'] = self.request.get('adultMales')
         params['adultFemales'] = self.request.get('adultFemales')
         params['childMales'] = self.request.get('childMales')
@@ -203,8 +213,10 @@ class BookingError(webapp.RequestHandler):
         type =  self.request.get('type')
         start = self.request.get('start')
         nights = self.request.get('nights')
+        wheelchairAccess = \
+            self.request.get('wheelchairAccess', 'off') != 'off'
         genderSensitive = \
-            self.request.get('genderSensitive', 'False') != 'False'
+            self.request.get('genderSensitive', 'off') != 'off'
         adultMales = self.request.get('adultMales')
         adultFemales= self.request.get('adultFemales')
         childMales = self.request.get('childMales')
@@ -212,22 +224,26 @@ class BookingError(webapp.RequestHandler):
 
         filepath = os.path.join(
             PROJECT_PATH, 'templates', 'bookings', 'bookingerror.html')
-        self.response.out.write(template.render(filepath, 
-                    {
-                        'base_path':BASE_PATH,
-                        'error':error,
-                        'city':city,
-                        'type':type,
-                        'start':start,
-                        'nights':nights,
-                        'genderSensitive':genderSensitive,
-                        'adultMales':adultMales,
-                        'adultFemales':adultFemales,
-                        'childMales':childMales,
-                        'childFemales':childFemales,
-                        'auth_url':auth_url,
-                        'auth_url_text':auth_url_text
-                        }))
+        extras= { 'base_path':BASE_PATH,
+                  'error':error,
+                  'city':city,
+                  'type':type,
+                  'start':start,
+                  'nights':nights,
+                  'adultMales':adultMales,
+                  'adultFemales':adultFemales,
+                  'childMales':childMales,
+                  'childFemales':childFemales,
+                  'auth_url':auth_url,
+                  'auth_url_text':auth_url_text
+                  }
+        if wheelchairAccess:
+            extras['wheelchairAccess'] = 'on'
+        if genderSensitive:
+            extras['genderSensitive'] = 'on'
+
+        self.response.out.write(
+            template.render(filepath, extras))
 
     def post(self):
         came_from = '/bookings/bookinginfo' 
@@ -236,7 +252,10 @@ class BookingError(webapp.RequestHandler):
         params['type'] =  self.request.get('type')
         params['start'] = self.request.get('start')
         params['nights'] = self.request.get('nights')
-        params['genderSensitive'] = self.request.get('genderSensitive')
+        if self.request.get('wheelchairAccess', 'off') != 'off':
+            params['wheelchairAccess'] = 'on'
+        if self.request.get('genderSensitive', 'off') != 'off':
+            params['genderSensitive'] = 'on'
         params['adultMales'] = self.request.get('adultMales')
         params['adultFemales'] = self.request.get('adultFemales')
         params['childMales'] = self.request.get('childMales')
