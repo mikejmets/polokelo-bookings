@@ -7,7 +7,7 @@ from google.appengine.ext.db import djangoforms
 from google.appengine.ext import db
 
 from controllers.home import BASE_PATH, PROJECT_PATH
-from models.clientinfo import Client
+from models.clientinfo import Client, Flight, MatchTicket
 from controllers.utils import get_authentication_urls
 
 logger = logging.getLogger('ClientHandler')
@@ -41,8 +41,8 @@ class ViewClient(webapp.RequestHandler):
         addresses = client.entity_addresses
         phonenumbers = client.entity_phonenumbers
         emails = client.entity_emails
-        flights = client.client_flights
-        matchtickets = client.client_matchtickets
+        flights = Flight.all().ancestor(client)
+        matchtickets = MatchTicket.all().ancestor(client)
         contractedbookings = client.contracted_bookings
         self.response.out.write(template.render(filepath, 
                       {

@@ -16,7 +16,7 @@ logger = logging.getLogger('MatchTicketHandler')
 class MatchTicketForm(djangoforms.ModelForm):
     class Meta:
         model = MatchTicket
-        exclude = ['created', 'creator', 'client']
+        exclude = ['created', 'creator']
 
 
 class CaptureMatchTicket(webapp.RequestHandler):
@@ -45,7 +45,8 @@ class CaptureMatchTicket(webapp.RequestHandler):
         if data.is_valid():
             entity = data.save(commit=False)
             entity.creator = users.get_current_user()
-            entity.client = container
+            entity._parent_key = containerkey
+            entity._parent = container
             entity.put()
             self.redirect(came_from)
         else:
@@ -69,7 +70,6 @@ class EditMatchTicket(webapp.RequestHandler):
         auth_url, auth_url_text = get_authentication_urls(self.request.uri)
         matchticketkey = self.request.get('matchticketkey')
         matchticket = MatchTicket.get(matchticketkey)
-        container = matchticket.client
         filepath = os.path.join(PROJECT_PATH, 
                                     'templates', 'clients', 'editmatchticket.html')
         self.response.out.write(template.render(filepath, 
@@ -77,7 +77,6 @@ class EditMatchTicket(webapp.RequestHandler):
                       'base_path':BASE_PATH,
                       'form':MatchTicketForm(instance=matchticket),
                       'matchticketkey':matchticketkey,
-                      'containerkey': container.key,
                       'came_from':came_from,
                       'auth_url':auth_url,
                       'auth_url_text':auth_url_text
@@ -87,12 +86,10 @@ class EditMatchTicket(webapp.RequestHandler):
         came_from = self.request.get('came_from')
         matchticketkey = self.request.get('matchticketkey')
         matchticket = MatchTicket.get(matchticketkey)
-        container = matchticket.client
         data = MatchTicketForm(data=self.request.POST, instance=matchticket)
         if data.is_valid():
             entity = data.save(commit=False)
             entity.creator = users.get_current_user()
-            entity.container = container
             entity.put()
             self.redirect(came_from)
         else:
@@ -104,7 +101,6 @@ class EditMatchTicket(webapp.RequestHandler):
                                         'base_path':BASE_PATH,
                                         'form':data,
                                         'matchticketkey':matchticketkey,
-                                        'containerkey':container.key(),
                                         'came_from':came_from,
                                         'auth_url':auth_url,
                                         'auth_url_text':auth_url_text
@@ -117,7 +113,6 @@ class DeleteMatchTicket(webapp.RequestHandler):
         came_from = self.request.referer
         key = self.request.get('matchticketkey')
         matchticket = MatchTicket.get(key)
-        container = matchticket.client
         if matchticket:
             #recursive delete
             matchticket.rdelete()

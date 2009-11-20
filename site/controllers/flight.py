@@ -16,7 +16,7 @@ logger = logging.getLogger('FlightHandler')
 class FlightForm(djangoforms.ModelForm):
     class Meta:
         model = Flight
-        exclude = ['created', 'creator', 'client']
+        exclude = ['created', 'creator']
 
 
 class CaptureFlight(webapp.RequestHandler):
@@ -45,7 +45,8 @@ class CaptureFlight(webapp.RequestHandler):
         if data.is_valid():
             entity = data.save(commit=False)
             entity.creator = users.get_current_user()
-            entity.client = container
+            entity._parent_key = containerkey
+            entity._parent = container
             entity.put()
             self.redirect(came_from)
         else:
@@ -69,7 +70,6 @@ class EditFlight(webapp.RequestHandler):
         auth_url, auth_url_text = get_authentication_urls(self.request.uri)
         flightkey = self.request.get('flightkey')
         flight = Flight.get(flightkey)
-        container = flight.client
         filepath = os.path.join(PROJECT_PATH, 
                                     'templates', 'clients', 'editflight.html')
         self.response.out.write(template.render(filepath, 
@@ -77,7 +77,6 @@ class EditFlight(webapp.RequestHandler):
                                         'base_path':BASE_PATH,
                                         'form':FlightForm(instance=flight),
                                         'flightkey':flightkey,
-                                        'containerkey': container.key,
                                         'came_from':came_from,
                                         'auth_url':auth_url,
                                         'auth_url_text':auth_url_text
@@ -87,12 +86,10 @@ class EditFlight(webapp.RequestHandler):
         came_from = self.request.get('came_from')
         flightkey = self.request.get('flightkey')
         flight = Flight.get(flightkey)
-        container = flight.client
         data = FlightForm(data=self.request.POST, instance=flight)
         if data.is_valid():
             entity = data.save(commit=False)
             entity.creator = users.get_current_user()
-            entity.container = container
             entity.put()
             self.redirect(came_from)
         else:
@@ -104,7 +101,6 @@ class EditFlight(webapp.RequestHandler):
                                         'base_path':BASE_PATH,
                                         'form':data,
                                         'flightkey':flightkey,
-                                        'containerkey':container.key(),
                                         'came_from':came_from,
                                         'auth_url':auth_url,
                                         'auth_url_text':auth_url_text
@@ -117,7 +113,6 @@ class DeleteFlight(webapp.RequestHandler):
         came_from = self.request.referer
         key = self.request.get('flightkey')
         flight = Flight.get(key)
-        container = flight.client
         if flight:
             #recursive delete
             flight.rdelete()
