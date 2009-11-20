@@ -4,12 +4,12 @@ import urllib
 from datetime import datetime, timedelta
 
 from google.appengine.ext.db import run_in_transaction
-from google.appengine.api import users
 
 from booking_errors import BookingConflictError
 from models.hostinfo import Slot, Berth
 from models.bookinginfo import \
     ContractedBooking, Enquiry, AccommodationElement
+from controllers import generator
 
 logger = logging.getLogger('BookingsTool')
 
@@ -60,7 +60,7 @@ class BookingsTool():
                 if berthkey in berthkeys:
                     #Create Booking
                     booking = ContractedBooking(
-                        bookingNumber='123',
+                        bookingNumber=generator.generateBookingNumber(),
                         enquiry=enquiry,
                         duration=element.nights)
                     booking.put()
