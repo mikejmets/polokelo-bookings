@@ -42,6 +42,7 @@ class CapturePhotograph(webapp.RequestHandler):
                 photo = Photograph.get_or_insert(caption)
                 photo.creator = users.get_current_user()
                 photo.venue = venue
+                photo._parent_key = venuekey
                 photo._parent = venue
                 photo.caption = caption
                 rawphoto = self.request.get('fullsize')
@@ -99,6 +100,7 @@ class EditPhotograph(webapp.RequestHandler):
                 # rawphoto = self.request.get('fullsize')
                 # photo.thumbnail = db.Blob(images.resize(rawphoto, 132, 132))
                 # photo.fullsize = db.Blob(images.resize(rawphoto, 640, 640))
+                photo._parent_key = photo.venue.key()
                 photo._parent = photo.venue
                 photo.put()
 
