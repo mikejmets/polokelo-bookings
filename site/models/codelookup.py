@@ -70,7 +70,7 @@ def getChoices(container):
         memcache.add(container, result)
     return result
 
-def getItemDescription(itemcode):
+def getItemDescription(parentcode, itemcode):
     """ retrieve the long description of any item
         in active or obsolete state
         for external use.
@@ -78,13 +78,13 @@ def getItemDescription(itemcode):
     result = memcache.get(itemcode, namespace='codelookup-description')
     if result is None:
         items = CodeLookup.all()
+        items.filter('container =', parentcode)
         items.filter('shortcode =', itemcode)
         items.filter('state in', ['active', 'obsolete'])
-        logging.info('getItemDescription: items: %s', 
-                ''.join([item.description for item in items]))
         item_set = items.fetch(1)
         if item_set:
-            return item_set[0].description
-        result = '**unknown**'
-        memcache.add(itemcode, result, namespace='codelookup-description')
+            result = item_set[0].description
+            memcache.add(itemcode, result, namespace='codelookup-description')
+        else:
+            result = '**unknown**'
     return result

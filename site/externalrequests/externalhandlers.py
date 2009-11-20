@@ -12,6 +12,7 @@ from xml.etree.ElementTree import XML, SubElement, tostring
 
 # from models.bookinginfo import ContractedBooking
 from models.clientinfo import Client
+from models.bookinginfo import Enquiry, AccommodationElement
 from controllers.bookingstool import BookingsTool
 from models.codelookup import getItemDescription
 
@@ -24,39 +25,66 @@ class ExternalBookings(webapp.RequestHandler):
     def _checkAvailability(self, node):
         """ Handle the initial check for available slots on an enquiry
         """
-        # get the tool we query for availability
+        # retrieve all the data from the xml
+        enquiry_number = node.findtext('enquirynumber') 
+
+        # check if the browser is submitting the same enquiry again
+        # and raise an error.
+        enquiry = Enquiry.get_by_key_name(enquiry_number)
+        if equiry:
+            # append the result as a sub element to the node element
+            search_elem = SubElement(node, 'searchresult')
+            # append the error element
+            error_element = SubElement(node, 'systemerror')
+            error_code = SubElement(error_element, 'errorcode')
+            error_code.text = '101'
+            error_msg = SubElement(error_element, 'errormessage')
+            error_msg.text = 'The enquiry with number %s has already been submitted' % \
+                                                    enquiry_number
+            # return the result as xml
+            return tostring(node)
+
+
+        # instantiate enquiry and accommodation classes
+        enquiry = Enquiry(enquiry_number)
+        enquiry.creator = users.get_current_user()
+        enquiry.created = datetime.now()
+        enquiry.referenceNumber = enquiry_number
+        enquiry.guestEmail = node.findtext('email')
+        enquiry.agentCode = node.findtext('guestagentcode')
+        enquiry.state = 'Temporary'
+        enquiry.xmlSource = tostring(node)
+        enquiry.put()
+
+
+        accommodation = AccommodationElement(parent=enquiry)
+        accommodation.creator = users.get_current_user()
+        accommodation.created = datetime.now()
+        accommodation.city = node.findtext('city')
+        accommodation.type = getItemDescription('ACTYP', 
+                                    node.findtext('accommodationtype'))
+        accommodation.start = datetime.strptime(node.findtext('startdate'), 
+                                        '%Y-%m-%d').date()
+        accommodation.nights = int(node.findtext('duration'))
+        accommodation.genderSensitive = node.findtext('guestgendersensitive') == 'yes'
+        adults = node.find('adults')
+        accommodation.adultMales = int(adults.findtext('male'))
+        accommodation.adultFemales = int(adults.findtext('female'))
+        children = node.find('children')
+        accommodation.childMales = int(children.findtext('male'))
+        accommodation.childFemales = int(children.findtext('female'))
+        disability = node.find('disability')
+        accommodation.wheelchair = disability.findtext('wheelchairaccess') == 'yes'
+        accommodation.specialNeeds = disability.findtext('otherspecialneeds') == 'yes'
+        accommodation.xmlSource = tostring(node)
+        accommodation.put()
+
+
+        # get the bookings tool
         bt = BookingsTool()
 
-        # check the enquiry for availability
-        enquiry_number = node.findtext('enquirynumber') 
-        guest_email = node.findtext('email')
-        agent_code = node.findtext('guestagentcode')
-        city = getItemDescription(node.findtext('city')) 
-        accom_type = getItemDescription( \
-                        node.findtext('accommodationtype'))
-        start_date = datetime.strptime(node.findtext('startdate'), 
-                                        '%Y-%m-%d').date()
-        duration = int(node.findtext('duration'))
-        gender_sensitive = node.findtext('guestgendersensitive') == 'yes'
-        adults = node.find('adults')
-        adult_male = int(adults.findtext('male'))
-        adult_female = int(adults.findtext('female'))
-        children = node.find('adults')
-        children_male = int(children.findtext('male'))
-        children_female = int(children.findtext('female'))
-        disability = node.find('disability')
-        wheelchair = disability.findtext('wheelchairaccess') == 'yes'
-        specialneeds = disability.findtext('otherspecialneeds') == 'yes'
-
         # do the availability check
-        available, amount, expiry = bt.checkAvailability(
-                enquiry_number, guest_email,
-                city, accom_type, 
-                start_date, duration,
-                gender_sensitive,
-                adult_male, adult_female,
-                children_male, children_female,
-                wheelchair, specialneeds)
+        available, amount, expiry = bt.checkAvailability(accommodation)
         available = available and 'available' or 'not available'
 
         # append the result as a sub element to the node element

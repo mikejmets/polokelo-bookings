@@ -7,8 +7,10 @@ from models.codelookup import getChoices
 class Enquiry(db.Model):
     created = db.DateTimeProperty(auto_now_add=True)
     creator = db.UserProperty()
-    referenceNumber = db.StringProperty(
-        required=True, verbose_name='Reference Number')
+    referenceNumber = db.StringProperty(required=True, 
+                                            verbose_name='Reference Number')
+    guestEmail = db.StringProperty(verbose_name='Guest Email')
+    agentCode = db.StringProperty(verbose_name='Travel Agent Code')
     state = db.StringProperty(default='Temporary', choices=getChoices('EQSTA'))
     xmlSource = db.TextProperty(verbose_name='Source Detail')
 
@@ -25,8 +27,6 @@ class Enquiry(db.Model):
 class AccommodationElement(db.Model):
     created = db.DateTimeProperty(auto_now_add=True)
     creator = db.UserProperty()
-    enquiry = db.ReferenceProperty(
-        Enquiry, collection_name='accommodation_elements')
     city = db.StringProperty(verbose_name='City',
         default='Potchefstroom', choices=getChoices('CTY'))
     type = db.StringProperty(default='Family Home', 
@@ -43,6 +43,8 @@ class AccommodationElement(db.Model):
     adultFemales = db.IntegerProperty(default=0)
     childMales = db.IntegerProperty(default=0)
     childFemales = db.IntegerProperty(default=0)
+    wheelchair = db.BooleanProperty(default=False)
+    specialNeeds = db.BooleanProperty(default=False)
     xmlSource = db.TextProperty(verbose_name='Source Detail')
     availableBerths = db.TextProperty()
 
