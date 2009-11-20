@@ -5,8 +5,8 @@ from models.clientinfo import Client
 from models.codelookup import getChoices
 
 
-class BookingNumberSequence(db.Model):
-    """ generate a booking number
+class IdSequence(db.Model):
+    """ keep track of sequences for number generators
     """
     created = db.DateTimeProperty(auto_now_add=True)
     creator = db.UserProperty()
