@@ -14,17 +14,25 @@ logger = logging.getLogger('BookingsTool')
 
 class BookingsTool():
 
-    def checkAvailability(self, enquiry_number, guest_email,
-                              city, type, start, nights, gender_sensitive,
-                              adult_male, adult_female,
-                              children_male, children_female,
-                              wheelchair, special_needs):
-      quote_amount = 4356.78
-      expiry_date = datetime.now()
-      people = adult_male + adult_female + children_male + children_female,
-      return (len(self.findBerths(city, type, start, nights, people)) > 0,
-              quote_amount, 
-              expiry_date)
+    def checkAvailability(self, accommodationElement):
+        """ check for availabilty for the given accommodation element
+            used from the public sites to do initial enquiries
+        """
+        berths = self.findBerths(accommodationElement) 
+        if berths:
+          quote_amount = self.calculateQuote(accommodationElement)
+          expiry_date = datetime.now() + timedelta(minutes=30)
+        else:
+          quote_amount = 0.0
+          expiry_date = datetime.now()
+        return (len(berths) > 0, quote_amount, expiry_date)
+
+
+    def calculateQuote(self, accommodationElement):
+        """ calculate the quote for the enquiry based on the packages
+        """
+        # we do not have package info yet, so just return something
+        return 5555.55
 
   #def findVenues(self, city, type, start, nights, people):
   #    berths = self.findBerths(city, type, start, nights, people)
