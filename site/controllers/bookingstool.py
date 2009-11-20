@@ -4,6 +4,7 @@ import urllib
 from datetime import datetime, timedelta
 
 from google.appengine.ext.db import run_in_transaction
+from google.appengine.api import users
 
 from booking_errors import BookingConflictError
 from models.hostinfo import Slot, Berth
