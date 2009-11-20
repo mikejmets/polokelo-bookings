@@ -24,12 +24,13 @@ class Client(db.Model):
         return '%s %s' % (self.firstNames, self.surname)
 
     def rdelete(self):
-        for r in self.client_flights:
+        for r in Flight.all().ancestor(self):
+            r.rdelete()
+        for r in MatchTicket.all().ancestor(self):
             r.rdelete()
         self.delete()
 
 class Flight(db.Model):
-    client = db.ReferenceProperty(Client, collection_name='client_flights')
     created = db.DateTimeProperty(auto_now_add=True)
     creator = db.UserProperty()
     number = db.StringProperty(
@@ -50,7 +51,6 @@ class Flight(db.Model):
         self.delete()
 
 class MatchTicket(db.Model):
-    client = db.ReferenceProperty(Client, collection_name='client_matchtickets')
     created = db.DateTimeProperty(auto_now_add=True)
     creator = db.UserProperty()
     number = db.StringProperty(
