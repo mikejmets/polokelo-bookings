@@ -16,6 +16,7 @@ from models.bookinginfo import Enquiry, AccommodationElement
 from controllers.bookingstool import BookingsTool
 from models.codelookup import getItemDescription
 
+from controllers import generator
 
 class ExternalBookings(webapp.RequestHandler):
     """ Handler class for all enquiry/booking requests from
@@ -106,51 +107,6 @@ class ExternalBookings(webapp.RequestHandler):
         return tostring(node)
 
 
-    # def _findBooking(self, node):
-    #     """ store the booking as temporary to enable a 
-    #         staff member to do a manual allocation
-    #     """
-    #     # look for all the bookings in the request
-    #     bookings = node.findall('booking')
-    #     result = ""
-
-    #     # get the tool we query for availability
-    #     bt = BookingsTool()
-
-    #     # create a client and temporary booking from each enquiry
-    #     for booking in bookings:
-    #         guestnodes = booking.find('guests')
-    #         if guestnodes:
-    #             primaryguest = guestnodes.find('guest')
-    #             if primaryguest:
-    #                 guest_key_name = booking.findtext('bookingnumber').strip().lower() + \
-    #                         '-' + primaryguest.findtext('passportnumber').strip().lower()
-    #                 guest = Client.find_or_insert(guest_key_name)
-    #                 guest.clientNumber = 'unassigned'
-    #                 guest.surname = primaryguest.findtext('surname').strip() 
-    #                 guest.firstNames = primaryguest.findtext('')
-
-
-    #         client = Client.get_or_insert(
-    #         available = bt.checkAvailability( \
-    #             booking.findtext('city'), 
-    #             booking.findtext('accommodationtype'),
-    #             datetime.strptime(booking.findtext('bookingdate'), '%Y-%m-%d').date(),
-    #             int(booking.findtext('duration')),
-    #             int(booking.findtext('numadults')) + \
-    #                     int(booking.findtext('numchildren')) + \
-    #                     int(booking.findtext('numinfants'))) \
-    #                             and 'available' or 'not available'
-
-    #         # append the result as a sub element to the booking element
-    #         avail_elem = SubElement(booking, 'availability')
-    #         avail_elem.text = available
-
-    #     # return the result as xml
-    #     return tostring(node)
-
-
-
     def post(self):
         """ Primary interface for enquiries, bookings and payments
             coming from the public sites
@@ -170,10 +126,10 @@ class ExternalBookings(webapp.RequestHandler):
             # initial enquiry to check for availability
             result = self._checkAvailability(xmlroot)
 
-        # if action.lower() == 'find booking':
-        #     # if 'check availability' returned 'not available' 
-        #     # for a booking then find a booking manually
-        #     result = self._findBooking(xmlroot)
+        elif action.lower() == 'generate enquiry number':
+            number_element = SubElement(xmlroot, 'enquirynumber')
+            number_element.text = generator.generateEnquiryNumber()
+            result = tostring(xmlroot)
 
         else:
             # send back an error informing the public site
