@@ -7,8 +7,9 @@ from google.appengine.ext.webapp import template
 from controllers.home import BASE_PATH, PROJECT_PATH
 from controllers.match import MatchSchedule, CaptureMatch, EditMatch, DeleteMatch
 from controllers.codelookup import \
-        LookupTablesRoot, CaptureLookupTable, EditLookupTable, DeleteLookupTable, \
-        ViewLookupTable, CaptureLookupItem, EditLookupItem, DeleteLookupItem
+    LookupTablesRoot, CaptureLookupTable, EditLookupTable, DeleteLookupTable, \
+    ViewLookupTable, CaptureLookupItem, EditLookupItem, DeleteLookupItem
+from controllers.statistics import ViewStatistics
 from controllers.utils import get_authentication_urls
 from models.schedule import Match
 
@@ -26,20 +27,21 @@ class AdminHomePage(webapp.RequestHandler):
 
 
 application = webapp.WSGIApplication([
-                            ('/admin/home', AdminHomePage),
-                            ('/admin/schedule', MatchSchedule),
-                            ('/admin/schedule/capturematch', CaptureMatch),
-                            ('/admin/schedule/editmatch', EditMatch),
-                            ('/admin/schedule/deletematch', DeleteMatch),
-                            ('/admin/lookups', LookupTablesRoot),
-                            ('/admin/lookups/capturelookuptable', CaptureLookupTable),
-                            ('/admin/lookups/editlookuptable', EditLookupTable),
-                            ('/admin/lookups/deletelookuptable', DeleteLookupTable),
-                            ('/admin/lookups/viewlookuptable', ViewLookupTable),
-                            ('/admin/lookups/capturelookupitem', CaptureLookupItem),
-                            ('/admin/lookups/editlookupitem', EditLookupItem),
-                            ('/admin/lookups/deletelookupitem', DeleteLookupItem),
-                            ], debug=True)
+          ('/admin/home', AdminHomePage),
+          ('/admin/schedule', MatchSchedule),
+          ('/admin/schedule/capturematch', CaptureMatch),
+          ('/admin/schedule/editmatch', EditMatch),
+          ('/admin/schedule/deletematch', DeleteMatch),
+          ('/admin/lookups', LookupTablesRoot),
+          ('/admin/lookups/capturelookuptable', CaptureLookupTable),
+          ('/admin/lookups/editlookuptable', EditLookupTable),
+          ('/admin/lookups/deletelookuptable', DeleteLookupTable),
+          ('/admin/lookups/viewlookuptable', ViewLookupTable),
+          ('/admin/lookups/capturelookupitem', CaptureLookupItem),
+          ('/admin/lookups/editlookupitem', EditLookupItem),
+          ('/admin/lookups/deletelookupitem', DeleteLookupItem),
+          ('/admin/statistics', ViewStatistics),
+          ], debug=True)
 
 def main():
     run_wsgi_app(application)
