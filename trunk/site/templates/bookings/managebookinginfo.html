@@ -92,7 +92,7 @@
           </thead>
           {% for berth in berths %}
           <tr>
-            <td> <input type="checkbox" name="{{ berth.key }}" /> </td>
+            <td> <input type="checkbox" name="berth_{{ berth.key }}" /> </td>
             <td>{{ berth.bed.bedroom.venue.owner.listing_name }}</td>
             <td>{{ berth.bed.bedroom.venue.name }}</td>
             <td>{{ berth.bed.bedroom.name }}</td>
@@ -124,23 +124,26 @@
     <hr />
 
     <p><strong>Contracted Bookings</strong>
-      <a title="Add a new booking"
+      <!-- <a title="Add a new booking"
          href="/bookings/capturecontractedbooking">
           <img src="/images/add.png"/>
-      </a>
+        </a> -->
     </p>
     <table class="listing" cellspacing="0">
         <thead>
-          <td colspan="3">Reference</td>
+          <td>Reference</td>
+          <td>&nbsp;</td>
         </thead>
         {% for contractedbooking in contractedbookings %}
         <tr>
           <td><a href="/bookings/viewcontractedbooking?bookingkey={{ contractedbooking.key }}">{{ contractedbooking.bookingNumber }}</a></td>
+          <!-- 
           <td class="action">
             <a title="Edit this booking"
               href="/bookings/editcontractedbooking?contractedbookingkey={{ contractedbooking.key }}">
               <img src="/images/edit.png"/>
             </a></td>
+            -->
           <td class="action">
             <a title="Delete this booking"
               href="/bookings/deletecontractedbooking?contractedbookingkey={{ contractedbooking.key }}"
@@ -154,25 +157,30 @@
     <hr />
 
     <p><strong>Enquiries</strong>
+    <!--
       <a title="Add a new enquiry"
          href="/bookings/captureenquiry">
           <img src="/images/add.png"/>
       </a>
+      -->
     </p>
     <table class="listing" cellspacing="0">
         <thead>
-          <td colspan="3">Reference</td>
+          <td>Reference</td>
           <td>Status</td>
+          <td>&nbsp;</td>
         </thead>
         {% for enquiry in enquiries %}
         <tr>
           <td>{{ enquiry.referenceNumber }}</td>
           <td>{{ enquiry.state }}</td>
+          <!--
           <td class="action">
             <a title="Edit this enquiry"
               href="/bookings/editenquiry?enquirykey={{ enquiry.key }}">
               <img src="/images/edit.png"/>
             </a></td>
+            -->
           <td class="action">
             <a title="Delete this enquiry"
               href="/bookings/deleteenquiry?enquirykey={{ enquiry.key }}"

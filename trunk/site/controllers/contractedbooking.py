@@ -10,6 +10,7 @@ from controllers.home import BASE_PATH, PROJECT_PATH
 from models.bookinginfo import ContractedBooking
 from models.clientinfo import Client
 from controllers.utils import get_authentication_urls
+from controllers import generator
 
 logger = logging.getLogger('ContractedBookingHandler')
 
@@ -17,7 +18,7 @@ logger = logging.getLogger('ContractedBookingHandler')
 class ContractedBookingForm(djangoforms.ModelForm):
     class Meta:
         model = ContractedBooking
-        exclude = ['created', 'creator', 'client', 'enquiry']
+        exclude = ['created', 'creator', 'client', 'enquiry', 'bookingNumber']
 
 
 class ViewContractedBooking(webapp.RequestHandler):
@@ -57,6 +58,7 @@ class CaptureContractedBooking(webapp.RequestHandler):
         data = ContractedBookingForm(data=self.request.POST)
         if data.is_valid():
             entity = data.save(commit=False)
+            entity.bookingNumber(generator.generateBookingNumber())
             entity.creator = users.get_current_user()
             entity.put()
             self.redirect('/bookings/bookinginfo')

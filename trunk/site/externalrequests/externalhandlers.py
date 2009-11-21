@@ -32,7 +32,7 @@ class ExternalBookings(webapp.RequestHandler):
         # check if the browser is submitting the same enquiry again
         # and raise an error.
         enquiry = Enquiry.get_by_key_name(enquiry_number)
-        if equiry:
+        if enquiry:
             # append the result as a sub element to the node element
             search_elem = SubElement(node, 'searchresult')
             # append the error element
@@ -47,7 +47,9 @@ class ExternalBookings(webapp.RequestHandler):
 
 
         # instantiate enquiry and accommodation classes
-        enquiry = Enquiry(enquiry_number)
+        enquiry = Enquiry(
+            key_name=enquiry_number, 
+            referenceNumber=enquiry_number)
         enquiry.creator = users.get_current_user()
         enquiry.created = datetime.now()
         enquiry.referenceNumber = enquiry_number
@@ -58,14 +60,16 @@ class ExternalBookings(webapp.RequestHandler):
         enquiry.put()
 
 
-        accommodation = AccommodationElement(parent=enquiry)
+        accommodation = AccommodationElement(
+            parent=enquiry,
+            start=datetime.strptime(node.findtext('startdate'), 
+                                        '%Y-%m-%d').date())
         accommodation.creator = users.get_current_user()
         accommodation.created = datetime.now()
-        accommodation.city = node.findtext('city')
+        accommodation.city = getItemDescription('CTY',
+                                    node.findtext('city'))
         accommodation.type = getItemDescription('ACTYP', 
                                     node.findtext('accommodationtype'))
-        accommodation.start = datetime.strptime(node.findtext('startdate'), 
-                                        '%Y-%m-%d').date()
         accommodation.nights = int(node.findtext('duration'))
         accommodation.genderSensitive = node.findtext('guestgendersensitive') == 'yes'
         adults = node.find('adults')
@@ -85,7 +89,7 @@ class ExternalBookings(webapp.RequestHandler):
         bt = BookingsTool()
 
         # do the availability check
-        available, amount, expiry = bt.checkAvailability(accommodation)
+        available, amount, expiry = bt.checkAvailability(enquiry)
         available = available and 'available' or 'not available'
 
         # append the result as a sub element to the node element

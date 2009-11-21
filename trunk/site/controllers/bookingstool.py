@@ -15,17 +15,34 @@ logger = logging.getLogger('BookingsTool')
 
 class BookingsTool():
 
-    def checkAvailability(self, accommodationElement):
+    def checkAvailability(self, enquiry):
         """ check for availabilty for the given accommodation element
             used from the public sites to do initial enquiries
         """
+        #Defaults
+        quote_amount = 0.0
+        expiry_date = datetime.now()
+
+        #search
+        query = AccommodationElement.all().ancestor(enquiry)
+        accommodationElement = query.fetch(1)[0]
+        logger.info("Got element %s", accommodationElement)
+
         berths = self.findBerths(accommodationElement) 
         if berths:
-          quote_amount = self.calculateQuote(accommodationElement)
-          expiry_date = datetime.now() + timedelta(minutes=30)
-        else:
-          quote_amount = 0.0
-          expiry_date = datetime.now()
+          accommodationElement.availableBerths = str(berths)
+          #Simply pull from the top of the list
+          people = accommodationElement.adultMales + \
+                   accommodationElement.adultFemales + \
+                   accommodationElement.childMales + \
+                   accommodationElement.childFemales
+          if people <= len(berths): #Should always be true
+              quote_amount = self.calculateQuote(accommodationElement)
+              expiry_date = datetime.now() + timedelta(minutes=30)
+              selected_berths = [b[0] for b in berths[:people]]
+              self.createBookings(enquiry,
+                                  accommodationElement,
+                                  selected_berths)
         return (len(berths) > 0, quote_amount, expiry_date)
 
 
@@ -34,13 +51,6 @@ class BookingsTool():
         """
         # we do not have package info yet, so just return something
         return 5555.55
-
-  #def findVenues(self, city, type, start, nights, people):
-  #    berths = self.findBerths(city, type, start, nights, people)
-  #    venues = set()
-  #    for key, slots in berths:
-  #        venues.add(Berth.get(key).bed.bedroom.venue.name)
-  #    return venues
 
     def findBerths(self, element):
         h1 = SimpleAccommodationSearch()
@@ -56,13 +66,13 @@ class BookingsTool():
         bookings = []
         try:
             people = 0
+            #logger.info('AvailableBerths: %s', element.availableBerths)
             for berthkey, slotkeys in eval(element.availableBerths):
                 if berthkey in berthkeys:
                     #Create Booking
                     booking = ContractedBooking(
                         bookingNumber=generator.generateBookingNumber(),
-                        enquiry=enquiry,
-                        duration=element.nights)
+                        enquiry=enquiry)
                     booking.put()
                     bookings.append(booking)
                     logger.info('Create booking: %s', booking.bookingNumber) 
@@ -186,8 +196,8 @@ class SimpleAccommodationSearch(AccommodationSearch):
                 
         valid_berths = []
         for key in berths.keys():
-            #logger.info('Valid pairing %s', berths[key]['valid'])
             if berths[key]['valid']:
+                #logger.info('Valid pairing %s %s', key, berths[key]['slots'])
                 valid_berths.append((key, berths[key]['slots']))
 
         #for key, slots in valid_berths:
