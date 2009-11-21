@@ -28,7 +28,7 @@ class Enquiry(db.Model):
     def rdelete(self):
         for e in self.guest_elements:
             e.rdelete()
-        for e in self.accommodation_elements:
+        for e in AccommodationElement.all().ancestor(self):
             e.rdelete()
         self.delete()
 
@@ -82,7 +82,6 @@ class ContractedBooking(db.Model):
     created = db.DateTimeProperty(auto_now_add=True)
     creator = db.UserProperty()
     bookingNumber = db.StringProperty(required=True)
-    duration = db.IntegerProperty()
     client = db.ReferenceProperty(
         Client, collection_name='contracted_bookings')
     enquiry = db.ReferenceProperty(

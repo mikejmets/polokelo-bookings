@@ -19,6 +19,7 @@ from models.hostinfo import Berth
 from models.bookinginfo import ContractedBooking, Enquiry, AccommodationElement
 from models.codelookup import getChoices
 
+from controllers import generator
 from controllers.utils import get_authentication_urls
 
 logger = logging.getLogger('BookingHandlers')
@@ -48,6 +49,13 @@ class ManageBookings(webapp.RequestHandler):
                 for key, slots in eval(element.availableBerths):
                     berth = Berth.get(key)
                     berths.append(berth)
+            if berths:
+                #sort
+                berths.sort(key=lambda x: "%s %s %s %s" % (
+                    x.bed.bedroom.venue.owner.listing_name(),
+                    x.bed.bedroom.venue.name,
+                    x.bed.bedroom.name,
+                    x.bed.name))
         else:
             city =  self.request.get('city', 'Potchefstroom')
             type =  self.request.get('type', 'Family Home')
@@ -61,12 +69,6 @@ class ManageBookings(webapp.RequestHandler):
             adultFemales = self.request.get('adultFemales', 2)
             childMales = self.request.get('childMales', 0)
             childFemales = self.request.get('childFemales', 0)
-        #sort
-        berths.sort(key=lambda x: "%s %s %s %s" % (
-            x.bed.bedroom.venue.owner.listing_name(),
-            x.bed.bedroom.venue.name,
-            x.bed.bedroom.name,
-            x.bed.name))
 
         filepath = os.path.join(
             PROJECT_PATH, 'templates', 'bookings', 'managebookinginfo.html')
@@ -118,10 +120,11 @@ class BookingsToolFindAccommodation(webapp.RequestHandler):
         childMales = int(self.request.get('childMales', "0"))
         childFemales = int(self.request.get('childFemales', "0"))
         #Generate number
-        enquiry = Enquiry(referenceNumber='123')
+        ref_num = generator.generateEnquiryNumber()
+        enquiry = Enquiry(referenceNumber=ref_num)
         enquiry.put()
         accom_element = AccommodationElement(
-            enquiry=enquiry,
+            parent=enquiry,
             city=city,
             type=type,
             start=start,
@@ -170,7 +173,7 @@ class BookingsToolReserveAccommodation(webapp.RequestHandler):
         if elementkey:
             element = AccommodationElement.get(elementkey)
             if element and element.availableBerths:
-                enquiry=element.enquiry
+                enquiry=element.parent()
                 berthkeys = []
                 for arg in args:
                     if arg.startswith('berth_'):

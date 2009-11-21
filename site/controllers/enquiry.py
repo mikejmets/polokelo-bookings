@@ -16,7 +16,7 @@ logger = logging.getLogger('EnquiryHandler')
 class EnquiryForm(djangoforms.ModelForm):
     class Meta:
         model = Enquiry
-        exclude = ['created', 'creator']
+        exclude = ['created', 'creator', 'referenceNumber']
 
 
 class CaptureEnquiry(webapp.RequestHandler):
