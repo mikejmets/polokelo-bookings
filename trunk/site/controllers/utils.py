@@ -13,6 +13,7 @@ def datetimeIterator(from_date=datetime.now(), to_date=None):
         from_date = from_date + timedelta(days = 1)
     return
 
+from models.hostinfo import *
 def listVenuesValidity():
     results = ""
     total = 0
@@ -43,7 +44,6 @@ def countAllEntities():
     results += countOtherEntities()
     return results
 
-from models.hostinfo import *
 def countHostInfoEntities():
     adict = {}
     adict['Owners'] = len([k for k in Owner.all(keys_only=True)])
