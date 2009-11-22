@@ -143,10 +143,15 @@ class Venue(db.Model):
         
         #Check physical address exists
         has_address = False
-        for a in self.entity_addresses:
+        for a in Address.all().ancestor(self): 
             if a.addressType == 'Physical Address':
                 has_address = True
                 break
+        #if not has_address:
+        #    for a in Address.all().ancestor(self.parent()): 
+        #        if a.addressType == 'Physical Address':
+        #            has_address = True
+        #            break
         if not has_address:
             return False, "No physical address for venue"
 
@@ -164,11 +169,11 @@ class Venue(db.Model):
         return True, ""
 
     def create_slots(self):
-        logging.info('Create slots for venue %s', self.name)
+        #logging.info('Create slots for venue %s', self.name)
         for room in self.venue_bedrooms:
             for bed in room.bedroom_beds:
                 for berth in bed.bed_berths:
-                    logging.info('Create slot for berth %s', berth)
+                    #logging.info('Create slot for berth %s', berth)
                     for slot in berth.berth_slots:
                         slot.delete()
 
@@ -176,8 +181,8 @@ class Venue(db.Model):
                                   self.contractStartDate, 
                                   self.contractEndDate):
                         t = time(14, 00)
-                        logging.info('Create slot for %s', 
-                            datetime.combine(d, t))
+                        #logging.info('Create slot for %s', 
+                        #    datetime.combine(d, t))
                         slot = Slot(parent=berth)
                         slot.creator = users.get_current_user()
                         slot.berth = berth
