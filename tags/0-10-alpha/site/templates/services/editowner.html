@@ -1,0 +1,16 @@
+{% extends base_path %}
+
+{% block breadcrumbs %}
+<a href="{{came_from}}">go back</a>
+{% endblock %}
+
+{% block pagecontent %}
+    <h1>Edit Existing Owner</h1>
+    <form name="owner" method="post" action="/services/owner/editowner">
+        <input type="hidden" name="ownerkey" value="{{ ownerkey }}" />
+        <table>
+            {{ form }}
+        </table>
+        <input type="submit" value="Update Owner" />
+    </form>
+{% endblock pagecontent %}

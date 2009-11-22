@@ -1,0 +1,194 @@
+{% extends base_path %}
+
+
+
+{% block pagecontent %}
+    <h1>Bookings Management</h1>
+
+    <form name="findAccommodation" method="post" 
+          action="/bookings/findaccommodation">
+      <p><strong>Search</strong></p>
+      <table class="listing" cellspacing="0">
+        <tr>
+          <td>City</td>
+          <td colspan="2"> 
+              <select name="city">
+                  {% for description in cities %}
+                      <option{%ifequal city description %} selected="1"{%endifequal%}>
+                      {{description}}
+                      </option>
+                  {% endfor %}
+              </select>
+          </td>
+        </tr>
+        <tr>
+          <td>Type</td>
+          <td colspan="2"> 
+              <select name="type">
+                  {% for description in accomtypes %}
+                      <option{%ifequal type description %} selected="1"{%endifequal%}>
+                      {{description}}
+                      </option>
+                  {% endfor %}
+              </select>
+          </td>
+        </tr>
+        <tr>
+          <td>Start Date</td>
+          <td colspan="2"> 
+           <input type="text" name="start" value="{{ start }}" /> </td>
+        </tr>
+        <tr>
+          <td>Number of nights</td>
+          <td colspan="2"> 
+           <input type="text" name="nights" value="{{ nights }}" /> </td>
+        </tr>
+        <tr>
+          <td>Requires Wheelchair Access</td>
+          <td colspan="2"> 
+            <input type="checkbox" name="wheelchairAccess" 
+            {% if wheelchairAccess %} checked {% endif %} />
+          </td>
+        </tr>
+        <tr>
+          <td>Gender Sensitive</td>
+          <td colspan="2"> 
+            <input type="checkbox" name="genderSensitive" 
+            {% if genderSensitive %} checked {% endif %} />
+          </td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>Male</td>
+          <td>Female</td>
+        </tr>
+        <tr>
+          <td>Number of adults</td>
+          <td> <input type="text" name="adultMales" value="{{ adultMales }}" /> </td>
+          <td> <input type="text" name="adultFemales" value="{{ adultFemales }}" /> </td>
+        </tr>
+        <tr>
+          <td>Number of children</td>
+          <td> <input type="text" name="childMales" value="{{ childMales }}" /> </td>
+          <td> <input type="text" name="childFemales" value="{{ childFemales }}" /> </td>
+        </tr>
+      </table>
+      <input title="Find accommodation"
+             type="submit" value="Find Accommodation" />
+    </form>
+
+    {% if berths %}
+    <form name="reserveAccommodation" method="post" 
+          action="/bookings/reserveaccommodation">
+      <table class="listing" cellspacing="0">
+          <thead>
+            <td>Select</td>
+            <td>Owner</td>
+            <td>Venue</td>
+            <td>Room</td>
+            <td>Bed</td>
+            <td>Type</td>
+            <td>Capacity</td>
+          </thead>
+          {% for berth in berths %}
+          <tr>
+            <td> <input type="checkbox" name="berth_{{ berth.key }}" /> </td>
+            <td>{{ berth.bed.bedroom.venue.owner.listing_name }}</td>
+            <td>{{ berth.bed.bedroom.venue.name }}</td>
+            <td>{{ berth.bed.bedroom.name }}</td>
+            <td>{{ berth.bed.name }}</td>
+            <td>{{ berth.bed.bedType }}</td>
+            <td>{{ berth.bed.capacity }}</td>
+          </tr>
+          {% endfor %}
+      </table>
+      <input type="hidden" name="elementkey" value="{{ elementkey }}" />
+      <input type="hidden" name="city" value="{{ city }}" /> 
+      <input type="hidden" name="type" value="{{ type }}" />
+      <input type="hidden" name="start" value="{{ start }}" />
+      <input type="hidden" name="nights" value="{{ nights }}" />
+      {% if wheelchairAccess %}
+        <input type="hidden" name="wheelchairAccess" checked /> 
+      {% endif %} 
+      {% if genderSensitive %}
+        <input type="hidden" name="genderSensitive" checked /> 
+      {% endif %} 
+      <input type="hidden" name="adultMales" value="{{ adultMales }}" />
+      <input type="hidden" name="adultFemales" value="{{ adultFemales }}" />
+      <input type="hidden" name="childMales" value="{{ childMales }}" />
+      <input type="hidden" name="childFemales" value="{{ childFemales }}" />
+      <input title="Reserve accommodation"
+             type="submit" value="Reserve Accommodation" />
+    </form>
+    {% endif %}
+    <hr />
+
+    <p><strong>Contracted Bookings</strong>
+      <!-- <a title="Add a new booking"
+         href="/bookings/capturecontractedbooking">
+          <img src="/images/add.png"/>
+        </a> -->
+    </p>
+    <table class="listing" cellspacing="0">
+        <thead>
+          <td>Reference</td>
+          <td>&nbsp;</td>
+        </thead>
+        {% for contractedbooking in contractedbookings %}
+        <tr>
+          <td><a href="/bookings/viewcontractedbooking?bookingkey={{ contractedbooking.key }}">{{ contractedbooking.bookingNumber }}</a></td>
+          <!-- 
+          <td class="action">
+            <a title="Edit this booking"
+              href="/bookings/editcontractedbooking?contractedbookingkey={{ contractedbooking.key }}">
+              <img src="/images/edit.png"/>
+            </a></td>
+            -->
+          <td class="action">
+            <a title="Delete this booking"
+              href="/bookings/deletecontractedbooking?contractedbookingkey={{ contractedbooking.key }}"
+                   onclick="return confirm('Are you sure?');">
+              <img src="/images/delete.png"/>
+            </a></td>
+        </tr>
+        {% endfor %}
+    </table>
+
+    <hr />
+
+    <p><strong>Enquiries</strong>
+    <!--
+      <a title="Add a new enquiry"
+         href="/bookings/captureenquiry">
+          <img src="/images/add.png"/>
+      </a>
+      -->
+    </p>
+    <table class="listing" cellspacing="0">
+        <thead>
+          <td>Reference</td>
+          <td>Status</td>
+          <td>&nbsp;</td>
+        </thead>
+        {% for enquiry in enquiries %}
+        <tr>
+          <td>{{ enquiry.referenceNumber }}</td>
+          <td>{{ enquiry.state }}</td>
+          <!--
+          <td class="action">
+            <a title="Edit this enquiry"
+              href="/bookings/editenquiry?enquirykey={{ enquiry.key }}">
+              <img src="/images/edit.png"/>
+            </a></td>
+            -->
+          <td class="action">
+            <a title="Delete this enquiry"
+              href="/bookings/deleteenquiry?enquirykey={{ enquiry.key }}"
+                   onclick="return confirm('Are you sure?');">
+              <img src="/images/delete.png"/>
+            </a></td>
+        </tr>
+        {% endfor %}
+    </table>
+
+{% endblock pagecontent %}

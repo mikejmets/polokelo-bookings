@@ -1,0 +1,28 @@
+{% extends base_path %}
+
+
+
+{% block pagecontent %}
+    <h1>Booking Result</h1>
+
+    <form name="bookingerror" method="post" 
+          action="/bookings/bookingerror">
+          <p><strong>{{ error }}</strong></p>
+          <input type="hidden" name="city" value="{{ city }}" />
+          <input type="hidden" name="type" value="{{ type }}" />
+          <input type="hidden" name="start" value="{{ start }}" />
+          <input type="hidden" name="nights" value="{{ nights }}" />
+          {% if wheelchairAccess %} 
+            <input type="hidden" name="wheelchairAccess" value="on" />
+          {% endif %} 
+          {% if genderSensitive %} 
+            <input type="hidden" name="genderSensitive" value="on" />
+          {% endif %} 
+          <input type="hidden" name="adultMales" value="{{ adultMales }}" />
+          <input type="hidden" name="adultFemales" value="{{ adultFemales }}" />
+          <input type="hidden" name="childMales" value="{{ childMales }}" />
+          <input type="hidden" name="childFemales" value="{{ childFemales }}" />
+      <input type="submit" name="Continue" value="Continue" />
+    </form>
+
+{% endblock pagecontent %}
