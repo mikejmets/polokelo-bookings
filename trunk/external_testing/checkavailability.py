@@ -3,19 +3,19 @@ xml = """
     <email>john@ogroats.co.uk</email>
     <guestagentcode>Trafalgar-234234234</guestagentcode>
     <action>check availability</action>
-    <enquirynumber>R-XAB-CDE</enquirynumber>
-    <city>CPT</city>
+    <enquirynumber>PBC-ABC-ABC</enquirynumber>
+    <city>PCS</city>
     <accommodationtype>ACFAM</accommodationtype>
     <startdate>2010-06-17</startdate>
     <duration>4</duration>
     <guestgendersensitive>no</guestgendersensitive>
     <adults>
         <male>2</male>
-        <female>2</female>
+        <female>0</female>
     </adults>
     <children>
-        <male>1</male>
-        <female>2</female>
+        <male>0</male>
+        <female>0</female>
     </children>
     <disability>
         <wheelchairaccess>no</wheelchairaccess>
@@ -24,8 +24,8 @@ xml = """
 </enquiry>
 """
 
-# url = 'http://localhost:8080/externalbookings'
-url = 'http://0-9-alpha.latest.bookings-dev.appspot.com/externalbookings'
+url = 'http://localhost:8080/externalbookings'
+#url = 'http://0-9-alpha.latest.bookings-dev.appspot.com/externalbookings'
 
 import urllib2
 
