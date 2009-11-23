@@ -266,7 +266,7 @@ class Bedroom(db.Model):
     created = db.DateTimeProperty(auto_now_add=True)
     creator = db.UserProperty()
     name = db.StringProperty(required=True, verbose_name='Name')
-    bathroomType = db.StringProperty(required=True, verbose_name='Bedroom Type',
+    bathroomType = db.StringProperty(required=True, verbose_name='Bathroom Type',
                                         choices=getChoices('BRTYP'))
     childFriendly = db.BooleanProperty(
         default=True, verbose_name='Child Friendly')
