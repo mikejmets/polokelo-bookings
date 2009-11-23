@@ -40,17 +40,23 @@ class AccommodationElement(db.Model):
     type = db.StringProperty(default='Family Home', 
         verbose_name='Accommodation Class',
         choices=getChoices('ACTYP'))
+    singlerooms = db.IntegerProperty(default=0)
+    twinrooms = db.IntegerProperty(default=0)
+    doublerooms = db.IntegerProperty(default=0)
+    familyrooms = db.IntegerProperty(default=0)
     start = db.DateProperty(
         default=datetime(2010, 6, 1),
         verbose_name='Start Date')
     nights = db.IntegerProperty(default=0)
     wheelchairAccess = db.BooleanProperty(default=False)
     specialNeeds = db.BooleanProperty(default=False)
-    genderSensitive = db.BooleanProperty(default=False)
-    adultMales = db.IntegerProperty(default=0)
-    adultFemales = db.IntegerProperty(default=0)
-    childMales = db.IntegerProperty(default=0)
-    childFemales = db.IntegerProperty(default=0)
+    # genderSensitive = db.BooleanProperty(default=False)
+    # adultMales = db.IntegerProperty(default=0)
+    # adultFemales = db.IntegerProperty(default=0)
+    # childMales = db.IntegerProperty(default=0)
+    # childFemales = db.IntegerProperty(default=0)
+    adults = db.IntegerProperty(default=0)
+    children = db.IntegerProperty(default=0)
     wheelchair = db.BooleanProperty(default=False)
     specialNeeds = db.BooleanProperty(default=False)
     xmlSource = db.TextProperty(verbose_name='Source Detail')
