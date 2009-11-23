@@ -47,9 +47,8 @@ class ExternalBookings(webapp.RequestHandler):
 
 
         # instantiate enquiry and accommodation classes
-        enquiry = Enquiry(
-            key_name=enquiry_number, 
-            referenceNumber=enquiry_number)
+        enquiry = Enquiry(key_name=enquiry_number, 
+                          referenceNumber=enquiry_number)
         enquiry.creator = users.get_current_user()
         enquiry.created = datetime.now()
         enquiry.referenceNumber = enquiry_number
@@ -61,23 +60,25 @@ class ExternalBookings(webapp.RequestHandler):
 
 
         accommodation = AccommodationElement(
-            parent=enquiry,
-            start=datetime.strptime(node.findtext('startdate'), 
+                            parent=enquiry,
+                            start=datetime.strptime(node.findtext('startdate'), 
                                         '%Y-%m-%d').date())
         accommodation.creator = users.get_current_user()
         accommodation.created = datetime.now()
         accommodation.city = getItemDescription('CTY',
                                     node.findtext('city'))
+        accomnode = node.find('accommodation')
         accommodation.type = getItemDescription('ACTYP', 
-                                    node.findtext('accommodationtype'))
+                                    accomnode.findtext('type'))
+        if accommodation.type in ['HOM', 'GH']:
+            roomsnode = accomnode.find('rooms')
+            accommodation.singlerooms = roomsnode.findtext('single')
+            accommodation.doublerooms = roomsnode.findtext('double')
+            accommodation.twinrooms = roomsnode.findtext('twin')
+            accommodation.familyrooms = roomsnode.findtext('family')
         accommodation.nights = int(node.findtext('duration'))
-        accommodation.genderSensitive = node.findtext('guestgendersensitive') == 'yes'
-        adults = node.find('adults')
-        accommodation.adultMales = int(adults.findtext('male'))
-        accommodation.adultFemales = int(adults.findtext('female'))
-        children = node.find('children')
-        accommodation.childMales = int(children.findtext('male'))
-        accommodation.childFemales = int(children.findtext('female'))
+        accommodation.adults = int(node.findtext('adults'))
+        accommodation.children = int(node.findtext('children'))
         disability = node.find('disability')
         accommodation.wheelchair = disability.findtext('wheelchairaccess') == 'yes'
         accommodation.specialNeeds = disability.findtext('otherspecialneeds') == 'yes'
@@ -96,7 +97,7 @@ class ExternalBookings(webapp.RequestHandler):
         search_elem = SubElement(node, 'searchresult')
         avail_elem = SubElement(search_elem, 'availability')
         avail_elem.text = available
-        amount_elem = SubElement(search_elem, 'zaramount')
+        amount_elem = SubElement(search_elem, 'amount')
         amount_elem.text = str(amount)
         expiry_elem = SubElement(search_elem, 'expirydate')
         expiry_elem.text = str(expiry)
