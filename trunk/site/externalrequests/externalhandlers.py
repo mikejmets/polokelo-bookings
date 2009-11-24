@@ -1,5 +1,5 @@
 import os
-from datetime import datetime
+from datetime import datetime, timedelta
 import logging
 from google.appengine.ext import webapp
 from google.appengine.ext.webapp import template
@@ -12,7 +12,8 @@ from xml.etree.ElementTree import XML, SubElement, tostring
 
 # from models.bookinginfo import ContractedBooking
 from models.clientinfo import Client
-from models.bookinginfo import Enquiry, AccommodationElement
+from models.bookinginfo import EnquiryCollection, Enquiry, \
+                                AccommodationElement, GuestElement
 from controllers.bookingstool import BookingsTool
 from models.codelookup import getItemDescription
 
@@ -51,8 +52,6 @@ class ExternalBookings(webapp.RequestHandler):
         enquiry = Enquiry(key_name=enquiry_number, 
                           referenceNumber=enquiry_number)
         enquiry.creator = users.get_current_user()
-        enquiry.created = datetime.now()
-        enquiry.referenceNumber = enquiry_number
         enquiry.guestEmail = node.findtext('email')
         enquiry.agentCode = node.findtext('guestagentcode')
         enquiry.xmlSource = tostring(node)
@@ -65,7 +64,6 @@ class ExternalBookings(webapp.RequestHandler):
                             start=datetime.strptime(node.findtext('startdate'), 
                                         '%Y-%m-%d').date())
         accommodation.creator = users.get_current_user()
-        accommodation.created = datetime.now()
         accommodation.city = getItemDescription('CTY',
                                     node.findtext('city'))
         accomnode = node.find('accommodation')
@@ -113,6 +111,86 @@ class ExternalBookings(webapp.RequestHandler):
         return tostring(node)
 
 
+    def _confirmEnquiries(self, node):
+        """ confirm the final list of enquiries
+        """
+        # retrieve the enquiry number
+        enquiry_number = node.findtext('enquirynumber') 
+
+        # check if the browser is submitting the same confirmation again
+        # and raise an error.
+        enquiry_collection = EnquiryCollection.get_by_key_name(enquiry_number)
+        if enquiry_collection:
+            # append the result as a sub element to the node element
+            confirm_elem = SubElement(node, 'confirmationresult')
+            # append the error element
+            error_element = SubElement(node, 'systemerror')
+            error_code = SubElement(error_element, 'errorcode')
+            error_code.text = '102'
+            error_msg = SubElement(error_element, 'errormessage')
+            error_msg.text = 'The enquiry with number %s has already been confirmed' % \
+                                                    enquiry_number
+            # return the result as xml
+            return tostring(node)
+
+        # instantiate the enquiry collection
+        enquiry_collection = EnquiryCollection(key_name=enquiry_number,
+                                               referenceNumber = enquiry_number)
+        enquiry_collection.creator = users.get_current_user()
+        enquiry_collection.put()
+
+        # create the primary guest (credit card holder)
+        guest_node = node.find('creditcardholder')
+        if guest_node:
+            # am I setting the parent correctly here?
+            guest_element = GuestElement(parent=enquiry_collection,
+                                         surname = guest_node.findtext('surname'),
+                                         firstNames = guest_node.findtext('name'))
+            guest_element.isPrimary = True
+            guest_element.email = guest_node.findtext('email')
+            guest_element.contactNumber = guest_node.findtext('telephone')
+            guest_element.identifyingNumber = guest_node.findtext('passportnumber')
+            guest_element.xmlSource = tostring(guest_node)
+            guest_element.put()
+
+        # update the individual enquiries to have the collection
+        # as their parent, and extend their expiry dates for 24 hours
+        # in anticipation of the deposit
+        enquiry_elements = node.find('enquiries').findall('enquiry')
+        for enquiry_element in enquiry_elements:
+            refnum = enquiry_element.findtext('number')
+            # retrieve the existing enquiry
+            enquiry = Enquiry.get_by_key_name(refnum)
+            if enquiry:
+                # hope this works properly!!!
+                enquiry.parent = enquiry_collection
+                enquiry.xmlSource = tostring(enquiry_element)
+                enquiry.put()
+                # add the enquiries to the guest element, if it exists
+                if guest_node:
+                    if enquiry.key() not in guest_element.enquiries:
+                        guest_element.enquiries.append(enquiry.key())
+                        guest_element.put()
+
+        # append the result
+        confirm_elem = SubElement(node, 'confirmationresult')
+        result_elem = SubElement(confirm_elem, 'result')
+        result_elem.text = 'confirmed enquiry batch %s' % enquiry_number
+        expiry_elem = SubElement(confirm_elem, 'expirydate')
+        expiry_date = datetime.now() + timedelta(hours=24)
+        expiry_elem.text = str(expiry_date)
+
+        # append the error element
+        error_element = SubElement(node, 'systemerror')
+        error_code = SubElement(error_element, 'errorcode')
+        error_code.text = '0'
+        error_msg = SubElement(error_element, 'errormessage')
+
+        # return the result as xml
+        return tostring(node)
+
+
+
     def post(self):
         """ Primary interface for enquiries, bookings and payments
             coming from the public sites
@@ -131,6 +209,10 @@ class ExternalBookings(webapp.RequestHandler):
         if action.lower() == 'check availability':
             # initial enquiry to check for availability
             result = self._checkAvailability(xmlroot)
+
+        elif action.lower() == 'confirm enquiries':
+            # initial enquiry to check for availability
+            result = self._confirmEnquiries(xmlroot)
 
         elif action.lower() == 'generate enquiry number':
             number_element = SubElement(xmlroot, 'enquirynumber')
