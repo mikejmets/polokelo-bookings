@@ -30,6 +30,8 @@ class Enquiry(WorkflowAware):
     creator = db.UserProperty()
     referenceNumber = db.StringProperty(required=True, 
                                             verbose_name='Reference Number')
+    enqColl = db.ReferenceProperty(EnquiryCollection, 
+                                        collection_name='coll_enq')
     guestEmail = db.StringProperty(verbose_name='Guest Email')
     agentCode = db.StringProperty(verbose_name='Travel Agent Code')
     xmlSource = db.TextProperty(verbose_name='Source Detail')

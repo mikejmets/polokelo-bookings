@@ -152,18 +152,21 @@ class ExternalBookings(webapp.RequestHandler):
             guest_element.identifyingNumber = guest_node.findtext('passportnumber')
             guest_element.xmlSource = tostring(guest_node)
             guest_element.put()
+            # logging.info(tostring(guest_node))
 
         # update the individual enquiries to have the collection
         # as their parent, and extend their expiry dates for 24 hours
         # in anticipation of the deposit
         enquiry_elements = node.find('enquiries').findall('enquiry')
         for enquiry_element in enquiry_elements:
+            # logging.info(tostring(enquiry_element))
             refnum = enquiry_element.findtext('number')
             # retrieve the existing enquiry
             enquiry = Enquiry.get_by_key_name(refnum)
             if enquiry:
                 # hope this works properly!!!
                 enquiry.parent = enquiry_collection
+                enquiry.enqColl = enquiry_collection
                 enquiry.xmlSource = tostring(enquiry_element)
                 enquiry.put()
                 # add the enquiries to the guest element, if it exists
