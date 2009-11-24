@@ -99,8 +99,8 @@ class Venue(db.Model):
     specialNeeds = db.StringProperty(verbose_name='Special Needs')
     registrationFeePaid = db.BooleanProperty(
         default=False, verbose_name='Registration Fee Paid')
-    contractStartDate = db.DateProperty(verbose_name='Contracted Start Date')
-    contractEndDate = db.DateProperty(verbose_name='Contracted End Date')
+    contractStartDate = db.DateProperty(verbose_name='Contracted Start Date (YYYY-MM-DD)')
+    contractEndDate = db.DateProperty(verbose_name='Contracted End Date (YYYY-MM-DD)')
     state = db.StringProperty(default='Closed', choices=getChoices('VNSTA'))
 
     def get_city(self):
@@ -143,7 +143,7 @@ class Venue(db.Model):
         
         #Check physical address exists
         has_address = False
-        for a in Address.all().ancestor(self): 
+        for a in Address.all().ancestor(self):
             if a.addressType == 'Physical Address':
                 has_address = True
                 break
@@ -266,8 +266,10 @@ class Bedroom(db.Model):
     created = db.DateTimeProperty(auto_now_add=True)
     creator = db.UserProperty()
     name = db.StringProperty(required=True, verbose_name='Name')
-    bathroomType = db.StringProperty(required=True, verbose_name='Bathroom Type',
-                                        choices=getChoices('BRTYP'))
+    bedroomType = db.StringProperty(
+        verbose_name='Bedroom Type', choices=getChoices('BEDRTYP'))
+    bathroomType = db.StringProperty(required=True, 
+        verbose_name='Bathroom Type', choices=getChoices('BRTYP'))
     childFriendly = db.BooleanProperty(
         default=True, verbose_name='Child Friendly')
     wheelchairAccess = db.BooleanProperty(
@@ -288,7 +290,11 @@ class Bedroom(db.Model):
 
         #Check bedroom capacity > 0
         if self.capacity == 0:
-            return False, "No capacity"
+            return False, "No capacity in bedroom %s" % self.name
+
+        #Check type is captured
+        if not self.bedroomType:
+            return False, "Type not specified in bedroom %s" % self.name
 
         #Check capacity matches
         bed_cap = 0
