@@ -100,13 +100,16 @@ class EditAddress(webapp.RequestHandler):
         addresskey = self.request.get('addresskey')
         address = Address.get(addresskey)
         container = address.container
-        data = AddressForm(data=self.request.POST, instance=address)
+        logger.info('Post to container %s', container.name)
+        data = AddressForm(data=self.request.POST)
         if data.is_valid():
             entity = data.save(commit=False)
             entity.creator = users.get_current_user()
             entity._parent_key = container.key()
             entity._parent = container
+            entity.container = container
             entity.put()
+            address.delete()
             self.redirect(came_from)
         else:
             auth_url, auth_url_text = get_authentication_urls(self.request.uri)
