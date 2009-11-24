@@ -15,13 +15,8 @@
           {% if wheelchairAccess %} 
             <input type="hidden" name="wheelchairAccess" value="on" />
           {% endif %} 
-          {% if genderSensitive %} 
-            <input type="hidden" name="genderSensitive" value="on" />
-          {% endif %} 
-          <input type="hidden" name="adultMales" value="{{ adultMales }}" />
-          <input type="hidden" name="adultFemales" value="{{ adultFemales }}" />
-          <input type="hidden" name="childMales" value="{{ childMales }}" />
-          <input type="hidden" name="childFemales" value="{{ childFemales }}" />
+          <input type="hidden" name="adults" value="{{ adults }}" />
+          <input type="hidden" name="children" value="{{ children }}" />
       <input type="submit" name="Continue" value="Continue" />
     </form>
 

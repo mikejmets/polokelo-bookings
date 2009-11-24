@@ -51,26 +51,12 @@
           </td>
         </tr>
         <tr>
-          <td>Gender Sensitive</td>
-          <td colspan="2"> 
-            <input type="checkbox" name="genderSensitive" 
-            {% if genderSensitive %} checked {% endif %} />
-          </td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>Male</td>
-          <td>Female</td>
-        </tr>
-        <tr>
           <td>Number of adults</td>
-          <td> <input type="text" name="adultMales" value="{{ adultMales }}" /> </td>
-          <td> <input type="text" name="adultFemales" value="{{ adultFemales }}" /> </td>
+          <td> <input type="text" name="adults" value="{{ adults }}" /> </td>
         </tr>
         <tr>
           <td>Number of children</td>
-          <td> <input type="text" name="childMales" value="{{ childMales }}" /> </td>
-          <td> <input type="text" name="childFemales" value="{{ childFemales }}" /> </td>
+          <td> <input type="text" name="children" value="{{ children }}" /> </td>
         </tr>
       </table>
       <input title="Find accommodation"
@@ -110,13 +96,8 @@
       {% if wheelchairAccess %}
         <input type="hidden" name="wheelchairAccess" checked /> 
       {% endif %} 
-      {% if genderSensitive %}
-        <input type="hidden" name="genderSensitive" checked /> 
-      {% endif %} 
-      <input type="hidden" name="adultMales" value="{{ adultMales }}" />
-      <input type="hidden" name="adultFemales" value="{{ adultFemales }}" />
-      <input type="hidden" name="childMales" value="{{ childMales }}" />
-      <input type="hidden" name="childFemales" value="{{ childFemales }}" />
+      <input type="hidden" name="adults" value="{{ adults }}" />
+      <input type="hidden" name="children" value="{{ children }}" />
       <input title="Reserve accommodation"
              type="submit" value="Reserve Accommodation" />
     </form>
@@ -173,7 +154,7 @@
         {% for enquiry in enquiries %}
         <tr>
           <td>{{ enquiry.referenceNumber }}</td>
-          <td>{{ enquiry.state }}</td>
+          <td>{{ enquiry.get_statename }}</td>
           <!--
           <td class="action">
             <a title="Edit this enquiry"

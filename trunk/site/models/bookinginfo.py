@@ -1,8 +1,9 @@
 from datetime import datetime
 from google.appengine.ext import db
-from models.clientinfo import Client
 
+from models.clientinfo import Client
 from models.codelookup import getChoices
+from workflow.workflow import WorkflowAware
 
 
 class IdSequence(db.Model):
@@ -12,14 +13,13 @@ class IdSequence(db.Model):
     creator = db.UserProperty()
     sequence = db.IntegerProperty(default=0)
 
-class Enquiry(db.Model):
+class Enquiry(WorkflowAware):
     created = db.DateTimeProperty(auto_now_add=True)
     creator = db.UserProperty()
     referenceNumber = db.StringProperty(required=True, 
                                             verbose_name='Reference Number')
     guestEmail = db.StringProperty(verbose_name='Guest Email')
     agentCode = db.StringProperty(verbose_name='Travel Agent Code')
-    state = db.StringProperty(default='Temporary', choices=getChoices('EQSTA'))
     xmlSource = db.TextProperty(verbose_name='Source Detail')
 
     def listing_name(self):
@@ -50,11 +50,6 @@ class AccommodationElement(db.Model):
     nights = db.IntegerProperty(default=0)
     wheelchairAccess = db.BooleanProperty(default=False)
     specialNeeds = db.BooleanProperty(default=False)
-    # genderSensitive = db.BooleanProperty(default=False)
-    # adultMales = db.IntegerProperty(default=0)
-    # adultFemales = db.IntegerProperty(default=0)
-    # childMales = db.IntegerProperty(default=0)
-    # childFemales = db.IntegerProperty(default=0)
     adults = db.IntegerProperty(default=0)
     children = db.IntegerProperty(default=0)
     wheelchair = db.BooleanProperty(default=False)
