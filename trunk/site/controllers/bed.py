@@ -96,20 +96,22 @@ class EditBed(webapp.RequestHandler):
         bedkey = self.request.get('bedkey')
         bed = Bed.get(bedkey)
         container = bed.bedroom
-        data = BedForm(data=self.request.POST, instance=bed)
+        data = BedForm(data=self.request.POST)
         if data.is_valid():
-            bed = data.save(commit=False)
-            bed.creator = users.get_current_user()
-            bed._parent_key = container.key()
-            bed._parent = container
-            bed.put()
+            new_bed = data.save(commit=False)
+            new_bed.creator = users.get_current_user()
+            new_bed._parent_key = container.key()
+            new_bed._parent = container
+            new_bed.bedroom = container
+            new_bed.put()
+            bed.rdelete()
             #Auto delete and recreate all berths
-            for i in bed.bed_berths:
+            for i in new_bed.bed_berths:
                 i.rdelete()
-            for i in range(bed.capacity):
-                berth = Berth(parent=bed)
+            for i in range(new_bed.capacity):
+                berth = Berth(parent=new_bed)
                 berth.creator = users.get_current_user()
-                berth.bed = bed
+                berth.bed = new_bed
                 berth.put()
             self.redirect(came_from)
         else:
