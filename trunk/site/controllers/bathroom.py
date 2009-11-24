@@ -90,13 +90,15 @@ class EditBathroom(webapp.RequestHandler):
         bathroomkey = self.request.get('bathroomkey')
         bathroom = Bathroom.get(bathroomkey)
         container = bathroom.venue
-        data = BathroomForm(data=self.request.POST, instance=bathroom)
+        data = BathroomForm(data=self.request.POST)
         if data.is_valid():
             entity = data.save(commit=False)
             entity.creator = users.get_current_user()
             entity._parent_key = container.key()
             entity._parent = container
+            entity.venue = container
             entity.put()
+            bathroom.delete()
             self.redirect(came_from)
         else:
             auth_url, auth_url_text = get_authentication_urls(self.request.uri)
