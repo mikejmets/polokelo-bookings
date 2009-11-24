@@ -9,18 +9,19 @@ def loadEquiryWorkflow():
     wfl.put()
     wfl.add_state('temporary')
     wfl.add_state('allocated')
+    wfl.add_state('requiresintervention')
     wfl.add_state('depositpaid')
+    wfl.add_state('paidinfull')
 
     wfl.add_trans('allocate', 'temporary', 'allocated')
-    wfl.add_trans('paydeposity', 'allocated', 'depositpaid')
+    wfl.add_trans('assigntouser', 'temporary', 'requiresintervention')
+    wfl.add_trans('paydeposit', 'allocated', 'depositpaid')
+    wfl.add_trans('payfull', 'depositpaid', 'paidinfull')
+    
     wfl.set_initstate('temporary')
+    wfl.put()
     return wfl
 
 ENQUIRY_WORKFLOW = Workflow.get_by_key_name('enquiry_workflow')
-if ENQUIRY_WORKFLOW:
-    for s in State.all().ancestor(ENQUIRY_WORKFLOW):
-        s.delete()
-    ENQUIRY_WORKFLOW.delete()
-    ENQUIRY_WORKFLOW = None
 if not ENQUIRY_WORKFLOW:
     ENQUIRY_WORKFLOW = loadEquiryWorkflow()
