@@ -12,6 +12,18 @@ class IdSequence(db.Model):
     created = db.DateTimeProperty(auto_now_add=True)
     creator = db.UserProperty()
     sequence = db.IntegerProperty(default=0)
+    
+
+class EnquiryCollection(db.Model):
+    created = db.DateTimeProperty(auto_now_add=True)
+    creator = db.UserProperty()
+    referenceNumber = db.StringProperty(required=True, 
+                                            verbose_name='Reference Number')
+
+    def rdelete(self):
+        for e in Enquiry.all.filter('ancestor =', self).fetch(1000):
+            e.rdelete()
+        self.delete()
 
 class Enquiry(WorkflowAware):
     created = db.DateTimeProperty(auto_now_add=True)
@@ -66,9 +78,8 @@ class AccommodationElement(db.Model):
 class GuestElement(db.Model):
     created = db.DateTimeProperty(auto_now_add=True)
     creator = db.UserProperty()
-    enquiry = db.ReferenceProperty(
-        Enquiry, collection_name='guest_elements')
-    isPrimary = db.BooleanProperty(default=True, verbose_name="Primary Guest")
+    enquiries = db.ListProperty(db.Key)
+    isPrimary = db.BooleanProperty(default=False, verbose_name="Primary Guest")
     surname = db.StringProperty(required=True)
     firstNames = db.StringProperty(required=True, verbose_name="First Names")
     email = db.EmailProperty(verbose_name='Email Address')
