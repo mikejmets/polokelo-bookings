@@ -32,10 +32,8 @@ class BookingsTool():
         if berths:
           accommodationElement.availableBerths = str(berths)
           #Simply pull from the top of the list
-          people = accommodationElement.adultMales + \
-                   accommodationElement.adultFemales + \
-                   accommodationElement.childMales + \
-                   accommodationElement.childFemales
+          people = accommodationElement.adults + \
+                   accommodationElement.children 
           if people <= len(berths): #Should always be true
               quote_amount = self.calculateQuote(accommodationElement)
               expiry_date = datetime.now() + timedelta(minutes=30)
@@ -83,7 +81,7 @@ class BookingsTool():
                         slotkeys, 
                         booking)
             if people:
-                enquiry.state = 'In Progress'
+                enquiry.do_trans('allocate')
                 enquiry.put()
         except BookingConflictError, error:
             logger.error('BookingConflict: %s', error) 
@@ -147,7 +145,7 @@ class SimpleAccommodationSearch(AccommodationSearch):
 
         #for key, slots in berths:
         #  logger.info('valid pairing %s: %s', key, slots)
-        people = element.adultMales + element.adultFemales + element.childMales + element.childFemales
+        people = element.adults + element.children
         if len(berths) >= people:
             logger.info('Found %s simple pairings for %s people', 
                 len(berths), people)
@@ -218,13 +216,13 @@ class WheelchairAccommodationSearch(AccommodationSearch):
 
         #for key, slots in berths:
         #  logger.info('valid pairing %s: %s', key, slots)
-        people = element.adultMales + element.adultFemales + element.childMales + element.childFemales
+        people = element.adults + element.children
         if len(berths) >= people:
             logger.info('Found %s wheelchair pairings for %s people', 
                 len(berths), people)
             return berths
         else:
-            logger.info('GenderSensitiveAccommodationSearch unsuccessful')
+            logger.info('WheelchairAccommodationSearch unsuccessful')
             return self.searchNext(element)
 
     def _findValidBerths(self, element):

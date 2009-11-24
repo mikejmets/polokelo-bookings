@@ -17,6 +17,7 @@ from controllers.bookingstool import BookingsTool
 from models.codelookup import getItemDescription
 
 from controllers import generator
+from workflow.__init__ import ENQUIRY_WORKFLOW
 
 class ExternalBookings(webapp.RequestHandler):
     """ Handler class for all enquiry/booking requests from
@@ -54,9 +55,9 @@ class ExternalBookings(webapp.RequestHandler):
         enquiry.referenceNumber = enquiry_number
         enquiry.guestEmail = node.findtext('email')
         enquiry.agentCode = node.findtext('guestagentcode')
-        enquiry.state = 'Temporary'
         enquiry.xmlSource = tostring(node)
         enquiry.put()
+        enquiry.enter_workflow(ENQUIRY_WORKFLOW)
 
 
         accommodation = AccommodationElement(
