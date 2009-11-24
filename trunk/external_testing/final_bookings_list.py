@@ -7,7 +7,7 @@ url = 'http://localhost:8080/externalbookings'
 
 xml = """
 <enquirylist>
-    <enquirynumber>YK8-DQN-XX4</enquirynumber>
+    <enquirynumber>YK8-DQN-XX5</enquirynumber>
     <guestagentcode>Trafalgar-234234324</guestagentcode>
     <action>confirm enquiries</action>
     <creditcardholder>
@@ -30,7 +30,7 @@ xml = """
     </creditcardholder>
     <enquiries>
         <enquiry>
-            <number>YK8-DQN-2PH</number>
+            <number>YK8-DQN-2PJ</number>
             <city>PCS</city>
             <accommodation>
                 <type>HOM</type>
