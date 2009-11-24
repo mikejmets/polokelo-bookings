@@ -46,6 +46,9 @@
           {% endifequal %}
         {% else %}
           <input type="submit" name="validate" value="Validate" />
+          {% ifequal venue.state 'Open' %}
+              <input type="submit" name="workflow" value="Close For Bookings" />
+          {% endifequal %}
         {% endif %}
       </form>
     </td>
@@ -173,6 +176,7 @@
       <table class="listing" cellspacing="0">
           <thead>
             <td>Name</td>
+            <td>Type</td>
             <td>Bathroom</td>
             <td>Capacity</td>
             {% if venue.canModify %}
@@ -182,6 +186,7 @@
           {% for bedroom in bedrooms %}
           <tr>
               <td><a href="/services/owner/venue/viewbedroom?bedroomkey={{ bedroom.key }}&venuekey={{ venue.key }}">{{ bedroom.name }}</a></td>
+              <td>{{ bedroom.bedroomType }}</td>
               <td>{{ bedroom.bathroomType }}</td>
               <td>{{ bedroom.capacity }}</td>
               {% if venue.canModify %}
