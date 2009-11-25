@@ -39,11 +39,7 @@
         <input type="hidden" name="venuekey" value="{{ venue.key }}" />
         <input type="hidden" name="state" value="{{ venue.state }}" />
         {% if venue.isValid %}
-          {% ifequal venue.state 'Closed' %}
-              <input type="submit" name="workflow" value="Open For Bookings" />
-          {% else %}
-              <input type="submit" name="workflow" value="Close For Bookings" />
-          {% endifequal %}
+          <span><strong>State: {{ venue.state }}</strong></span>
         {% else %}
           <input type="submit" name="validate" value="Validate" />
           {% ifequal venue.state 'Open' %}

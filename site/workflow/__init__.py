@@ -75,7 +75,8 @@ def loadEquiryWorkflow():
     return wfl
 
 ENQUIRY_WORKFLOW = Workflow.get_by_key_name('enquiry_workflow')
-if ENQUIRY_WORKFLOW:
+if False: #ENQUIRY_WORKFLOW:
+    logger.info('Reseting the enquiry workflow')
     for s in State.all().ancestor(ENQUIRY_WORKFLOW):
         s.delete()
     for t in Transition.all().ancestor(ENQUIRY_WORKFLOW):

@@ -100,7 +100,6 @@ class EditAddress(webapp.RequestHandler):
         addresskey = self.request.get('addresskey')
         address = Address.get(addresskey)
         container = address.container
-        logger.info('Post to container %s', container.name)
         data = AddressForm(data=self.request.POST)
         if data.is_valid():
             entity = data.save(commit=False)
