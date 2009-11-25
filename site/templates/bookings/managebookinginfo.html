@@ -154,19 +154,17 @@
         </thead>
         {% for enquiry in enquiries %}
         <tr>
-          <td>{{ enquiry.referenceNumber }}</td>
+          <td><a href="/bookings/enquiry/viewenquiry?enquirykey={{ enquiry.key }}">{{ enquiry.referenceNumber }}</td>
           <td>{{ enquiry.get_statename }}</td>
           <td>{{ enquiry.expiryDate }}</td>
-          <!--
           <td class="action">
             <a title="Edit this enquiry"
-              href="/bookings/editenquiry?enquirykey={{ enquiry.key }}">
+              href="/bookings/enquiry/editenquiry?enquirykey={{ enquiry.key }}">
               <img src="/images/edit.png"/>
             </a></td>
-            -->
           <td class="action">
             <a title="Delete this enquiry"
-              href="/bookings/deleteenquiry?enquirykey={{ enquiry.key }}"
+              href="/bookings/enquiry/deleteenquiry?enquirykey={{ enquiry.key }}"
                    onclick="return confirm('Are you sure?');">
               <img src="/images/delete.png"/>
             </a></td>
