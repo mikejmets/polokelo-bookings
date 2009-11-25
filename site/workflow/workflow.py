@@ -34,7 +34,7 @@ The development of a workflow system can be splitted in three steps:
 
     2.1 inherite from the 'WorkflowAware' class;
 
-    2.2 introduce each object into the workflow with the 'enter_workflow'
+    2.2 introduce each object into the workflow with the 'enterWorkflow'
         method.
 
  3. Associate the application semantics to the workflow aware objects
@@ -68,54 +68,54 @@ class Workflow(db.Model):
 
     created = db.DateTimeProperty(auto_now_add=True)
     creator = db.UserProperty()
-    initstate = db.StringProperty()
+    initialState = db.StringProperty()
 
-    def add_state(self, name):
+    def addState(self, name):
         """Adds a new state.
         """
         state = State(parent=self, key_name=name)
         state.put()
 
 
-    def find_state(self, name):
+    def findState(self, name):
         """Find existing state.
         """
         states = State.get_by_key_name([name], parent=self)
         if len(states) == 1:
             return states[0]
 
-    def find_transition(self, name):
+    def findTransition(self, name):
         """Find existing transition.
         """
         transitions = Transition.get_by_key_name([name], parent=self)
         if len(transitions) == 1:
             return transitions[0]
 
-    def set_initstate(self, name):
+    def setInitialState(self, name):
         """Sets the default initial state.
         """
-        if not self.find_state(name):
+        if not self.findState(name):
             raise WorkflowError, "invalid initial state: '%s'" % name
-        self.initstate = name
+        self.initialState = name
         self.put()
 
 
-    def add_trans(self, name, state_from, state_to):
+    def addTransition(self, name, state_from, state_to):
         """Adds a new transition.
 
         'state_from' and 'state_to' are respectively the origin
         and destination states of the transition.
         """
-        state_from = self.find_state(state_from)
+        state_from = self.findState(state_from)
         if not state_from:
             raise WorkflowError, "unregistered state: '%s'" % state_from
-        state_to = self.find_state(state_to)
+        state_to = self.findState(state_to)
         if not state_to:
             raise WorkflowError, "unregistered state: '%s'" % state_to
         transition = Transition(parent=self, 
-            key_name=name, state_from=state_from, state_to=state_to)
+            key_name=name, stateFrom=state_from, stateTo=state_to)
         transition.put()
-        #state_from.add_trans(name, transition)
+        #state_from.addTransition(name, transition)
         #state_from.put()
 
 
@@ -129,7 +129,7 @@ class State(db.Model):
     created = db.DateTimeProperty(auto_now_add=True)
     creator = db.UserProperty()
 
-    def add_trans(self, name, transition):
+    def addTransition(self, name, transition):
         """Adds a new transition.
         """
         self.transitions_from.append(transition)
@@ -143,8 +143,8 @@ class Transition(db.Model):
 
     created = db.DateTimeProperty(auto_now_add=True)
     creator = db.UserProperty()
-    state_from = db.ReferenceProperty(State, collection_name='transitions_from')
-    state_to = db.ReferenceProperty(State, collection_name='transitions_to')
+    stateFrom = db.ReferenceProperty(State, collection_name='transitions_from')
+    stateTo = db.ReferenceProperty(State, collection_name='transitions_to')
 
 
 class WorkflowAware(db.Model):
@@ -182,9 +182,9 @@ class WorkflowAware(db.Model):
     """
 
     workflow = db.ReferenceProperty(Workflow)
-    workflow_state = db.StringProperty()
+    workflowState = db.StringProperty()
 
-    def enter_workflow(self, workflow=None, initstate=None, *args, **kw):
+    def enterWorkflow(self, workflow=None, initstate=None, *args, **kw):
         """[Re-]Bind this object to a specific workflow.
 
         If the 'workflow' parameter is omitted then the object associated
@@ -204,15 +204,15 @@ class WorkflowAware(db.Model):
 
         # Set the initial state
         if initstate is None:
-            initstate = self.workflow.initstate
+            initstate = self.workflow.initialState
 
         if not initstate:
             raise WorkflowError, 'undefined initial state'
 
-        if not self.workflow.find_state(initstate):
+        if not self.workflow.findState(initstate):
             raise WorkflowError, "invalid initial state: '%s'" % initstate
 
-        self.workflow_state = initstate
+        self.workflowState = initstate
 
         # Call app-specific enter-state handler for initial state, if any
         name = 'onenter_%s' % initstate
@@ -222,13 +222,13 @@ class WorkflowAware(db.Model):
         #Set expiry date
         exp_date = ExpirationSetting.getExpirationDate(
             self.kind(),
-            self.workflow_state)
+            self.workflowState)
         self.expiryDate = exp_date
 
         self.put()
 
 
-    def do_trans(self, transname, *args, **kw):
+    def doTransition(self, transname, *args, **kw):
         """Performs a transition.
 
         Changes the state of the object and
@@ -239,26 +239,26 @@ class WorkflowAware(db.Model):
         workflow = self.workflow
 
         # Get the transition
-        transition = workflow.find_transition(transname)
+        transition = workflow.findTransition(transname)
         if not transition:
             error = "transition '%s' not in '%s'"
             raise WorkflowError, error % (transname, self.workflow.key().name())
 
         # Get the current state
-        state = workflow.find_state(self.workflow_state)
+        state = workflow.findState(self.workflowState)
         if transname not in [t.key().name() for t in state.transitions_from]:
             error = "transition '%s' is invalid from state '%s'"
-            raise WorkflowError, error % (transname, self.workflow_state)
+            raise WorkflowError, error % (transname, self.workflowState)
 
-        new_state = transition.state_to
+        new_state = transition.stateTo
 
         # call app-specific leave- state  handler if any
-        name = 'onleave_%s' % self.workflow_state
+        name = 'onleave_%s' % self.workflowState
         if hasattr(self, name):
             getattr(self, name)(*args, **kw)
 
         # Set the new state
-        self.workflow_state = new_state.key().name()
+        self.workflowState = new_state.key().name()
 
         # call app-specific transition handler if any
         name = 'ontrans_%s' % transname
@@ -273,30 +273,30 @@ class WorkflowAware(db.Model):
         #Set expiry date
         exp_date = ExpirationSetting.getExpirationDate(
             self.kind(),
-            self.workflow_state,
+            self.workflowState,
             transname)
         self.expiryDate = exp_date
 
         self.put()
 
 
-    def get_statename(self):
+    def getStateName(self):
         """Return the name of the current state.
         """
-        return self.workflow_state
+        return self.workflowState
 
 
-    def get_state(self):
+    def getState(self):
         """Returns the current state instance.
         """
-        statename = self.get_statename()
-        return self.workflow.find_state(statename)
+        statename = self.getStateName()
+        return self.workflow.findState(statename)
 
     def getPossibleTransitions(self):
         """Returns the list of transition from the current state
         """
         transitions = []
-        for t in self.get_state().transitions_from:
+        for t in self.getState().transitions_from:
             transitions.append(t.key().name())
         return transitions
 

@@ -56,7 +56,7 @@ class ExternalBookings(webapp.RequestHandler):
         enquiry.agentCode = node.findtext('guestagentcode')
         enquiry.xmlSource = tostring(node)
         enquiry.put()
-        enquiry.enter_workflow(ENQUIRY_WORKFLOW)
+        enquiry.enterWorkflow(ENQUIRY_WORKFLOW)
 
 
         accommodation = AccommodationElement(
