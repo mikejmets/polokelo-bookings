@@ -1,0 +1,4 @@
+cron:
+- description: clean up expired enquiries
+  url: /tasks/clearexpiredenquiries
+  schedule: every 1 hours
