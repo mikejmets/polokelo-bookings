@@ -33,6 +33,9 @@ handlers:
 - url: /externalbookings
   script: externalrequests/externalhandlers.py
 
+- url: /tasks/.*
+  script: controllers/tasks.py
+
 - url: /unload
   script: $PYTHON_LIB/google/appengine/ext/remote_api/handler.py
   login: admin

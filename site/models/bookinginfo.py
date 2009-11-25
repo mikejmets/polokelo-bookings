@@ -1,10 +1,12 @@
 from datetime import datetime
+import logging
 from google.appengine.ext import db
 
 from models.clientinfo import Client
 from models.codelookup import getChoices
 from workflow.workflow import WorkflowAware
 
+logger = logging.getLogger('BookingInfo')
 
 class IdSequence(db.Model):
     """ keep track of sequences for number generators
@@ -36,6 +38,29 @@ class Enquiry(WorkflowAware):
     guestEmail = db.StringProperty(verbose_name='Guest Email')
     agentCode = db.StringProperty(verbose_name='Travel Agent Code')
     xmlSource = db.TextProperty(verbose_name='Source Detail')
+
+    def ontransition_expiretemporary(self, *args, **kw):
+        pass
+
+    def ontransition_expireallocated(self, *args, **kw):
+        for b in self.contracted_bookings:
+            b.rdelete()
+
+    def ontransition_expiredetails(self, *args, **kw):
+        for b in self.contracted_bookings:
+            b.rdelete()
+
+    def ontransition_expiredeposit(self, *args, **kw):
+        for b in self.contracted_bookings:
+            b.rdelete()
+
+    def ontransition_canceldeposit(self, *args, **kw):
+        for b in self.contracted_bookings:
+            b.rdelete()
+
+    def ontransition_cancelfull(self, *args, **kw):
+        for b in self.contracted_bookings:
+            b.rdelete()
 
     def listing_name(self):
         return '%s' % self.referenceNumber
@@ -100,7 +125,7 @@ class ContractedBooking(db.Model):
     client = db.ReferenceProperty(
         Client, collection_name='contracted_bookings')
     enquiry = db.ReferenceProperty(
-        Enquiry, collection_name='enquiries')
+        Enquiry, collection_name='contracted_bookings')
     state = db.StringProperty(default='Temporary', 
             choices=getChoices('CBSTA'))
 

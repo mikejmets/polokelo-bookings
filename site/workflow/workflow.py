@@ -261,7 +261,7 @@ class WorkflowAware(db.Model):
         self.workflowState = new_state.key().name()
 
         # call app-specific transition handler if any
-        name = 'ontrans_%s' % transname
+        name = 'ontransition_%s' % transname
         if hasattr(self, name):
             getattr(self, name)(*args, **kw)
 
