@@ -110,7 +110,7 @@ class BookingsToolFindAccommodation(webapp.RequestHandler):
         ref_num = generator.generateEnquiryNumber()
         enquiry = Enquiry(referenceNumber=ref_num)
         enquiry.put()
-        enquiry.enter_workflow(ENQUIRY_WORKFLOW)
+        enquiry.enterWorkflow(ENQUIRY_WORKFLOW)
         accom_element = AccommodationElement(
             parent=enquiry,
             city=city,
@@ -141,7 +141,7 @@ class BookingsToolFindAccommodation(webapp.RequestHandler):
             self.redirect('%s?%s' % (came_from, params))
         else:
             #Clean up
-            enquiry.do_trans('assigntouser')
+            enquiry.doTransition('assigntouser')
             params['error'] = "No results found" 
             params = urllib.urlencode(params)
             self.redirect('/bookings/bookingerror?%s' % params)

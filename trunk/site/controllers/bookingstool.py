@@ -79,7 +79,7 @@ class BookingsTool():
                         slotkeys, 
                         booking)
             if people:
-                enquiry.do_trans('allocate')
+                enquiry.doTransition('allocate')
                 enquiry.put()
 
         except BookingConflictError, error:

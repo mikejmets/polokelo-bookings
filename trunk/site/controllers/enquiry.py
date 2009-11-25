@@ -18,7 +18,7 @@ class EnquiryForm(djangoforms.ModelForm):
     class Meta:
         model = Enquiry
         exclude = ['created', 'creator', 'referenceNumber', 'workflow',
-            'workflow_state', 'enqColl', 'xmlSource']
+            'workflowState', 'enqColl', 'xmlSource']
 
 
 class ViewEnquiry(webapp.RequestHandler):
@@ -45,7 +45,7 @@ class ViewEnquiry(webapp.RequestHandler):
         transition = self.request.get('transition')
         enquirykey = self.request.get('enquirykey') 
         enquiry = Enquiry.get(enquirykey)
-        enquiry.do_trans(transition)
+        enquiry.doTransition(transition)
         params = {}
         params['enquirykey'] = enquirykey 
         params = urllib.urlencode(params)

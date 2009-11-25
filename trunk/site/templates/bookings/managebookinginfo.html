@@ -155,7 +155,7 @@
         {% for enquiry in enquiries %}
         <tr>
           <td><a href="/bookings/enquiry/viewenquiry?enquirykey={{ enquiry.key }}">{{ enquiry.referenceNumber }}</td>
-          <td>{{ enquiry.get_statename }}</td>
+            <td>{{ enquiry.getStateName }}</td>
           <td>{{ enquiry.expiryDate }}</td>
           <td class="action">
             <a title="Edit this enquiry"
