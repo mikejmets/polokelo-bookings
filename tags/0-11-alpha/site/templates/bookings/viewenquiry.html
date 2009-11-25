@@ -1,0 +1,30 @@
+{% extends base_path %}
+
+{% block breadcrumbs %}
+    <a href="/bookings/bookinginfo">manage bookings</a>
+{% endblock %}
+
+{% block pagecontent %}
+<br />
+
+<h1>Enquiry</h1>
+
+<p>Enquiry Number: {{ enquiry.referenceNumber }} </p>
+<p>Enquiry Status: {{ enquiry.workflowState }} </p>
+<p>Enquiry Expiry Date: {{ enquiry.expiryDate }} </p>
+
+<form name="advanceEnquiry" method="post" 
+      action="/bookings/enquiry/viewenquiry">
+
+  <input type="hidden" name="enquirykey" value="{{ enquirykey }}"/>
+  {% if transitions %}
+    <select name="transition">
+      {% for transition in transitions %}
+      <option value="{{ transition }}">{{ transition }}</option>
+      {% endfor %}
+    </select>
+    <input title="Advance" type="submit" value="Go"/>
+  {% endif %}
+</form>
+
+{% endblock pagecontent %}
