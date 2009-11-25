@@ -1,4 +1,5 @@
 import os
+import urllib
 import logging
 from google.appengine.api import users
 from google.appengine.ext import webapp
@@ -16,7 +17,58 @@ logger = logging.getLogger('EnquiryHandler')
 class EnquiryForm(djangoforms.ModelForm):
     class Meta:
         model = Enquiry
-        exclude = ['created', 'creator', 'referenceNumber']
+        exclude = ['created', 'creator', 'referenceNumber', 'workflow',
+            'workflow_state', 'enqColl', 'xmlSource']
+
+
+class ViewEnquiry(webapp.RequestHandler):
+
+    def get(self):
+        came_from = self.request.referer
+        auth_url, auth_url_text = get_authentication_urls(self.request.uri)
+        filepath = os.path.join(PROJECT_PATH, 
+                      'templates', 'bookings', 'viewenquiry.html')
+        enquirykey = self.request.get('enquirykey')
+        enquiry = Enquiry.get(enquirykey)
+        transitions = enquiry.getPossibleTransitions()
+        self.response.out.write(template.render(filepath, 
+                    {
+                        'base_path':BASE_PATH,
+                        'enquirykey': enquirykey,
+                        'enquiry': enquiry,
+                        'transitions':transitions,
+                        'auth_url':auth_url,
+                        'auth_url_text':auth_url_text
+                        }))
+
+    def post(self):
+        transition = self.request.get('transition')
+        enquirykey = self.request.get('enquirykey') 
+        enquiry = Enquiry.get(enquirykey)
+        enquiry.do_trans(transition)
+        params = {}
+        params['enquirykey'] = enquirykey 
+        params = urllib.urlencode(params)
+        self.redirect('/bookings/enquiry/viewenquiry?%s' % params)
+
+class AdvanceEnquiry(webapp.RequestHandler):
+
+    def get(self):
+        auth_url, auth_url_text = get_authentication_urls(self.request.uri)
+        filepath = os.path.join(PROJECT_PATH, 
+                      'templates', 'bookings', 'viewenquiry.html')
+        enquirykey = self.request.get('enquirykey')
+        enquiry = Enquiry.get(enquirykey)
+        transitions = enquiry.getPossibleTransitions()
+        self.response.out.write(template.render(filepath, 
+                    {
+                        'base_path':BASE_PATH,
+                        'enquirykey': enquirykey,
+                        'enquiry': enquiry,
+                        'transitions':transitions,
+                        'auth_url':auth_url,
+                        'auth_url_text':auth_url_text
+                        }))
 
 
 class CaptureEnquiry(webapp.RequestHandler):
@@ -53,6 +105,7 @@ class EditEnquiry(webapp.RequestHandler):
 
     def get(self):
         auth_url, auth_url_text = get_authentication_urls(self.request.uri)
+        came_from = self.request.referer
         enquirykey = self.request.get('enquirykey')
         enquiry = Enquiry.get(enquirykey)
         filepath = os.path.join(PROJECT_PATH, 
@@ -62,6 +115,8 @@ class EditEnquiry(webapp.RequestHandler):
                         'base_path':BASE_PATH,
                         'form':EnquiryForm(instance=enquiry),
                         'enquirykey':enquirykey,
+                        'came_from':came_from,
+                        'enquirykey':enquirykey,
                         'auth_url':auth_url,
                         'auth_url_text':auth_url_text
                         }))
@@ -69,6 +124,7 @@ class EditEnquiry(webapp.RequestHandler):
     def post(self):
         enquirykey = self.request.get('enquirykey')
         enquiry = Enquiry.get(enquirykey)
+        came_from = self.request.get('came_from')
         data = EnquiryForm(
                   data=self.request.POST, instance=enquiry)
         if data.is_valid():
@@ -79,7 +135,7 @@ class EditEnquiry(webapp.RequestHandler):
             #Change creator to last modified
             entity.creator = users.get_current_user()
             entity.put()
-            self.redirect('/bookings/bookinginfo')
+            self.redirect(came_from)
         else:
             filepath = os.path.join(PROJECT_PATH, 
                           'templates', 'bookings', 'editenquiry.html')
@@ -87,6 +143,7 @@ class EditEnquiry(webapp.RequestHandler):
                           {
                               'base_path':BASE_PATH,
                               'form':data,
+                              'came_from':came_from,
                               'enquirykey':enquirykey
                               }))
 

@@ -21,7 +21,6 @@ class BookingsTool():
         """
         #Defaults
         quote_amount = 0.0
-        expiry_date = datetime.now()
 
         #search
         query = AccommodationElement.all().ancestor(enquiry)
@@ -36,12 +35,11 @@ class BookingsTool():
                    accommodationElement.children 
           if people <= len(berths): #Should always be true
               quote_amount = self.calculateQuote(accommodationElement)
-              expiry_date = datetime.now() + timedelta(minutes=30)
               selected_berths = [b[0] for b in berths[:people]]
               self.createBookings(enquiry,
                                   accommodationElement,
                                   selected_berths)
-        return (len(berths) > 0, quote_amount, expiry_date)
+        return (len(berths) > 0, quote_amount)
 
 
     def calculateQuote(self, accommodationElement):

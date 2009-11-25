@@ -292,6 +292,15 @@ class WorkflowAware(db.Model):
         statename = self.get_statename()
         return self.workflow.find_state(statename)
 
+    def getPossibleTransitions(self):
+        """Returns the list of transition from the current state
+        """
+        transitions = []
+        for t in self.get_state().transitions_from:
+            transitions.append(t.key().name())
+        return transitions
+
+
 
 class ExpirationSetting(db.Model):
     created = db.DateTimeProperty(auto_now_add=True)

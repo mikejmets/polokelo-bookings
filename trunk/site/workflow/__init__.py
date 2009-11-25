@@ -10,24 +10,33 @@ def loadEquiryWorkflow():
     wfl.add_state('temporary')
     wfl.add_state('allocated')
     wfl.add_state('requiresintervention')
+    wfl.add_state('detailsreceieved')
     wfl.add_state('depositpaid')
     wfl.add_state('paidinfull')
     wfl.add_state('expired')
     wfl.add_state('cancelled')
 
-    wfl.add_trans('expire', 'temporary', 'expired')
+    wfl.add_trans('expiretemporary', 'temporary', 'expired')
     wfl.add_trans('allocate', 'temporary', 'allocated')
-    wfl.add_trans('expire', 'allocated', 'expired')
     wfl.add_trans('assigntouser', 'temporary', 'requiresintervention')
-    wfl.add_trans('paydeposit', 'allocated', 'depositpaid')
-    wfl.add_trans('expire', 'depositpaid', 'expired')
-    wfl.add_trans('cancel', 'depositpaid', 'cancelled')
+
+    wfl.add_trans('expiremanaully', 'requiresintervention', 'expired')
+    wfl.add_trans('allocatemanually', 'requiresintervention', 'allocated')
+
+    wfl.add_trans('expireallocated', 'allocated', 'expired')
+    wfl.add_trans('receivedetails', 'allocated', 'detailsreceieved')
+
+    wfl.add_trans('expiredetails', 'detailsreceieved', 'expired')
+    wfl.add_trans('paydeposit', 'detailsreceieved', 'depositpaid')
+
+    wfl.add_trans('expiredeposit', 'depositpaid', 'expired')
+    wfl.add_trans('canceldeposit', 'depositpaid', 'cancelled')
     wfl.add_trans('payfull', 'depositpaid', 'paidinfull')
-    wfl.add_trans('cancel', 'paidinfull', 'cancelled')
+
+    wfl.add_trans('cancelfull', 'paidinfull', 'cancelled')
     
     wfl.set_initstate('temporary')
     wfl.put()
-    logger.info('-------------Ini %s', wfl.initstate)
 
     bcs = ExpirationSetting(
         entityKind = 'Enquiry', 
@@ -37,22 +46,29 @@ def loadEquiryWorkflow():
 
     bcs = ExpirationSetting(
         entityKind = 'Enquiry', 
-        entityState = 'allocated', 
         entityTransition = 'allocate', 
+        entityState = 'allocated', 
+        hours = 6)
+    bcs.put()
+
+    bcs = ExpirationSetting(
+        entityKind = 'Enquiry', 
+        entityTransition = 'receivedetails', 
+        entityState = 'detailsreceieved', 
         hours = 24)
     bcs.put()
 
     bcs = ExpirationSetting(
         entityKind = 'Enquiry', 
-        entityState = 'depositpaid', 
         entityTransition = 'paydeposit', 
+        entityState = 'depositpaid', 
         hours = 72)
     bcs.put()
 
     bcs = ExpirationSetting(
         entityKind = 'Enquiry', 
-        entityState = 'paidinfull', 
         entityTransition = 'payfull', 
+        entityState = 'paidinfull', 
         hours = -1)
     bcs.put()
 

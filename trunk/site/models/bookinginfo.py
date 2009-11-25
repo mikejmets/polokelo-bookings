@@ -29,10 +29,10 @@ class Enquiry(WorkflowAware):
     created = db.DateTimeProperty(auto_now_add=True)
     creator = db.UserProperty()
     referenceNumber = db.StringProperty(required=True, 
-                                            verbose_name='Reference Number')
-    expiryDate = db.DateTimeProperty()
+        verbose_name='Reference Number')
+    expiryDate = db.DateTimeProperty(verbose_name="Expiry Date/Time (YYYY-MM-DD hh:mm)")
     enqColl = db.ReferenceProperty(EnquiryCollection, 
-                                        collection_name='coll_enq')
+        collection_name='coll_enq')
     guestEmail = db.StringProperty(verbose_name='Guest Email')
     agentCode = db.StringProperty(verbose_name='Travel Agent Code')
     xmlSource = db.TextProperty(verbose_name='Source Detail')

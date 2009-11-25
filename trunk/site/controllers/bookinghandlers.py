@@ -13,8 +13,9 @@ from controllers.contractedbooking import \
     ViewContractedBooking, CaptureContractedBooking, \
     EditContractedBooking, DeleteContractedBooking
 from controllers.bookingstool import BookingsTool
-from controllers.enquiry \
-    import CaptureEnquiry, EditEnquiry, DeleteEnquiry
+from controllers.enquiry import \
+    ViewEnquiry, AdvanceEnquiry, \
+    CaptureEnquiry, EditEnquiry, DeleteEnquiry
 from models.hostinfo import Berth
 from models.bookinginfo import ContractedBooking, Enquiry, AccommodationElement
 from models.codelookup import getChoices
@@ -140,7 +141,7 @@ class BookingsToolFindAccommodation(webapp.RequestHandler):
             self.redirect('%s?%s' % (came_from, params))
         else:
             #Clean up
-            enquiry.rdelete()
+            enquiry.do_trans('assigntouser')
             params['error'] = "No results found" 
             params = urllib.urlencode(params)
             self.redirect('/bookings/bookingerror?%s' % params)
@@ -241,9 +242,11 @@ application = webapp.WSGIApplication([
       ('/bookings/capturecontractedbooking', CaptureContractedBooking),
       ('/bookings/editcontractedbooking', EditContractedBooking),
       ('/bookings/deletecontractedbooking', DeleteContractedBooking),
-      ('/bookings/captureenquiry', CaptureEnquiry),
-      ('/bookings/editenquiry', EditEnquiry),
-      ('/bookings/deleteenquiry', DeleteEnquiry),
+      ('/bookings/enquiry/viewenquiry', ViewEnquiry),
+      ('/bookings/enquiry/advanceenquiry', AdvanceEnquiry),
+      ('/bookings/enquiry/captureenquiry', CaptureEnquiry),
+      ('/bookings/enquiry/editenquiry', EditEnquiry),
+      ('/bookings/enquiry/deleteenquiry', DeleteEnquiry),
       ], debug=True)
 
 
