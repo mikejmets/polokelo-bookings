@@ -89,7 +89,7 @@ class ExternalBookings(webapp.RequestHandler):
         bt = BookingsTool()
 
         # do the availability check
-        available, amount, expiry = bt.checkAvailability(enquiry)
+        available, amount = bt.checkAvailability(enquiry)
         available = available and 'available' or 'not available'
 
         # append the result as a sub element to the node element
@@ -99,7 +99,7 @@ class ExternalBookings(webapp.RequestHandler):
         amount_elem = SubElement(search_elem, 'amount')
         amount_elem.text = str(amount)
         expiry_elem = SubElement(search_elem, 'expirydate')
-        expiry_elem.text = str(expiry)
+        expiry_elem.text = str(enquiry.expiryDate)
 
         # append the error element
         error_element = SubElement(node, 'systemerror')
