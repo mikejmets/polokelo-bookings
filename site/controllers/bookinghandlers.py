@@ -110,7 +110,6 @@ class BookingsToolFindAccommodation(webapp.RequestHandler):
         enquiry = Enquiry(referenceNumber=ref_num)
         enquiry.put()
         enquiry.enter_workflow(ENQUIRY_WORKFLOW)
-        logger.info('----------%s', enquiry.get_statename())
         accom_element = AccommodationElement(
             parent=enquiry,
             city=city,

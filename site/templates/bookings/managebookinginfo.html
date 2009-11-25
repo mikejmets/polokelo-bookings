@@ -149,12 +149,14 @@
         <thead>
           <td>Reference</td>
           <td>Status</td>
+          <td>Expires</td>
           <td>&nbsp;</td>
         </thead>
         {% for enquiry in enquiries %}
         <tr>
           <td>{{ enquiry.referenceNumber }}</td>
           <td>{{ enquiry.get_statename }}</td>
+          <td>{{ enquiry.expiryDate }}</td>
           <!--
           <td class="action">
             <a title="Edit this enquiry"

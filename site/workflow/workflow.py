@@ -49,6 +49,7 @@ The development of a workflow system can be splitted in three steps:
 """
 
 import logging
+from datetime import datetime, timedelta
 from google.appengine.ext import db
 
 logger = logging.getLogger('Worlflow')
@@ -218,6 +219,12 @@ class WorkflowAware(db.Model):
         if hasattr(self, name):
             getattr(self, name)(*args, **kw)
 
+        #Set expiry date
+        exp_date = ExpirationSetting.getExpirationDate(
+            self.kind(),
+            self.workflow_state)
+        self.expiryDate = exp_date
+
         self.put()
 
 
@@ -263,6 +270,15 @@ class WorkflowAware(db.Model):
         if hasattr(self, name):
             getattr(self, name)(*args, **kw)
 
+        #Set expiry date
+        exp_date = ExpirationSetting.getExpirationDate(
+            self.kind(),
+            self.workflow_state,
+            transname)
+        self.expiryDate = exp_date
+
+        self.put()
+
 
     def get_statename(self):
         """Return the name of the current state.
@@ -276,6 +292,26 @@ class WorkflowAware(db.Model):
         statename = self.get_statename()
         return self.workflow.find_state(statename)
 
+
+class ExpirationSetting(db.Model):
+    created = db.DateTimeProperty(auto_now_add=True)
+    creator = db.UserProperty()
+    entityKind = db.StringProperty() 
+    entityState = db.StringProperty() 
+    entityTransition = db.StringProperty() 
+    hours = db.IntegerProperty(default=1) 
+
+    @classmethod
+    def getExpirationDate(cls, entityKind, entityState, entityTransition=None):
+        setting = ExpirationSetting.all()
+        setting.filter('entityKind =', entityKind)
+        setting.filter('entityState =', entityState)
+        if entityTransition:
+            setting.filter('entityTransition =', entityTransition)
+        records = setting.fetch(1)
+        if records and records[0].hours >= 0:
+            logger.info('Expire in %s hours time', records[0].hours)
+            return datetime.now() + timedelta(hours=records[0].hours)
 
 ##    # Implements a stack that could be used to keep a record of the
 ##    # object way through the workflow.
