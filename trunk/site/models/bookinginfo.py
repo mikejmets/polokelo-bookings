@@ -30,6 +30,7 @@ class Enquiry(WorkflowAware):
     creator = db.UserProperty()
     referenceNumber = db.StringProperty(required=True, 
                                             verbose_name='Reference Number')
+    expiryDate = db.DateTimeProperty()
     enqColl = db.ReferenceProperty(EnquiryCollection, 
                                         collection_name='coll_enq')
     guestEmail = db.StringProperty(verbose_name='Guest Email')
@@ -40,7 +41,7 @@ class Enquiry(WorkflowAware):
         return '%s' % self.referenceNumber
 
     def rdelete(self):
-        for e in self.guest_elements:
+        for e in GuestElement.all().ancestor(self):
             e.rdelete()
         for e in AccommodationElement.all().ancestor(self):
             e.rdelete()

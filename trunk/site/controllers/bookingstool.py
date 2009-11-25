@@ -83,6 +83,7 @@ class BookingsTool():
             if people:
                 enquiry.do_trans('allocate')
                 enquiry.put()
+
         except BookingConflictError, error:
             logger.error('BookingConflict: %s', error) 
             #Clean up
