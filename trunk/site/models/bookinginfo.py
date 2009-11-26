@@ -32,8 +32,6 @@ class Enquiry(WorkflowAware):
     creator = db.UserProperty()
     referenceNumber = db.StringProperty(verbose_name='Reference Number')
     expiryDate = db.DateTimeProperty(verbose_name="Expiry Date/Time (YYYY-MM-DD hh:mm)")
-    enqColl = db.ReferenceProperty(EnquiryCollection, 
-        collection_name='coll_enq')
     guestEmail = db.StringProperty(verbose_name='Guest Email')
     agentCode = db.StringProperty(verbose_name='Travel Agent Code')
     quoteInZAR = db.FloatProperty(verbose_name='Quote', default=0.0)
