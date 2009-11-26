@@ -14,9 +14,10 @@ from xml.etree.ElementTree import XML, SubElement, tostring
 from models.clientinfo import Client
 from models.bookinginfo import EnquiryCollection, Enquiry, \
                                 AccommodationElement, GuestElement
-from controllers.bookingstool import BookingsTool
 from models.codelookup import getItemDescription
+from models.packages import Package
 
+from controllers.bookingstool import BookingsTool
 from controllers import generator
 from workflow.__init__ import ENQUIRY_WORKFLOW
 
@@ -46,7 +47,6 @@ class ExternalBookings(webapp.RequestHandler):
                                                     enquiry_number
             # return the result as xml
             return tostring(node)
-
 
         # instantiate enquiry and accommodation classes
         enquiry = Enquiry(key_name=enquiry_number, 
@@ -79,7 +79,7 @@ class ExternalBookings(webapp.RequestHandler):
         accommodation.adults = int(node.findtext('adults'))
         accommodation.children = int(node.findtext('children'))
         disability = node.find('disability')
-        accommodation.wheelchair = disability.findtext('wheelchairaccess') == 'yes'
+        accommodation.wheelchairAccess = disability.findtext('wheelchairaccess') == 'yes'
         accommodation.specialNeeds = disability.findtext('otherspecialneeds') == 'yes'
         accommodation.xmlSource = tostring(node)
         accommodation.put()
@@ -90,12 +90,15 @@ class ExternalBookings(webapp.RequestHandler):
 
         # do the availability check
         available, amount = bt.checkAvailability(enquiry)
-        available = available and 'available' or 'not available'
+        if not available:
+            enquiry.doTransition('assigntouser')
+        enquiry.quoteInZAR = amount
+        enquiry.put()
 
         # append the result as a sub element to the node element
         search_elem = SubElement(node, 'searchresult')
         avail_elem = SubElement(search_elem, 'availability')
-        avail_elem.text = available
+        avail_elem.text = available and 'available' or 'not available'
         amount_elem = SubElement(search_elem, 'amount')
         amount_elem.text = str(amount)
         expiry_elem = SubElement(search_elem, 'expirydate')
@@ -178,7 +181,7 @@ class ExternalBookings(webapp.RequestHandler):
         # append the result
         confirm_elem = SubElement(node, 'confirmationresult')
         result_elem = SubElement(confirm_elem, 'result')
-        result_elem.text = 'confirmed enquiry batch %s' % enquiry_number
+        result_elem.text = enquiry_number
         expiry_elem = SubElement(confirm_elem, 'expirydate')
         expiry_date = datetime.now() + timedelta(hours=24)
         expiry_elem.text = str(expiry_date)
