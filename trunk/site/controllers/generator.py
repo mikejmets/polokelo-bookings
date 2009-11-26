@@ -114,4 +114,4 @@ def generateClientNumber():
     """ generate a new client number
     """
     number = _generateNumber('A9TLW6FV', 'clientnumber')
-    return 'Y' + number[:2] + '-' + number[2:5] + '-' + number[5:]
+    return 'Y' + number
