@@ -89,6 +89,13 @@ def _generateNumber(seed, number_type):
     return result
 
 
+def generateEnquiryCollectionNumber():
+    """ generate a new enquiry number
+    """
+    number = _generateNumber('HT4W79ZD', 'enquirycollectionnumber')
+    return 'Y' + number[:2] + '-' + number[2:5] + '-' + number[5:]
+
+
 def generateEnquiryNumber():
     """ generate a new enquiry number
     """
