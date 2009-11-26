@@ -6,7 +6,8 @@
 
 {% block pagecontent %}
     <h1>Capture New Enquiry</h1>
-    <form name="booking" method="post" action="/bookings/captureenquiry">
+    <form name="booking" method="post" action="/bookings/enquiry/captureenquiry">
+      <input type="hidden" name="enquirycollectionkey" value="{{ enquirycollectionkey }}" />
         <table>
             {{ form }}
         </table>

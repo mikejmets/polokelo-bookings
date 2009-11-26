@@ -30,8 +30,7 @@ class EnquiryCollection(db.Model):
 class Enquiry(WorkflowAware):
     created = db.DateTimeProperty(auto_now_add=True)
     creator = db.UserProperty()
-    referenceNumber = db.StringProperty(required=True, 
-        verbose_name='Reference Number')
+    referenceNumber = db.StringProperty(verbose_name='Reference Number')
     expiryDate = db.DateTimeProperty(verbose_name="Expiry Date/Time (YYYY-MM-DD hh:mm)")
     enqColl = db.ReferenceProperty(EnquiryCollection, 
         collection_name='coll_enq')
@@ -83,15 +82,15 @@ class AccommodationElement(db.Model):
         choices=getChoices('ACTYP'))
     singlerooms = db.IntegerProperty(default=0)
     twinrooms = db.IntegerProperty(default=0)
-    doublerooms = db.IntegerProperty(default=0)
+    doublerooms = db.IntegerProperty(default=1)
     familyrooms = db.IntegerProperty(default=0)
     start = db.DateProperty(
-        default=datetime(2010, 6, 1),
+        default=datetime(2010, 6, 1).date(),
         verbose_name='Start Date')
-    nights = db.IntegerProperty(default=0)
+    nights = db.IntegerProperty(default=2)
     wheelchairAccess = db.BooleanProperty(default=False)
     specialNeeds = db.BooleanProperty(default=False)
-    adults = db.IntegerProperty(default=0)
+    adults = db.IntegerProperty(default=2)
     children = db.IntegerProperty(default=0)
     xmlSource = db.TextProperty(verbose_name='Source Detail')
     availableBerths = db.TextProperty()
