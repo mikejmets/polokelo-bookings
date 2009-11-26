@@ -39,7 +39,8 @@ class ViewEnquiry(webapp.RequestHandler):
         element = AccommodationElement.all().ancestor(enquiry)[0]
         show_search = enquiry.workflowState in \
             ['temporary', 'requiresintervention']
-        show_transitions = not show_search
+        show_transitions = enquiry.workflowState not in \
+            ['temporary', 'requiresintervention', 'expired', 'cancelled']
         transitions = None
         if show_transitions:
             transitions = enquiry.getPossibleTransitions()

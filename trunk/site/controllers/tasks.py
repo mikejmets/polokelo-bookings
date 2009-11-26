@@ -21,7 +21,7 @@ class ClearExpireEnquiries(webapp.RequestHandler):
             logger.info("Expire enquiry -- %s", enquiry.referenceNumber)
             transitions = enquiry.getPossibleTransitions()
             for t in transitions:
-                if t.startswith('expire'):
+                if t.key().name().startswith('expire'):
                     enquiry.doTransition(t)
                     break
 
