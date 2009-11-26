@@ -9,6 +9,8 @@ from controllers.match import MatchSchedule, CaptureMatch, EditMatch, DeleteMatc
 from controllers.codelookup import \
     LookupTablesRoot, CaptureLookupTable, EditLookupTable, DeleteLookupTable, \
     ViewLookupTable, CaptureLookupItem, EditLookupItem, DeleteLookupItem
+from controllers.packages import \
+    PackageRoot, CapturePackage, EditPackage, DeletePackage
 from controllers.statistics import ViewStatistics
 from controllers.utils import get_authentication_urls
 from models.schedule import Match
@@ -41,6 +43,10 @@ application = webapp.WSGIApplication([
           ('/admin/lookups/editlookupitem', EditLookupItem),
           ('/admin/lookups/deletelookupitem', DeleteLookupItem),
           ('/admin/statistics', ViewStatistics),
+          ('/admin/packages', PackageRoot),
+          ('/admin/packages/capturepackage', CapturePackage),
+          ('/admin/packages/editpackage', EditPackage),
+          ('/admin/packages/deletepackage', DeletePackage),
           ], debug=True)
 
 def main():
