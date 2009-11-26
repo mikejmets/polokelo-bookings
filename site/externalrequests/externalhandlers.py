@@ -171,6 +171,7 @@ class ExternalBookings(webapp.RequestHandler):
                 enquiry.parent = enquiry_collection
                 enquiry.enqColl = enquiry_collection
                 enquiry.xmlSource = tostring(enquiry_element)
+                enquiry.doTransition('receivedetails')
                 enquiry.put()
                 # add the enquiries to the guest element, if it exists
                 if guest_node:
