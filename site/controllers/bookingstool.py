@@ -96,7 +96,10 @@ class BookingsTool():
                         slotkeys, 
                         booking)
             if people:
-                enquiry.doTransition('allocate')
+                if enquiry.workflowState == 'requiresintervention':
+                    enquiry.doTransition('allocatemanually')
+                else:
+                    enquiry.doTransition('allocate')
                 enquiry.put()
 
         except BookingConflictError, error:

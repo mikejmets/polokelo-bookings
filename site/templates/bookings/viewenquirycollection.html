@@ -1,0 +1,40 @@
+{% extends base_path %}
+
+{% block breadcrumbs %}
+    <a href="/bookings/bookinginfo">manage bookings</a>
+{% endblock %}
+
+{% block pagecontent %}
+<br />
+
+<h1>Enquiry Collection</h1>
+
+<p>Enquiry Number: {{ enquirycollection.referenceNumber }} </p>
+<hr />
+  
+    <p><strong>Enquiries </strong>
+      <a title="Add a new enquiry"
+        href="/bookings/enquiry/captureenquiry?enquirycollectionkey={{ enquirycollectionkey }}">
+          <img src="/images/add.png"/>
+      </a>
+    </p>
+    <table class="listing" cellspacing="0">
+        <thead>
+          <td>Reference</td>
+          <td>Status</td>
+          <td>&nbsp;</td>
+        </thead>
+        {% for enquiry in enquiries %}
+        <tr>
+          <td><a href="/bookings/enquiry/viewenquiry?enquirykey={{ enquiry.key }}">{{ enquiry.referenceNumber }}</td>
+          <td>{{ enquiry.workflowState }}</td>
+          <td class="action">
+            <a title="Edit this enquiry "
+              href="/bookings/enquiry/editenquiry?enquirykey={{ enquiry.key }}">
+              <img src="/images/edit.png"/>
+            </a></td>
+        </tr>
+        {% endfor %}
+    </table>
+
+{% endblock pagecontent %}

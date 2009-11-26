@@ -5,103 +5,36 @@
 {% block pagecontent %}
     <h1>Bookings Management</h1>
 
-    <form name="findAccommodation" method="post" 
-          action="/bookings/findaccommodation">
-      <p><strong>Search</strong></p>
-      <table class="listing" cellspacing="0">
+    <p><strong>Enquiry Collections</strong>
+      <a title="Add a new enquiry collection"
+         href="/bookings/collection/captureenquirycollection">
+          <img src="/images/add.png"/>
+      </a>
+    </p>
+    <table class="listing" cellspacing="0">
+        <thead>
+          <td>Reference</td>
+        </thead>
+        {% for collection in collections %}
         <tr>
-          <td>City</td>
-          <td colspan="2"> 
-              <select name="city">
-                  {% for description in cities %}
-                      <option{%ifequal city description %} selected="1"{%endifequal%}>
-                      {{description}}
-                      </option>
-                  {% endfor %}
-              </select>
-          </td>
+          <td><a href="/bookings/collection/viewenquirycollection?enquirycollectionkey={{ collection.key }}">{{ collection.referenceNumber }}</td>
+          <!--
+          <td class="action">
+            <a title="Edit this enquiry collection"
+              href="/bookings/collection/editenquirycollection?enquirycollectionkey={{ collection.key }}">
+              <img src="/images/edit.png"/>
+            </a></td>
+          <td class="action">
+            <a title="Delete this enquiry"
+              href="/bookings/enquiry/deleteenquiry?enquirykey={{ enquiry.key }}"
+                   onclick="return confirm('Are you sure?');">
+              <img src="/images/delete.png"/>
+            </a></td>
+         -->
         </tr>
-        <tr>
-          <td>Type</td>
-          <td colspan="2"> 
-              <select name="type">
-                  {% for description in accomtypes %}
-                      <option{%ifequal type description %} selected="1"{%endifequal%}>
-                      {{description}}
-                      </option>
-                  {% endfor %}
-              </select>
-          </td>
-        </tr>
-        <tr>
-          <td>Start Date</td>
-          <td colspan="2"> 
-           <input type="text" name="start" value="{{ start }}" /> </td>
-        </tr>
-        <tr>
-          <td>Number of nights</td>
-          <td colspan="2"> 
-           <input type="text" name="nights" value="{{ nights }}" /> </td>
-        </tr>
-        <tr>
-          <td>Requires Wheelchair Access</td>
-          <td colspan="2"> 
-            <input type="checkbox" name="wheelchairAccess" 
-            {% if wheelchairAccess %} checked {% endif %} />
-          </td>
-        </tr>
-        <tr>
-          <td>Number of adults</td>
-          <td> <input type="text" name="adults" value="{{ adults }}" /> </td>
-        </tr>
-        <tr>
-          <td>Number of children</td>
-          <td> <input type="text" name="children" value="{{ children }}" /> </td>
-        </tr>
-      </table>
-      <input title="Find accommodation"
-             type="submit" value="Find Accommodation" />
-    </form>
+        {% endfor %}
+    </table>
 
-    {% if berths %}
-    <form name="reserveAccommodation" method="post" 
-          action="/bookings/reserveaccommodation">
-      <table class="listing" cellspacing="0">
-          <thead>
-            <td>Select</td>
-            <td>Owner</td>
-            <td>Venue</td>
-            <td>Room</td>
-            <td>Bed</td>
-            <td>Type</td>
-            <td>Capacity</td>
-          </thead>
-          {% for berth in berths %}
-          <tr>
-            <td> <input type="checkbox" name="berth_{{ berth.key }}" /> </td>
-            <td>{{ berth.bed.bedroom.venue.owner.listing_name }}</td>
-            <td>{{ berth.bed.bedroom.venue.name }}</td>
-            <td>{{ berth.bed.bedroom.name }}</td>
-            <td>{{ berth.bed.name }}</td>
-            <td>{{ berth.bed.bedType }}</td>
-            <td>{{ berth.bed.capacity }}</td>
-          </tr>
-          {% endfor %}
-      </table>
-      <input type="hidden" name="elementkey" value="{{ elementkey }}" />
-      <input type="hidden" name="city" value="{{ city }}" /> 
-      <input type="hidden" name="type" value="{{ type }}" />
-      <input type="hidden" name="start" value="{{ start }}" />
-      <input type="hidden" name="nights" value="{{ nights }}" />
-      {% if wheelchairAccess %}
-        <input type="hidden" name="wheelchairAccess" checked /> 
-      {% endif %} 
-      <input type="hidden" name="adults" value="{{ adults }}" />
-      <input type="hidden" name="children" value="{{ children }}" />
-      <input title="Reserve accommodation"
-             type="submit" value="Reserve Accommodation" />
-    </form>
-    {% endif %}
     <hr />
 
     <p><strong>Contracted Bookings</strong>
@@ -131,45 +64,6 @@
                    onclick="return confirm('Are you sure?');">
               <img src="/images/delete.png"/>
             </a></td>
-        </tr>
-        {% endfor %}
-    </table>
-
-    <hr />
-
-    <p><strong>Enquiries</strong>
-    <!--
-      <a title="Add a new enquiry"
-         href="/bookings/captureenquiry">
-          <img src="/images/add.png"/>
-      </a>
-      -->
-    </p>
-    <table class="listing" cellspacing="0">
-        <thead>
-          <td>Reference</td>
-          <td>Status</td>
-          <td>Expires</td>
-          <td>&nbsp;</td>
-        </thead>
-        {% for enquiry in enquiries %}
-        <tr>
-          <td><a href="/bookings/enquiry/viewenquiry?enquirykey={{ enquiry.key }}">{{ enquiry.referenceNumber }}</td>
-            <td>{{ enquiry.getStateName }}</td>
-          <td>{{ enquiry.expiryDate }}</td>
-          <td class="action">
-            <a title="Edit this enquiry"
-              href="/bookings/enquiry/editenquiry?enquirykey={{ enquiry.key }}">
-              <img src="/images/edit.png"/>
-            </a></td>
-          <!--
-          <td class="action">
-            <a title="Delete this enquiry"
-              href="/bookings/enquiry/deleteenquiry?enquirykey={{ enquiry.key }}"
-                   onclick="return confirm('Are you sure?');">
-              <img src="/images/delete.png"/>
-            </a></td>
-         -->
         </tr>
         {% endfor %}
     </table>

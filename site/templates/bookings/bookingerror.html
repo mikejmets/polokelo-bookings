@@ -8,15 +8,7 @@
     <form name="bookingerror" method="post" 
           action="/bookings/bookingerror">
           <p><strong>{{ error }}</strong></p>
-          <input type="hidden" name="city" value="{{ city }}" />
-          <input type="hidden" name="type" value="{{ type }}" />
-          <input type="hidden" name="start" value="{{ start }}" />
-          <input type="hidden" name="nights" value="{{ nights }}" />
-          {% if wheelchairAccess %} 
-            <input type="hidden" name="wheelchairAccess" value="on" />
-          {% endif %} 
-          <input type="hidden" name="adults" value="{{ adults }}" />
-          <input type="hidden" name="children" value="{{ children }}" />
+          <input type="hidden" name="enquirykey" value="{{ enquirykey }}" />
       <input type="submit" name="Continue" value="Continue" />
     </form>
 
