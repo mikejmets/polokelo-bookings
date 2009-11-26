@@ -9,6 +9,7 @@ from booking_errors import BookingConflictError
 from models.hostinfo import Slot, Berth
 from models.bookinginfo import \
     ContractedBooking, Enquiry, AccommodationElement
+from models.packages import Package
 from controllers import generator
 
 logger = logging.getLogger('BookingsTool')
@@ -24,29 +25,45 @@ class BookingsTool():
 
         #search
         query = AccommodationElement.all().ancestor(enquiry)
-        accommodationElement = query.fetch(1)[0]
+        #accommodationElement = query.fetch(1)[0]
+        accommodationElement = query.get()
         logger.info("Got element %s", accommodationElement)
 
+        # check for scpecial needs and return
+        if accommodationElement.specialNeeds == True:
+            return (False, 0.0)
+
+        # Check if we have a package for the accommodation type in the city.
+        # This indicates contracted bookings of the type are available
+        #   and auto allocation and quote can go ahead.
+        query = Package.all()
+        query.filter('city =', accommodationElement.city)
+        query.filter('accommodationType =', accommodationElement.type)
+        package = query.get()
+        if not package:
+            return (False, 0.0)
+
+        logging.info('Package: %s, %s, %5.2f', \
+                                package.city, package.accommodationType, 
+                                package.basePriceInZAR)
+
+        # now, carry on and look for availble accommodation
         berths = self.findBerths(accommodationElement) 
         if berths:
-          accommodationElement.availableBerths = str(berths)
-          #Simply pull from the top of the list
-          people = accommodationElement.adults + \
+            accommodationElement.availableBerths = str(berths)
+            #Simply pull from the top of the list
+            people = accommodationElement.adults + \
                    accommodationElement.children 
-          if people <= len(berths): #Should always be true
-              quote_amount = self.calculateQuote(accommodationElement)
-              selected_berths = [b[0] for b in berths[:people]]
-              self.createBookings(enquiry,
+            if people <= len(berths): #Should always be true
+                quote_amount = package.calculateQuote(accommodationElement)
+                selected_berths = [b[0] for b in berths[:people]]
+                self.createBookings(enquiry,
                                   accommodationElement,
                                   selected_berths)
-        return (len(berths) > 0, quote_amount)
+                return (True, quote_amount)
 
+        return (False, 0.0)
 
-    def calculateQuote(self, accommodationElement):
-        """ calculate the quote for the enquiry based on the packages
-        """
-        # we do not have package info yet, so just return something
-        return 5555.55
 
     def findBerths(self, element):
         h1 = SimpleAccommodationSearch()
