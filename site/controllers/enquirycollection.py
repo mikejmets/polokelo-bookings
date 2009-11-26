@@ -56,7 +56,7 @@ class CaptureEnquiryCollection(webapp.RequestHandler):
     def get(self):
         auth_url, auth_url_text = get_authentication_urls(self.request.uri)
         collection = EnquiryCollection(
-            referenceNumber=generator.generateEnquiryNumber())
+            referenceNumber=generator.generateEnquiryCollectionNumber())
         collection.put()
         self.redirect('/bookings/collection/viewenquirycollection?enquirycollectionkey=%s' % collection.key())
 

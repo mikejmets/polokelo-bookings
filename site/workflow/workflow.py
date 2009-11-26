@@ -70,10 +70,12 @@ class Workflow(db.Model):
     creator = db.UserProperty()
     initialState = db.StringProperty()
 
-    def addState(self, name):
+    def addState(self, name, title=None):
         """Adds a new state.
         """
         state = State(parent=self, key_name=name)
+        if title:
+            state.title = title
         state.put()
 
 
@@ -100,7 +102,7 @@ class Workflow(db.Model):
         self.put()
 
 
-    def addTransition(self, name, state_from, state_to):
+    def addTransition(self, name, state_from, state_to, title=None):
         """Adds a new transition.
 
         'state_from' and 'state_to' are respectively the origin
@@ -114,13 +116,15 @@ class Workflow(db.Model):
             raise WorkflowError, "unregistered state: '%s'" % state_to
         transition = Transition(parent=self, 
             key_name=name, stateFrom=state_from, stateTo=state_to)
+        if title:
+            transition.title = title
         transition.put()
         #state_from.addTransition(name, transition)
         #state_from.put()
 
 
 
-class State(db.Model):
+class State(db.Expando):
     """This class is used to describe a state.
 
     An state has transitions to other states.
@@ -135,7 +139,7 @@ class State(db.Model):
         self.transitions_from.append(transition)
 
 
-class Transition(db.Model):
+class Transition(db.Expando):
     """This class is used to describe transitions.
 
     Transitions come from one state and go to another.
@@ -295,12 +299,7 @@ class WorkflowAware(db.Model):
     def getPossibleTransitions(self):
         """Returns the list of transition from the current state
         """
-        transitions = []
-        for t in self.getState().transitions_from:
-            transitions.append(t.key().name())
-        return transitions
-
-
+        return self.getState().transitions_from
 
 class ExpirationSetting(db.Model):
     created = db.DateTimeProperty(auto_now_add=True)

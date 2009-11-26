@@ -7,33 +7,44 @@ logger = logging.getLogger('Init Workflow')
 def loadEquiryWorkflow():
     wfl = Workflow(key_name='enquiry_workflow')
     wfl.put()
-    wfl.addState('temporary')
-    wfl.addState('allocated')
-    wfl.addState('requiresintervention')
-    wfl.addState('detailsreceieved')
-    wfl.addState('depositpaid')
-    wfl.addState('paidinfull')
-    wfl.addState('expired')
-    wfl.addState('cancelled')
+    wfl.addState('temporary', title='Temporary')
+    wfl.addState('allocated', title='Allocated')
+    wfl.addState('requiresintervention', title='Requires Intervention')
+    wfl.addState('detailsreceieved', title='Details Received')
+    wfl.addState('depositpaid', title='Deposit Paid')
+    wfl.addState('paidinfull', title='Paid In Full')
+    wfl.addState('expired', title='Expired')
+    wfl.addState('cancelled', title='Cancelled')
 
-    wfl.addTransition('expiretemporary', 'temporary', 'expired')
-    wfl.addTransition('allocate', 'temporary', 'allocated')
-    wfl.addTransition('assigntouser', 'temporary', 'requiresintervention')
+    wfl.addTransition('expiretemporary', 'temporary', 'expired', 
+        title='Expire')
+    wfl.addTransition('allocate', 'temporary', 'allocated', title='Allocate')
+    wfl.addTransition('assigntouser', 'temporary', 'requiresintervention', 
+        title='Assign to user')
 
-    wfl.addTransition('expiremanaully', 'requiresintervention', 'expired')
-    wfl.addTransition('allocatemanually', 'requiresintervention', 'allocated')
+    wfl.addTransition('expiremanaully', 'requiresintervention', 'expired', 
+        title='Expire')
+    wfl.addTransition('allocatemanually', 'requiresintervention', 'allocated', 
+        title='Allocate')
 
-    wfl.addTransition('expireallocated', 'allocated', 'expired')
-    wfl.addTransition('receivedetails', 'allocated', 'detailsreceieved')
+    wfl.addTransition('expireallocated', 'allocated', 'expired', 
+        title='Expire')
+    wfl.addTransition('receivedetails', 'allocated', 'detailsreceieved', 
+        title='Receive Details')
 
-    wfl.addTransition('expiredetails', 'detailsreceieved', 'expired')
-    wfl.addTransition('paydeposit', 'detailsreceieved', 'depositpaid')
+    wfl.addTransition('expiredetails', 'detailsreceieved', 'expired', 
+        title='Expire')
+    wfl.addTransition('paydeposit', 'detailsreceieved', 'depositpaid', 
+        title='Pay deposit')
 
-    wfl.addTransition('expiredeposit', 'depositpaid', 'expired')
-    wfl.addTransition('canceldeposit', 'depositpaid', 'cancelled')
-    wfl.addTransition('payfull', 'depositpaid', 'paidinfull')
+    wfl.addTransition(
+        'expiredeposit', 'depositpaid', 'expired', title='Expire')
+    wfl.addTransition(
+        'canceldeposit', 'depositpaid', 'cancelled', title='Cancel')
+    wfl.addTransition(
+        'payfull', 'depositpaid', 'paidinfull', title='Pay in full')
 
-    wfl.addTransition('cancelfull', 'paidinfull', 'cancelled')
+    wfl.addTransition('cancelfull', 'paidinfull', 'cancelled', title='Cancel')
     
     wfl.setInitialState('temporary')
     wfl.put()
@@ -76,6 +87,7 @@ def loadEquiryWorkflow():
 
 ENQUIRY_WORKFLOW = Workflow.get_by_key_name('enquiry_workflow')
 if ENQUIRY_WORKFLOW:
+    logger.info('Recreate enquiry workflow')
     for s in State.all().ancestor(ENQUIRY_WORKFLOW):
         s.delete()
     for t in Transition.all().ancestor(ENQUIRY_WORKFLOW):
