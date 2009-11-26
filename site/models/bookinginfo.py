@@ -37,6 +37,7 @@ class Enquiry(WorkflowAware):
         collection_name='coll_enq')
     guestEmail = db.StringProperty(verbose_name='Guest Email')
     agentCode = db.StringProperty(verbose_name='Travel Agent Code')
+    quoteInZAR = db.FloatProperty(verbose_name='Quote', default=0.0)
     xmlSource = db.TextProperty(verbose_name='Source Detail')
 
     def ontransition_expiretemporary(self, *args, **kw):
@@ -92,8 +93,6 @@ class AccommodationElement(db.Model):
     specialNeeds = db.BooleanProperty(default=False)
     adults = db.IntegerProperty(default=0)
     children = db.IntegerProperty(default=0)
-    wheelchair = db.BooleanProperty(default=False)
-    specialNeeds = db.BooleanProperty(default=False)
     xmlSource = db.TextProperty(verbose_name='Source Detail')
     availableBerths = db.TextProperty()
 
