@@ -10,12 +10,11 @@ from google.appengine.api import users
 
 from xml.etree.ElementTree import XML, SubElement, tostring
 
-# from models.bookinginfo import ContractedBooking
-from models.clientinfo import Client
 from models.bookinginfo import EnquiryCollection, Enquiry, \
                                 AccommodationElement, GuestElement
+from models.hostinfo import EmailAddress, PhoneNumber
+from models.clientinfo import Client
 from models.codelookup import getItemDescription
-from models.packages import Package
 
 from controllers.bookingstool import BookingsTool
 from controllers import generator
@@ -29,12 +28,21 @@ class ExternalBookings(webapp.RequestHandler):
     def _checkAvailability(self, node):
         """ Handle the initial check for available slots on an enquiry
         """
-        # retrieve all the data from the xml
-        enquiry_number = node.findtext('enquirynumber') 
+        # retrieve the enquiry batch number and 
+        # create or get the enquiry collection instance
+        batch_number = node.findtext('enquirybatchnumber')
+        enquiry_collection = EnquiryCollection.get_or_insert( \
+                                        key_name=batch_number,
+                                        referenceNumber=batch_number)
+        enquiry_collection.creator = users.get_current_user()
+        enquiry_collection.put()
+
+        # retrieve all the enquiry number
+        enquiry_number = node.findtext('enquirynumber')
 
         # check if the browser is submitting the same enquiry again
         # and raise an error.
-        enquiry = Enquiry.get_by_key_name(enquiry_number)
+        enquiry = Enquiry.get_by_key_name(enquiry_number, parent=enquiry_collection)
         if enquiry:
             # append the result as a sub element to the node element
             search_elem = SubElement(node, 'searchresult')
@@ -49,7 +57,8 @@ class ExternalBookings(webapp.RequestHandler):
             return tostring(node)
 
         # instantiate enquiry and accommodation classes
-        enquiry = Enquiry(key_name=enquiry_number, 
+        enquiry = Enquiry(parent=enquiry_collection,
+                          key_name=enquiry_number, 
                           referenceNumber=enquiry_number)
         enquiry.creator = users.get_current_user()
         enquiry.guestEmail = node.findtext('email')
@@ -57,7 +66,6 @@ class ExternalBookings(webapp.RequestHandler):
         enquiry.xmlSource = tostring(node)
         enquiry.put()
         enquiry.enterWorkflow(ENQUIRY_WORKFLOW)
-
 
         accommodation = AccommodationElement(
                             parent=enquiry,
@@ -89,10 +97,11 @@ class ExternalBookings(webapp.RequestHandler):
         bt = BookingsTool()
 
         # do the availability check
-        available, amount = bt.checkAvailability(enquiry)
+        available, amount, vat = bt.checkAvailability(enquiry)
         if not available:
-            enquiry.doTransition('assigntouser')
+            enquiry.doTransition('putonhold')
         enquiry.quoteInZAR = amount
+        enquiry.vatInZAR = vat
         enquiry.put()
 
         # append the result as a sub element to the node element
@@ -101,8 +110,8 @@ class ExternalBookings(webapp.RequestHandler):
         avail_elem.text = available and 'available' or 'not available'
         amount_elem = SubElement(search_elem, 'amount')
         amount_elem.text = str(amount)
-        expiry_elem = SubElement(search_elem, 'expirydate')
-        expiry_elem.text = str(enquiry.expiryDate)
+        amount_elem = SubElement(search_elem, 'vat')
+        amount_elem.text = str(vat)
 
         # append the error element
         error_element = SubElement(node, 'systemerror')
@@ -117,45 +126,12 @@ class ExternalBookings(webapp.RequestHandler):
     def _confirmEnquiries(self, node):
         """ confirm the final list of enquiries
         """
-        # retrieve the enquiry number
-        enquiry_number = node.findtext('enquirynumber') 
+        # retrieve the enquiry batch number and collection instance
+        collection_number = node.findtext('enquirybatchnumber') 
+        enquiry_collection = EnquiryCollection.get_by_key_name(collection_number)
 
-        # check if the browser is submitting the same confirmation again
-        # and raise an error.
-        enquiry_collection = EnquiryCollection.get_by_key_name(enquiry_number)
-        if enquiry_collection:
-            # append the result as a sub element to the node element
-            confirm_elem = SubElement(node, 'confirmationresult')
-            # append the error element
-            error_element = SubElement(node, 'systemerror')
-            error_code = SubElement(error_element, 'errorcode')
-            error_code.text = '102'
-            error_msg = SubElement(error_element, 'errormessage')
-            error_msg.text = 'The enquiry with number %s has already been confirmed' % \
-                                                    enquiry_number
-            # return the result as xml
-            return tostring(node)
-
-        # instantiate the enquiry collection
-        enquiry_collection = EnquiryCollection(key_name=enquiry_number,
-                                               referenceNumber = enquiry_number)
-        enquiry_collection.creator = users.get_current_user()
-        enquiry_collection.put()
-
-        # create the primary guest (credit card holder)
+        # locate the primary guest node (credit card holder)
         guest_node = node.find('creditcardholder')
-        if guest_node:
-            # am I setting the parent correctly here?
-            guest_element = GuestElement(parent=enquiry_collection,
-                                         surname = guest_node.findtext('surname'),
-                                         firstNames = guest_node.findtext('name'))
-            guest_element.isPrimary = True
-            guest_element.email = guest_node.findtext('email')
-            guest_element.contactNumber = guest_node.findtext('telephone')
-            guest_element.identifyingNumber = guest_node.findtext('passportnumber')
-            guest_element.xmlSource = tostring(guest_node)
-            guest_element.put()
-            # logging.info(tostring(guest_node))
 
         # update the individual enquiries to have the collection
         # as their parent, and extend their expiry dates for 24 hours
@@ -163,29 +139,86 @@ class ExternalBookings(webapp.RequestHandler):
         enquiry_elements = node.find('enquiries').findall('enquiry')
         for enquiry_element in enquiry_elements:
             # logging.info(tostring(enquiry_element))
-            refnum = enquiry_element.findtext('number')
+            refnum = enquiry_element.findtext('enquirynumber')
             # retrieve the existing enquiry
-            enquiry = Enquiry.get_by_key_name(refnum)
+            enquiry = Enquiry.get_by_key_name(refnum, parent=enquiry_collection)
             if enquiry:
-                # hope this works properly!!!
-                enquiry.parent = enquiry_collection
-                enquiry.enqColl = enquiry_collection
-                enquiry.xmlSource = tostring(enquiry_element)
-                enquiry.doTransition('receivedetails')
+                # clone the enquiry and set its parent to the collection
+                if enquiry.getStateName() == 'allocated':
+                    enquiry.doTransition('receivedetails')
+                elif enquiry.getStateName() == 'onhold':
+                    enquiry.doTransition('assigntouser')
                 enquiry.put()
-                # add the enquiries to the guest element, if it exists
+
                 if guest_node:
+                    guest_element = GuestElement( \
+                                        key_name=guest_node.findtext('passportnumber'),
+                                        parent=enquiry,
+                                        surname=guest_node.findtext('surname'),
+                                        firstNames=guest_node.findtext('name'))
+                    guest_element.creator = users.get_current_user()
+                    guest_element.isPrimary = True
+                    guest_element.email = guest_node.findtext('email')
+                    guest_element.contactNumber = guest_node.findtext('telephone')
+                    guest_element.identifyingNumber = guest_node.findtext('passportnumber')
+                    guest_element.xmlSource = tostring(guest_node)
+                    guest_element.put()
+                    # logging.info(tostring(guest_node))
+
                     if enquiry.key() not in guest_element.enquiries:
                         guest_element.enquiries.append(enquiry.key())
                         guest_element.put()
 
+                    # create a client instance
+                    if enquiry.getStateName() == 'detailsreceieved':
+                        client = Client(parent=enquiry, 
+                                        clientNumber = generator.generateClientNumber(),
+                                        surname=guest_element.surname,
+                                        firstNames = guest_element.firstNames)
+                        client.creator = users.get_current_user()
+                        for language_node in \
+                                guest_node.find('languages').findall('language'):
+                            client.languages.append(language_node.text)
+                        client.state = 'Confirmed'
+                        client.identityNumber = guest_element.identifyingNumber
+                        client.identityNumberType = 'Passport'
+                        client.put()
+
+                        # create email address and telephone for client
+                        email = EmailAddress(parent=client,
+                                             emailType='Other',
+                                             email=guest_element.email)
+                        email.container = client
+                        email.creator = users.get_current_user()
+                        email.put()
+
+                        phone = PhoneNumber(parent=client,
+                                            numberType='Other Number',
+                                            number=guest_element.contactNumber) 
+                        phone.container=client
+                        phone.creator = users.get_current_user()
+                        phone.put()
+            else:
+                # no enquiry found: send an error back
+                confirm_elem = SubElement(node, 'confirmationresult')
+                result_elem = SubElement(confirm_elem, 'result')
+
+                # append the error element
+                error_element = SubElement(node, 'systemerror')
+                error_code = SubElement(error_element, 'errorcode')
+                error_code.text = '103'
+                error_msg = SubElement(error_element, 'errormessage')
+                error_msg.text = 'Enquiry element %s is not part of enquiry batch %s' \
+                        % (refnum, collection_number)
+
+                # return the result as xml
+                return tostring(node)
+
+
         # append the result
         confirm_elem = SubElement(node, 'confirmationresult')
         result_elem = SubElement(confirm_elem, 'result')
-        result_elem.text = enquiry_number
-        expiry_elem = SubElement(confirm_elem, 'expirydate')
-        expiry_date = datetime.now() + timedelta(hours=24)
-        expiry_elem.text = str(expiry_date)
+        result_elem.text = collection_number
 
         # append the error element
         error_element = SubElement(node, 'systemerror')
@@ -195,7 +228,6 @@ class ExternalBookings(webapp.RequestHandler):
 
         # return the result as xml
         return tostring(node)
-
 
 
     def post(self):
@@ -224,6 +256,11 @@ class ExternalBookings(webapp.RequestHandler):
         elif action.lower() == 'generate enquiry number':
             number_element = SubElement(xmlroot, 'enquirynumber')
             number_element.text = generator.generateEnquiryNumber()
+            result = tostring(xmlroot)
+
+        elif action.lower() == 'generate collection number':
+            number_element = SubElement(xmlroot, 'collectionnumber')
+            number_element.text = generator.generateEnquiryCollectionNumber()
             result = tostring(xmlroot)
 
         else:
