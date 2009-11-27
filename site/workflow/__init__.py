@@ -8,6 +8,7 @@ def loadEquiryWorkflow():
     wfl = Workflow(key_name='enquiry_workflow')
     wfl.put()
     wfl.addState('temporary', title='Temporary')
+    wfl.addState('onhold', title='On Hold')
     wfl.addState('allocated', title='Allocated')
     wfl.addState('requiresintervention', title='Requires Intervention')
     wfl.addState('detailsreceieved', title='Details Received')
@@ -19,14 +20,15 @@ def loadEquiryWorkflow():
     wfl.addTransition('expiretemporary', 'temporary', 'expired', 
         title='Expire')
     wfl.addTransition('allocate', 'temporary', 'allocated', title='Allocate')
-    wfl.addTransition('assigntouser', 'temporary', 'requiresintervention', 
+    wfl.addTransition('expiremanaully', 'temporary', 'expired', title='Expire')
+    wfl.addTransition('putonhold', 'temporary', 'onhold', title='Put on Hold')
+
+    wfl.addTransition('expireonhold', 'onhold', 'expired', title='Expire')
+    wfl.addTransition('assigntouser', 'onhold', 'requiresintervention', 
         title='Assign to user')
 
-    wfl.addTransition('expiremanaully', 'requiresintervention', 'expired', 
-        title='Expire')
     wfl.addTransition('allocatemanually', 'requiresintervention', 'allocated', 
         title='Allocate')
-
     wfl.addTransition('expireallocated', 'allocated', 'expired', 
         title='Expire')
     wfl.addTransition('receivedetails', 'allocated', 'detailsreceieved', 
@@ -53,6 +55,12 @@ def loadEquiryWorkflow():
         entityKind = 'Enquiry', 
         entityState = 'temporary', 
         hours = 1)
+    bcs.put()
+
+    bcs = ExpirationSetting(
+        entityKind = 'Enquiry', 
+        entityState = 'onhold', 
+        hours = 2)
     bcs.put()
 
     bcs = ExpirationSetting(
