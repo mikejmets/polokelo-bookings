@@ -36,10 +36,10 @@ class Package(db.Model):
         result -= self.calculateDiscounts(price, accommodationElement)
 
         # add penalties
-        result += self.calculatePenalties(price, accommodationElement)
+        result += self.calculateExtras(price, accommodationElement)
 
         # return the final result in ZAR
-        return result
+        return (result, result * 0.14)
 
     def calculateDiscounts(self, price, accommodation):
         """ apply any discount rules and return the discount value
@@ -47,8 +47,8 @@ class Package(db.Model):
         # at this stage, no discount rules are in place
         return 0.0
 
-    def calculatePenalties(self, price, accommodation):
-        """ apply any penalty rules and return the penalty amount
+    def calculateExtras(self, price, accommodation):
+        """ apply any extras or fee rules and return the penalty amount
         """
         # at this stage, no penalty rules are in place
         return 0.0
