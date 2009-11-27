@@ -35,6 +35,7 @@ class Enquiry(WorkflowAware):
     guestEmail = db.StringProperty(verbose_name='Guest Email')
     agentCode = db.StringProperty(verbose_name='Travel Agent Code')
     quoteInZAR = db.FloatProperty(verbose_name='Quote', default=0.0)
+    vatInZAR = db.FloatProperty(verbose_name='VAT', default=0.0)
     xmlSource = db.TextProperty(verbose_name='Source Detail')
 
     def ontransition_expiretemporary(self, *args, **kw):
