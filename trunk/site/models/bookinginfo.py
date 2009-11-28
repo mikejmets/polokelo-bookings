@@ -92,7 +92,7 @@ class AccommodationElement(db.Model):
     adults = db.IntegerProperty(default=2)
     children = db.IntegerProperty(default=0)
     xmlSource = db.TextProperty(verbose_name='Source Detail')
-    availableBerths = db.TextProperty()
+    availableBerths = db.TextProperty(default='{}')
 
     def listing_name(self):
         return '%s' % self.city

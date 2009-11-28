@@ -33,6 +33,7 @@ class BookingsTool():
         # check for scpecial needs and return
         if accommodationElement.specialNeeds == True:
             logger.info("specialneeds is %s", accommodationElement.specialNeeds)
+            # SHOULD WE TRANSITION TO MANUAL???
             return (False, 0.0, 0.0)
 
         # Check if we have a package for the accommodation type in the city.
@@ -43,6 +44,7 @@ class BookingsTool():
         query.filter('accommodationType =', accommodationElement.type)
         package = query.get()
         if not package:
+            logger.info('No package found')
             return (False, 0.0, 0.0)
 
         logging.info('Package: %s, %s, %5.2f', \
@@ -50,54 +52,53 @@ class BookingsTool():
                                 package.basePriceInZAR)
 
         # now, carry on and look for availble accommodation
-        berths = self.findBerths(accommodationElement) 
-        if berths:
-            accommodationElement.availableBerths = str(berths)
+        venues = self.findVenues(accommodationElement) 
+        if venues:
+            accommodationElement.availableBerths = str(venues)
             #Simply pull from the top of the list
+            quote_amount, vat_amount = package.calculateQuote(accommodationElement)
+            selected_venue = venues[venues.keys()[0]]
             people = accommodationElement.adults + \
-                   accommodationElement.children 
-            if people <= len(berths): #Should always be true
-                quote_amount, vat_amount = package.calculateQuote(accommodationElement)
-                selected_berths = [b[0] for b in berths[:people]]
-                self.createBookings(enquiry,
-                                  accommodationElement,
-                                  selected_berths)
-                return (True, quote_amount, vat_amount)
+                     accommodationElement.children 
+            selected_berths = [b[0] for b in selected_venue[:people]]
+            self.createBookings(enquiry,
+                              accommodationElement,
+                              selected_berths)
+            return (True, quote_amount, vat_amount)
 
         return (False, 0.0, 0.0)
 
 
-    def findBerths(self, element):
-        logging.info('in findBerths')
+    def findVenues(self, element):
         h1 = SimpleAccommodationSearch()
-        h2 = WheelchairAccommodationSearch()
-        h1.successor = h2
         
-        return h1.findBerths(element)
+        return h1.findVenues(element)
 
 
-    def createBookings(self, enquiry, element, berthkeys):
+    def createBookings(self, enquiry, element, selected_keys):
         #Mark slots as occupied
         error = None
         bookings = []
         try:
             people = 0
             #logger.info('AvailableBerths: %s', element.availableBerths)
-            for berthkey, slotkeys in eval(element.availableBerths):
-                if berthkey in berthkeys:
-                    #Create Booking
-                    booking = ContractedBooking(
-                        bookingNumber=generator.generateBookingNumber(),
-                        enquiry=enquiry)
-                    booking.put()
-                    bookings.append(booking)
-                    logger.info('Create booking: %s', booking.bookingNumber) 
-                    people += 1
-                    run_in_transaction(
-                        self._assignBookingToSlots, 
-                        enquiry, 
-                        slotkeys, 
-                        booking)
+            venues = eval(element.availableBerths)
+            for venue_key in venues.keys():
+                for berth_key, slotkeys in venues[venue_key]:
+                    if berth_key in selected_keys:
+                        #Create Booking
+                        booking = ContractedBooking(
+                            bookingNumber=generator.generateBookingNumber(),
+                            enquiry=enquiry)
+                        booking.put()
+                        bookings.append(booking)
+                        logger.info('Create booking: %s', booking.bookingNumber) 
+                        people += 1
+                        run_in_transaction(
+                            self._assignBookingToSlots, 
+                            enquiry, 
+                            slotkeys, 
+                            booking)
             if people:
                 if enquiry.workflowState == 'requiresintervention':
                     enquiry.doTransition('allocatemanually')
@@ -121,175 +122,112 @@ class BookingsTool():
                 slot.contracted_booking = booking
                 slot.put()
             else:
-                #logger.info(
-                #  'LOGGER Conflict on enquiry %s (bed %s, date %s)' \
-                #      % (enquiry.referenceNumber,
-                #         slot.berth.bed.name,
-                #         slot.startDate))
                 raise BookingConflictError(
-                  'Conflict on enquiry %s (bed %s, date %s)' \
+                    'Conflict on enquiry %s (bed %s, date %s): bed taken after search' \
                       % (enquiry.referenceNumber,
                          slot.berth.bed.name,
                          slot.startDate))
-                  #'Conflict on enquiry %s (owner %s, venue %s, room %s, bed %s, date %s)' \
-                  #    % (enquiry.referenceNumber,
-                  #       slot.berth.bed.bedroom.venue.owner.surname,
-                  #       slot.berth.bed.bedroom.venue.name,
-                  #       slot.berth.bed.bedroom.name,
-                  #       slot.berth.bed.name,
-                  #       slot.startDate))
 
 
 class AccommodationSearch():
     successor = None
 
     #this is always subclassed
-    def findBerths(self, element):
-        logger.error('AccommodationSearch.findBerths should always subclassed')
-        return []
+    def findVenues(self, element):
+        logger.error('AccommodationSearch.findVenues should always subclassed')
+        return {}
 
     def searchNext(self, element):
         if self.successor:
-            return self.successor.findBerths(element)
+            return self.successor.findVenues(element)
         else:
-            return []
+            return {}
+
+    def _validateBerths(self, slots, element):
+        #Group slots by berth in a dict
+        venues = {}
+        for slot in slots:
+            #logger.info('Found berth %s', slot.berth.key())
+            venue_key = str(slot.berth.bed.bedroom.venue.key())
+            berth_key = str(slot.berth.key())
+            if not venues.has_key(venue_key):
+                venues[venue_key] = {}
+            venue = venues[venue_key]
+            if venue.has_key(berth_key):
+                venue[berth_key].append(str(slot.key()))
+            else:
+                venue[berth_key] = [str(slot.key())]
+
+        #Check for completeness
+        valid_venues = {}
+        for venue_key in venues.keys():
+            venue = venues[venue_key]
+            valid_berths = []
+            for berth_key in venue.keys():
+                berth = venue[berth_key]
+                #Check completeness
+                if len(berth) != element.nights:
+                    #logger.info('INVALID: Pairing for %s is incomplete', key)
+                    break #it remains false
+                valid_berths.append((berth_key, berth))
+            if len(valid_berths) > 0:
+                valid_venues[venue_key] = valid_berths
+                
+        #for key, slots in valid_berths:
+        # logger.info('valid pairing %s: %s', key, slots)
+        return valid_venues
 
 class SimpleAccommodationSearch(AccommodationSearch):
 
-    def findBerths(self, element):
-        # logger.info('SimpleAccommodationSearch for %s, %s, %s(%s)', 
-        #     element.city, element.type, element.start, element.nights)
+    def findVenues(self, element):
+        logger.info('SimpleAccommodationSearch for %s, %s, %s(%s)', 
+            element.city, element.type, element.start, element.nights)
 
-        if element.wheelchairAccess:
-            return self.searchNext(element)
-
-        berths = self._findValidBerths(element)
-
-        # for key, slots in berths:
-        #       logger.info('valid pairing %s: %s', key, slots)
-        people = element.adults + element.children
-        if len(berths) >= people:
-            # logger.info('Found %s simple pairings for %s people', len(berths), people)
-            return berths
-        else:
-            logger.info('SimpleSearch unsuccessful')
-            return self.searchNext(element)
-
-    def _findValidBerths(self, element):
-        end = element.start + timedelta(days = (element.nights-1))
-        # logger.info('Search for %s, %s, %s -> %s(%s)', \
-        #      element.city, element.type, element.start, end, element.nights)
-
-        slots = Slot.all()
-        slots.filter('occupied =', False)
-        slots.filter('city =', element.city)
-        slots.filter('type =', element.type)
-        slots.filter('startDate >=', element.start)
-        slots.filter('startDate <=', end)
-        slots.order('startDate')
-
-        #Hack for logging
-        # getslotsforlogger = [s for s in slots]
-        # logger.info('Found %s slots', len(getslotsforlogger))
-
-        #group by berth
-        berths = {}
-        for slot in slots:
-            # logger.info('Found berth %s', slot.berth.key())
-            berthkey = str(slot.berth.key())
-            if berths.has_key(berthkey):
-                berths[berthkey]['slots'].append(str(slot.key()))
-            else:
-                berths[berthkey] = {'slots': [str(slot.key())], 'valid':False}
-
-        #check for complete 
-        for key in berths.keys():
-            # logger.info('Check pair %s', key)
-            valid = True #until proven otherwise
-            #Check completeness
-            if len(berths[key]['slots']) != element.nights:
-                # logger.info('INVALID: Pairing for %s is incomplete', key)
-                break #it remains false
-            if valid:
-                berths[key]['valid'] = True
-                
-        valid_berths = []
-        for key in berths.keys():
-            if berths[key]['valid']:
-                # logger.info('Valid pairing %s %s', key, berths[key]['slots'])
-                valid_berths.append((key, berths[key]['slots']))
-
-        # for key, slots in valid_berths:
-        #      logger.info('valid pairing %s: %s', key, slots)
-        return valid_berths
-
-class WheelchairAccommodationSearch(AccommodationSearch):
-
-    def findBerths(self, element):
-        # logger.info('WheelchairAccommodationSearch for %s, %s, %s(%s)', 
-        #     element.city, element.type, element.start, 
-        #     element.nights)
-
-        if not element.wheelchairAccess:
-            return self.searchNext(element)
-
-        berths = self._findValidBerths(element)
+        venues = self._findValidBerths(element)
 
         #for key, slots in berths:
         #  logger.info('valid pairing %s: %s', key, slots)
+
+        #Find venues with enough berths for all people
         people = element.adults + element.children
-        if len(berths) >= people:
-            # logger.info('Found %s wheelchair pairings for %s people', len(berths), people)
-            return berths
-        else:
-            # logger.info('WheelchairAccommodationSearch unsuccessful')
-            return self.searchNext(element)
+        venue_keys = venues.keys()
+        valid_venues = {}
+        if len(venue_keys) > 0:
+            for venue_key in venue_keys:
+                berths = venues[venue_key]
+                if len(berths) >= people:
+                    valid_venues[venue_key] = berths
+        if valid_venues:
+            logger.info('Found %s venues for %s people', 
+                len(valid_venues.keys()), people)
+            return valid_venues
+
+        logger.info('SimpleSearch unsuccessful')
+        return self.searchNext(element)
 
     def _findValidBerths(self, element):
+        #Infer extra criteria
         end = element.start + timedelta(days = (element.nights-1))
-        #logger.info('Search for %s, %s, %s -> %s(%s)', \
-        # element.city, element.type, element.start, end, element.nights)
+        child_friendly_required = element.children > 0
+        #logger.info('Search for %s, %s, %s -> %s(%s), %s', 
+        #  element.city, element.type, element.start, end, element.nights,
+        #  child_friendly_required)
 
+        #Contract query
         slots = Slot.all()
         slots.filter('occupied =', False)
-        slots.filter('wheelchairAccess =', True)
         slots.filter('city =', element.city)
-        slots.filter('type =', element.type)
+        slots.filter('venueType =', element.type)
+        if element.wheelchairAccess:
+            slots.filter('wheelchairAccess =', True)
+        if child_friendly_required:
+            slots.filter('childFriendly =', True)
         slots.filter('startDate >=', element.start)
         slots.filter('startDate <=', end)
         slots.order('startDate')
 
-        #Hack for logging
-        #getslotsforlogger = [s for s in slots]
-        #logger.info('Found %s slots', len(getslotsforlogger))
+        #Run query and 
+        return self._validateBerths(slots, element)
 
-        #group by berth
-        berths = {}
-        for slot in slots:
-            #logger.info('Found berth %s', slot.berth.key())
-            berthkey = str(slot.berth.key())
-            if berths.has_key(berthkey):
-                berths[berthkey]['slots'].append(str(slot.key()))
-            else:
-                berths[berthkey] = {'slots': [str(slot.key())], 'valid':False}
-        #check for complete 
-        for key in berths.keys():
-            #logger.info('Check pair %s', key)
-            valid = True #until proven otherwise
-            #Check completeness
-            if len(berths[key]['slots']) != element.nights:
-                #logger.info('INVALID: Pairing for %s is incomplete', key)
-                break #it remains false
-            if valid:
-                berths[key]['valid'] = True
-                
-        valid_berths = []
-        for key in berths.keys():
-            #logger.info('Valid pairing %s', berths[key]['valid'])
-            if berths[key]['valid']:
-                valid_berths.append((key, berths[key]['slots']))
 
-        #for key, slots in valid_berths:
-        # logger.info('valid pairing %s: %s', key, slots)
-        return valid_berths
 

@@ -185,17 +185,18 @@ class Venue(db.Model):
                         #    datetime.combine(d, t))
                         slot = Slot(parent=berth)
                         slot.creator = users.get_current_user()
+                        slot.ownerReference = self.owner.referenceNumber
                         slot.berth = berth
                         slot.startDate = d #datetime.combine(d, t)
-                        slot.city = berth.bed.bedroom.venue.get_city()
-                        slot.type = berth.bed.bedroom.venue.venueType
+                        slot.city = self.get_city()
+                        slot.venueType = self.venueType
+                        slot.bedType = bed.bedType
                         slot.childFriendly = \
-                            berth.bed.bedroom.venue.childFriendly or \
-                            berth.bed.bedroom.childFriendly 
+                            self.childFriendly or \
+                            room.childFriendly 
                         slot.wheelchairAccess = \
-                            berth.bed.bedroom.venue.wheelchairAccess or \
-                            berth.bed.bedroom.wheelchairAccess 
-                        slot.type = berth.bed.bedroom.venue.venueType
+                            self.wheelchairAccess or \
+                            room.wheelchairAccess 
                         slot.put()
                         
                         
@@ -356,13 +357,15 @@ class Berth(db.Model):
 class Slot(db.Model):
     created = db.DateTimeProperty(auto_now_add=True)
     creator = db.UserProperty()
+    ownerReference = db.StringProperty()
     berth = db.ReferenceProperty(Berth, collection_name='berth_slots')
     occupied = db.BooleanProperty(default=False)
     contracted_booking = db.ReferenceProperty(
         ContractedBooking, collection_name="slots")
     startDate = db.DateProperty()
     city = db.StringProperty()
-    type = db.StringProperty()
+    venueType = db.StringProperty()
+    bedType = db.StringProperty()
     childFriendly = db.BooleanProperty()
     wheelchairAccess = db.BooleanProperty()
 

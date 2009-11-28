@@ -38,7 +38,7 @@ class ViewEnquiry(webapp.RequestHandler):
         enquiry = Enquiry.get(enquirykey)
         element = AccommodationElement.all().ancestor(enquiry)[0]
         show_search = enquiry.workflowState in \
-            ['temporary', 'requiresintervention']
+            ['temporary', 'onhold', 'requiresintervention']
         show_transitions = enquiry.workflowState not in \
             ['temporary', 'requiresintervention', 'expired', 'cancelled']
         transitions = None
@@ -50,13 +50,15 @@ class ViewEnquiry(webapp.RequestHandler):
         show_results = show_search
         if show_results:
             if element.availableBerths:
-                for key, slots in eval(element.availableBerths):
-                    berth = Berth.get(key)
-                    berths.append(berth)
+                venues = eval(element.availableBerths)
+                for venue_key in venues:
+                    for key, slots in venues[venue_key]:
+                        berth = Berth.get(key)
+                        berths.append(berth)
             if berths:
                 #sort
                 berths.sort(key=lambda x: "%s %s %s %s" % (
-                    x.bed.bedroom.venue.owner.listing_name(),
+                    x.bed.bedroom.venue.owner.referenceNumber,
                     x.bed.bedroom.venue.name,
                     x.bed.bedroom.name,
                     x.bed.name))
@@ -195,21 +197,21 @@ class BookingsToolFindAccommodation(webapp.RequestHandler):
             self.request.get('start'),
             '%Y-%m-%d').date()
         accom_element.nights = int(self.request.get('nights', '0'))
+        accom_element.wheelchairAccess = \
+            self.request.get('wheelchairAccess', 'off') != 'off'
         accom_element.adults = int(self.request.get('adults', '0'))
-        accom_element.children = int(self.request.get('children', '0'))
-        accom_element.children = int(self.request.get('children', '0'))
         accom_element.children = int(self.request.get('children', '0'))
         accom_element.doublerooms = int(self.request.get('doublerooms', '0'))
         accom_element.singlerooms = int(self.request.get('singlerooms', '0'))
         accom_element.put()
 
         tool = BookingsTool()
-        berths = tool.findBerths(accom_element)
+        venues = tool.findVenues(accom_element)
 
         params = {}
         params['enquirykey'] = enquirykey
-        if berths:
-            accom_element.availableBerths = str(berths)
+        if venues:
+            accom_element.availableBerths = str(venues)
             accom_element.put()
             params = urllib.urlencode(params)
             self.redirect('/bookings/enquiry/viewenquiry?%s' % params)
@@ -217,8 +219,8 @@ class BookingsToolFindAccommodation(webapp.RequestHandler):
             #Clean up
             accom_element.availableBerths = None
             accom_element.put()
-            if enquiry.workflowState != 'requiresintervention':
-                enquiry.doTransition('assigntouser')
+            if enquiry.workflowState not in ['onhold', 'requiresintervention']:
+                enquiry.doTransition('putonhold')
             params['error'] = "No results found" 
             params = urllib.urlencode(params)
             self.redirect('/bookings/bookingerror?%s' % params)
