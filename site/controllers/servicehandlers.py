@@ -58,10 +58,10 @@ class ManageHosts(webapp.RequestHandler):
         auth_url, auth_url_text = get_authentication_urls(self.request.uri)
         start = self.request.get('start', ' ')
         new_start = start
-        query = Owner.all().order('surname')
-        owners = query.filter('surname >=', start).fetch(PAGESIZE+1)
+        query = Owner.all().order('referenceNumber')
+        owners = query.filter('referenceNumber >=', start).fetch(PAGESIZE+1)
         if owners:
-            new_start = owners[-1].surname
+            new_start = owners[-1].referenceNumber
 
         filepath = os.path.join(PROJECT_PATH, 'templates', 'services', 'managehosts.html')
         self.response.out.write(template.render(filepath, 

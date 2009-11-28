@@ -26,6 +26,8 @@ def loadEquiryWorkflow():
     wfl.addTransition('expireonhold', 'onhold', 'expired', title='Expire')
     wfl.addTransition('assigntouser', 'onhold', 'requiresintervention', 
         title='Assign to user')
+    wfl.addTransition('allocatefromhold', 'onhold', 'allocated', 
+        title='Allocate')
 
     wfl.addTransition('allocatemanually', 'requiresintervention', 'allocated', 
         title='Allocate')
