@@ -7,11 +7,13 @@
 {% block pagecontent %}
 <h1>Enquiry</h1>
 
-<p>
-<span>Enquiry Number: <strong>{{ enquiry.referenceNumber }}</strong> </span>
-    <span>Enquiry Status: <strong>{{ enquiry.getState.title }}</strong> </span>
-        <span>Enquiry Expiry Date: <strong>{{ enquiry.expiryDate }}</strong> </span>
-</p>
+<table class="listing">
+  <tr>
+    <td>Enquiry Number: <strong>{{ enquiry.referenceNumber }}</strong> </td>
+    <td>Enquiry Status: <strong>{{ enquiry.getState.title }}</strong> </td>
+    <td>Enquiry Expiry Date: <strong>{{ enquiry.expiryDate }}</strong> </td>
+  </tr>
+</table>
 
 {% ifnotequal enquiry.workflowState 'temporary' %}
 <form name="advanceEnquiry" method="post" 
@@ -29,16 +31,16 @@
 </form>
 {% endifnotequal %}
 
-{% if show_search %}
 <hr />
 <form name="findAccommodation" method="post" 
       action="/bookings/enquiry/findaccommodation">
   <input type="hidden" name="enquirykey" value="{{ enquiry.key }}"/>
-  <p><strong>Search</strong></p>
+  <p><strong>Criteria</strong></p>
   <table class="listing" cellspacing="0">
     <tr>
       <td>City</td>
-      <td colspan="2"> 
+      <td> 
+      {% if show_search %}
           <select name="city">
               {% for description in cities %}
                   <option {% ifequal element.city description %} selected="1"{%endifequal%}>
@@ -46,11 +48,15 @@
                   </option>
               {% endfor %}
           </select>
+      {% else %}
+        {{ element.city }}
+      {% endif %}
       </td>
     </tr>
     <tr>
       <td>Type</td>
-      <td colspan="2"> 
+      <td>
+      {% if show_search %}
           <select name="type">
               {% for description in accomtypes %}
                   <option{%ifequal element.type description %} selected="1"{%endifequal%}>
@@ -58,46 +64,86 @@
                   </option>
               {% endfor %}
           </select>
+      {% else %}
+        {{ element.type }}
+      {% endif %}
       </td>
     </tr>
     <tr>
       <td>Start Date</td>
-      <td colspan="2"> 
+      <td> 
+      {% if show_search %}
        <input type="text" name="start" value="{{ element.start }}" /> </td>
+      {% else %}
+        {{ element.start }}
+      {% endif %}
     </tr>
     <tr>
       <td>Number of nights</td>
-      <td colspan="2"> 
+      <td> 
+      {% if show_search %}
        <input type="text" name="nights" value="{{ element.nights }}" /> </td>
+      {% else %}
+        {{ element.nights }}
+      {% endif %}
     </tr>
     <tr>
       <td>Requires Wheelchair Access</td>
-      <td colspan="2"> 
+      <td> 
+      {% if show_search %}
         <input type="checkbox" name="wheelchairAccess" 
         {% if element.wheelchairAccess %} checked {% endif %} />
+      {% else %}
+      {% if element.wheelchairAccess %} True {% else %} False {% endif %} 
+      {% endif %}
       </td>
     </tr>
     <tr>
       <td>Number of adults</td>
-      <td> <input type="text" name="adults" value="{{ element.adults }}" /> </td>
+      <td> 
+      {% if show_search %}
+      <input type="text" name="adults" value="{{ element.adults }}" /> 
+      {% else %}
+        {{ element.adults }}
+      {% endif %}
+      </td>
     </tr>
     <tr>
       <td>Number of children</td>
-      <td> <input type="text" name="children" value="{{ element.children }}" /> </td>
+      <td> 
+      {% if show_search %}
+      <input type="text" name="children" value="{{ element.children }}" /> 
+      {% else %}
+        {{ element.children }}
+      {% endif %}
+      </td>
     </tr>
     <tr>
       <td>Number of double beds</td>
-      <td> <input type="text" name="doublerooms" value="{{ element.doublerooms }}" /> </td>
+      <td> 
+      {% if show_search %}
+      <input type="text" name="doublerooms" value="{{ element.doublerooms }}" /> 
+      {% else %}
+        {{ element.doublerooms }}
+      {% endif %}
+      </td>
     </tr>
     <tr>
       <td>Number of single beds</td>
-      <td> <input type="text" name="singlerooms" value="{{ element.singlerooms }}" /> </td>
+      <td> 
+      {% if show_search %}
+        <input type="text" name="singlerooms" value="{{ element.singlerooms }}" /> 
+      {% else %}
+        {{ element.singlerooms }}
+      {% endif %}
+      </td>
     </tr>
   </table>
+  {% if show_search %}
   <input title="Find accommodation"
          type="submit" value="Find Accommodation" />
+  {% endif %}
 </form>
-{% endif %}
 
 {% if show_results %}
 <hr />
