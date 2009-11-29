@@ -115,6 +115,12 @@ class Venue(db.Model):
         return 'Name:%s Class:%s Contact:%s' % \
             (self.name, self.venueType, self.contactPerson)
 
+    def getContractedBookings(self):
+        bookings = set()
+        for room in self.venue_bedrooms:
+            bookings.update(room.getContractedBookings())
+        return bookings
+
     def isValid(self):
         is_valid, err = self.validate()
         #if not is_valid:
@@ -311,6 +317,11 @@ class Bedroom(db.Model):
             r.rdelete()
         self.delete()
 
+    def getContractedBookings(self):
+        bookings = set()
+        for bed in self.bedroom_beds:
+            bookings.update(bed.getContractedBookings())
+        return bookings
 
 class Bathroom(db.Model):
     venue = db.ReferenceProperty(Venue, collection_name='venue_bathrooms')
@@ -344,6 +355,12 @@ class Bed(db.Model):
             r.rdelete()
         self.delete()
         
+    def getContractedBookings(self):
+        bookings = set()
+        for berth in self.bed_berths:
+            bookings.update(berth.getContractedBookings())
+        return bookings
+
 class Berth(db.Model):
     bed = db.ReferenceProperty(Bed, collection_name='bed_berths')
     created = db.DateTimeProperty(auto_now_add=True)
@@ -353,6 +370,14 @@ class Berth(db.Model):
         for r in self.berth_slots:
             r.rdelete()
         self.delete()
+
+    def getContractedBookings(self):
+        bookings = set()
+        for slot in self.berth_slots:
+            if hasattr(slot, 'contracted_booking') and \
+               slot.contracted_booking:
+                bookings.add(str(slot.contracted_booking.key()))
+        return bookings
         
 class Slot(db.Model):
     created = db.DateTimeProperty(auto_now_add=True)

@@ -7,6 +7,7 @@ from google.appengine.ext.webapp import template
 from google.appengine.ext.db import djangoforms
 
 from controllers.home import BASE_PATH, PROJECT_PATH
+from models.bookinginfo import ContractedBooking
 from models.hostinfo import Owner, Venue
 from controllers.utils import get_authentication_urls
 
@@ -45,24 +46,26 @@ class ViewVenue(webapp.RequestHandler):
         emails = venue.entity_emails
         bathrooms = venue.venue_bathrooms
         ownerkey = venue.owner.key()
+        contractedbookings = [ContractedBooking.get(k) for k in venue.getContractedBookings()]
         self.response.out.write(template.render(filepath, 
-                                    {
-                                        'base_path':BASE_PATH,
-                                        'ownerkey':ownerkey,
-                                        'owner_name':venue.owner.listing_name(),
-                                        'venue':venue,
-                                        'venue_values':venue_values,
-                                        'addresses':addresses,
-                                        'photographs':photographs,
-                                        'inspections':inspections,
-                                        'complaints':complaints,
-                                        'phonenumbers':phonenumbers,
-                                        'bedrooms':bedrooms,
-                                        'emails':emails,
-                                        'bathrooms':bathrooms,
-                                        'auth_url':auth_url,
-                                        'auth_url_text':auth_url_text
-                                        }))
+                  {
+                      'base_path':BASE_PATH,
+                      'ownerkey':ownerkey,
+                      'owner_name':venue.owner.listing_name(),
+                      'venue':venue,
+                      'venue_values':venue_values,
+                      'addresses':addresses,
+                      'photographs':photographs,
+                      'inspections':inspections,
+                      'complaints':complaints,
+                      'phonenumbers':phonenumbers,
+                      'bedrooms':bedrooms,
+                      'emails':emails,
+                      'bathrooms':bathrooms,
+                      'contractedbookings':contractedbookings,
+                      'auth_url':auth_url,
+                      'auth_url_text':auth_url_text
+                      }))
 
 
     def post(self):

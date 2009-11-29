@@ -11,8 +11,7 @@ from google.appengine.ext import db
 from controllers.bookingstool import BookingsTool
 from controllers.home import BASE_PATH, PROJECT_PATH
 from models.hostinfo import Berth
-from models.bookinginfo import Enquiry, EnquiryCollection, \
-    ContractedBooking, AccommodationElement
+from models.bookinginfo import Enquiry, EnquiryCollection, AccommodationElement
 from controllers.utils import get_authentication_urls
 from controllers import generator
 from workflow.__init__ import ENQUIRY_WORKFLOW
@@ -57,7 +56,8 @@ class ViewEnquiry(webapp.RequestHandler):
                         berths.append(berth)
             if berths:
                 #sort
-                berths.sort(key=lambda x: "%s %s %s %s" % (
+                berths.sort(key=lambda x: "%s %s %s %s %s" % (
+                    len(x.bed.bedroom.venue.getContractedBookings()) > 0,
                     x.bed.bedroom.venue.owner.referenceNumber,
                     x.bed.bedroom.venue.name,
                     x.bed.bedroom.name,
