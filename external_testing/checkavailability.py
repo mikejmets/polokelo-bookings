@@ -45,9 +45,9 @@ xml = """
     <enquirynumber>%s</enquirynumber>
     <city>CPT</city>
     <accommodation>
-        <type>HOM</type>
+        <type>GH</type>
         <rooms>
-            <single>0</single>
+            <single>2</single>
             <twin>0</twin>
             <double>1</double>
             <family>0</family>
