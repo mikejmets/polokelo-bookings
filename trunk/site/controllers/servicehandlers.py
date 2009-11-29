@@ -59,7 +59,8 @@ class ManageHosts(webapp.RequestHandler):
         start = self.request.get('start', ' ')
         new_start = start
         query = Owner.all().order('referenceNumber')
-        owners = query.filter('referenceNumber >=', start).fetch(PAGESIZE+1)
+        query.filter('referenceNumber >=', start)
+        owners = query.fetch(PAGESIZE+1)
         if owners:
             new_start = owners[-1].referenceNumber
 
@@ -68,7 +69,7 @@ class ManageHosts(webapp.RequestHandler):
                                     {
                                         'base_path':BASE_PATH,
                                         'start':new_start,
-                                        'owners':owners[:-1],
+                                        'owners':owners,
                                         'user':users.get_current_user(),
                                         'auth_url':auth_url,
                                         'auth_url_text':auth_url_text
