@@ -27,13 +27,13 @@ class BookingsTool():
 
         #search
         query = AccommodationElement.all().ancestor(enquiry)
-        #accommodationElement = query.fetch(1)[0]
-        accommodationElement = query.get()
-        logger.info("Got element %s", accommodationElement)
+        #element = query.fetch(1)[0]
+        element = query.get()
+        logger.info("Got element %s", element)
 
         # check for scpecial needs and return
-        if accommodationElement.specialNeeds == True:
-            logger.info("specialneeds is %s", accommodationElement.specialNeeds)
+        if element.specialNeeds == True:
+            logger.info("specialneeds is %s", element.specialNeeds)
             # SHOULD WE TRANSITION TO MANUAL???
             return (False, 0.0, 0.0)
 
@@ -41,8 +41,8 @@ class BookingsTool():
         # This indicates contracted bookings of the type are available
         #   and auto allocation and quote can go ahead.
         query = Package.all()
-        query.filter('city =', accommodationElement.city)
-        query.filter('accommodationType =', accommodationElement.type)
+        query.filter('city =', element.city)
+        query.filter('accommodationType =', element.type)
         package = query.get()
         if not package:
             logger.info('No package found')
@@ -53,18 +53,26 @@ class BookingsTool():
                                 package.basePriceInZAR)
 
         # now, carry on and look for availble accommodation
-        venues = self.findVenues(accommodationElement) 
+        venues = self.findVenues(element) 
         if venues:
-            accommodationElement.availableBerths = str(venues)
+            element.availableBerths = str(venues)
+            berths = []
+            for venue_key in venues:
+                for key, slots in venues[venue_key]:
+                    berth = Berth.get(key)
+                    berths.append(berth)
             #Simply pull from the top of the list
-            quote_amount, vat_amount = package.calculateQuote(accommodationElement)
-            selected_venue = venues[venues.keys()[0]]
-            people = accommodationElement.adults + \
-                     accommodationElement.children 
-            selected_berths = [b[0] for b in selected_venue[:people]]
+            quote_amount, vat_amount = package.calculateQuote(element)
+            people = element.adults + \
+                     element.children 
+            selected_berths = berths[:people]
+            #sort
+            selected_berths.sort(key=lambda b: "%s" % (
+                    b.bed.bedroom.venue.fairAllocationsIndicator(
+                      b, element)))
             self.createBookings(enquiry,
-                              accommodationElement,
-                              selected_berths)
+                              element,
+                              [str(b.key()) for b in selected_berths])
             return (True, quote_amount, vat_amount)
 
         return (False, 0.0, 0.0)
@@ -83,10 +91,12 @@ class BookingsTool():
         try:
             people = 0
             #logger.info('AvailableBerths: %s', element.availableBerths)
+            #logger.info('selected keys: %s', selected_keys)
             venues = eval(element.availableBerths)
             for venue_key in venues.keys():
                 venue_affected = False
                 for berth_key, slotkeys in venues[venue_key]:
+                    #logger.info('test: %s', berth_key) 
                     if berth_key in selected_keys:
                         #Create Booking
                         booking = ContractedBooking(
