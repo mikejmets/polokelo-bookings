@@ -23,7 +23,7 @@ class EnquiryCollection(db.Model):
                                             verbose_name='Reference Number')
 
     def rdelete(self):
-        for e in Enquiry.all.filter('ancestor =', self).fetch(1000):
+        for e in Enquiry.all().ancestor(self):
             e.rdelete()
         self.delete()
 
@@ -68,6 +68,8 @@ class Enquiry(WorkflowAware):
         for e in GuestElement.all().ancestor(self):
             e.rdelete()
         for e in AccommodationElement.all().ancestor(self):
+            e.rdelete()
+        for e in ContractedBooking.all().ancestor(self):
             e.rdelete()
         self.delete()
 

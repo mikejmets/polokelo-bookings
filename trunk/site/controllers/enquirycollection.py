@@ -116,6 +116,8 @@ class DeleteEnquiryCollection(webapp.RequestHandler):
         enquirycollection = EnquiryCollection.get(enquirycollectionkey)
         if enquirycollection:
             #recursive delete
+            logger.info('Delete collection %s', 
+                enquirycollection.referenceNumber)
             enquirycollection.rdelete()
 
         self.redirect('/bookings/bookinginfo')
