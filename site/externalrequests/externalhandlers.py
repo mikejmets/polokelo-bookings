@@ -24,6 +24,13 @@ class ExternalBookings(webapp.RequestHandler):
     """ Handler class for all enquiry/booking requests from
         the pulic sites.
     """
+    def _addErrorNode(self, node, code='0', message=None):
+        error_element = SubElement(node, 'systemerror')
+        error_code = SubElement(error_element, 'errorcode')
+        error_code.text = code
+        error_msg = SubElement(error_element, 'errormessage')
+        if message is not None:
+            error_msg.text = message
 
     def _checkAvailability(self, node):
         """ Handle the initial check for available slots on an enquiry
@@ -47,12 +54,9 @@ class ExternalBookings(webapp.RequestHandler):
             # append the result as a sub element to the node element
             search_elem = SubElement(node, 'searchresult')
             # append the error element
-            error_element = SubElement(node, 'systemerror')
-            error_code = SubElement(error_element, 'errorcode')
-            error_code.text = '101'
-            error_msg = SubElement(error_element, 'errormessage')
-            error_msg.text = 'The enquiry with number %s has already been submitted' % \
-                                                    enquiry_number
+            self._addErrorNode(node, '101', 
+                    'The enquiry with number %s has already been submitted' % \
+                                                    enquiry_number)
             # return the result as xml
             return tostring(node)
 
@@ -114,10 +118,7 @@ class ExternalBookings(webapp.RequestHandler):
         amount_elem.text = str(vat)
 
         # append the error element
-        error_element = SubElement(node, 'systemerror')
-        error_code = SubElement(error_element, 'errorcode')
-        error_code.text = '0'
-        error_msg = SubElement(error_element, 'errormessage')
+        self._addErrorNode(node)
 
         # return the result as xml
         return tostring(node)
@@ -204,13 +205,9 @@ class ExternalBookings(webapp.RequestHandler):
                 result_elem = SubElement(confirm_elem, 'result')
 
                 # append the error element
-                error_element = SubElement(node, 'systemerror')
-                error_code = SubElement(error_element, 'errorcode')
-                error_code.text = '103'
-                error_msg = SubElement(error_element, 'errormessage')
-                error_msg.text = 'Enquiry element %s is not part of enquiry batch %s' \
-                        % (refnum, collection_number)
-
+                self._addErrorNode(node, '103',
+                        'Enquiry element %s is not part of enquiry batch %s' \
+                                                        % (refnum, collection_number))
                 # return the result as xml
                 return tostring(node)
 
@@ -221,10 +218,7 @@ class ExternalBookings(webapp.RequestHandler):
         result_elem.text = collection_number
 
         # append the error element
-        error_element = SubElement(node, 'systemerror')
-        error_code = SubElement(error_element, 'errorcode')
-        error_code.text = '0'
-        error_msg = SubElement(error_element, 'errormessage')
+        self._addErrorNode(node)
 
         # return the result as xml
         return tostring(node)
