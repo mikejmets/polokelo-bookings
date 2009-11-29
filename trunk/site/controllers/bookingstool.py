@@ -5,6 +5,7 @@ from datetime import datetime, timedelta
 
 from google.appengine.ext.db import run_in_transaction
 
+from workflow.workflow import WorkflowError
 from booking_errors import BookingConflictError
 from models.hostinfo import Venue, Slot, Berth
 from models.bookinginfo import \
@@ -113,6 +114,11 @@ class BookingsTool():
                     enquiry.doTransition('allocatefromhold')
                 enquiry.put()
 
+        except WorkflowError, error:
+            logger.error('BookingConflict: %s', error) 
+            #Clean up
+            for booking in bookings:
+                booking.rdelete()
         except BookingConflictError, error:
             logger.error('BookingConflict: %s', error) 
             #Clean up

@@ -60,7 +60,7 @@ class ViewEnquiry(webapp.RequestHandler):
                     x.bed.bedroom.venue.fairAllocationsIndicator(x, element)))
             else:
                 show_results = False
-        show_bookings = len(enquiry.contracted_bookings.fetch(1)) > 0
+        show_bookings = len(enquiry.getContractedBookings()) > 0
         self.response.out.write(template.render(filepath, 
                     {
                         'base_path':BASE_PATH,
