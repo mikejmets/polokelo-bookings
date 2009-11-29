@@ -102,6 +102,7 @@ class Venue(db.Model):
     contractStartDate = db.DateProperty(verbose_name='Contracted Start Date (YYYY-MM-DD)')
     contractEndDate = db.DateProperty(verbose_name='Contracted End Date (YYYY-MM-DD)')
     state = db.StringProperty(default='Closed', choices=getChoices('VNSTA'))
+    numberOfBookings = db.IntegerProperty(default=0)
 
     def get_city(self):
         results = Address.all()
@@ -114,6 +115,32 @@ class Venue(db.Model):
     def listing_name(self):
         return 'Name:%s Class:%s Contact:%s' % \
             (self.name, self.venueType, self.contactPerson)
+
+    def fairAllocationsIndicator(self, berth, element):
+        #For allocation purposes only
+        #Used as a string for sorting venues
+        allocations = min(self.numberOfBookings, 9)
+        doubles = element.doublerooms
+        if doubles > 0:
+            double_indicator = 9
+            if berth.bed.bedType == 'Double':
+                doubles = min(doubles, 9)
+                double_indicator = 9 - doubles
+        else:
+            double_indicator = 0
+            if berth.bed.bedType == 'Double':
+                double_indicator = 9
+        return "%s %s %s %s %s" % (
+            allocations, 
+            double_indicator, 
+            self.owner.referenceNumber,
+            berth.bed.bedroom.name,
+            berth.bed.name)
+
+    def recalcNumOfBookings(self):
+        self.numberOfBookings = len(self.getContractedBookings())
+        logger.info('Recalc venue %s to %d', self.name, self.numberOfBookings)
+        self.put()
 
     def getContractedBookings(self):
         bookings = set()

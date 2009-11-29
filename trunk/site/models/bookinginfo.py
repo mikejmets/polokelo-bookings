@@ -130,8 +130,12 @@ class ContractedBooking(db.Model):
         return '%s' % self.bookingNumber
 
     def rdelete(self):
-        for e in self.slots:
-            e.occupied = False
-            e.put()
+        venue = None
+        for slot in self.slots:
+            venue = slot.berth.bed.bedroom.venue
+            slot.occupied = False
+            slot.put()
+        if venue:
+            venue.recalcNumOfBookings()
         self.delete()
 

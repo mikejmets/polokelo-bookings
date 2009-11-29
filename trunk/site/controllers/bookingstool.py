@@ -6,7 +6,7 @@ from datetime import datetime, timedelta
 from google.appengine.ext.db import run_in_transaction
 
 from booking_errors import BookingConflictError
-from models.hostinfo import Slot, Berth
+from models.hostinfo import Venue, Slot, Berth
 from models.bookinginfo import \
     ContractedBooking, Enquiry, AccommodationElement
 from models.packages import Package
@@ -84,6 +84,7 @@ class BookingsTool():
             #logger.info('AvailableBerths: %s', element.availableBerths)
             venues = eval(element.availableBerths)
             for venue_key in venues.keys():
+                venue_affected = False
                 for berth_key, slotkeys in venues[venue_key]:
                     if berth_key in selected_keys:
                         #Create Booking
@@ -99,6 +100,10 @@ class BookingsTool():
                             enquiry, 
                             slotkeys, 
                             booking)
+                        venue_affected = True
+                if venue_affected:
+                    Venue.get(venue_key).recalcNumOfBookings()
+
             if people:
                 if enquiry.workflowState == 'temporary':
                     enquiry.doTransition('allocate')
