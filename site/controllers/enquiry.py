@@ -56,8 +56,8 @@ class ViewEnquiry(webapp.RequestHandler):
                         berths.append(berth)
             if berths:
                 #sort
-                berths.sort(key=lambda x: "%s" % (
-                    x.bed.bedroom.venue.fairAllocationsIndicator(x, element)))
+                berths.sort(key=lambda b: "%s" % (
+                    b.bed.bedroom.venue.fairAllocationsIndicator(b, element)))
             else:
                 show_results = False
         show_bookings = len(enquiry.getContractedBookings()) > 0
