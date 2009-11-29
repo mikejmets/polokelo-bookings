@@ -38,27 +38,30 @@ class Enquiry(WorkflowAware):
     vatInZAR = db.FloatProperty(verbose_name='VAT', default=0.0)
     xmlSource = db.TextProperty(verbose_name='Source Detail')
 
+    def getContractedBookings(self):
+        return ContractedBooking.all().ancestor(self).fetch(1000)
+
     def ontransition_expiretemporary(self, *args, **kw):
         pass
 
     def ontransition_expireallocated(self, *args, **kw):
-        for b in self.contracted_bookings:
+        for b in self.getContractedBookings():
             b.rdelete()
 
     def ontransition_expiredetails(self, *args, **kw):
-        for b in self.contracted_bookings:
+        for b in self.getContractedBookings():
             b.rdelete()
 
     def ontransition_expiredeposit(self, *args, **kw):
-        for b in self.contracted_bookings:
+        for b in self.getContractedBookings():
             b.rdelete()
 
     def ontransition_canceldeposit(self, *args, **kw):
-        for b in self.contracted_bookings:
+        for b in self.getContractedBookings():
             b.rdelete()
 
     def ontransition_cancelfull(self, *args, **kw):
-        for b in self.contracted_bookings:
+        for b in self.getContractedBookings():
             b.rdelete()
 
     def listing_name(self):
@@ -69,8 +72,8 @@ class Enquiry(WorkflowAware):
             e.rdelete()
         for e in AccommodationElement.all().ancestor(self):
             e.rdelete()
-        for e in ContractedBooking.all().ancestor(self):
-            e.rdelete()
+        for b in self.getContractedBookings():
+            b.rdelete()
         self.delete()
 
 class AccommodationElement(db.Model):
@@ -123,13 +126,11 @@ class ContractedBooking(db.Model):
     bookingNumber = db.StringProperty(required=True)
     client = db.ReferenceProperty(
         Client, collection_name='contracted_bookings')
-    enquiry = db.ReferenceProperty(
-        Enquiry, collection_name='contracted_bookings')
     state = db.StringProperty(default='Temporary', 
             choices=getChoices('CBSTA'))
 
     def listing_name(self):
-        return '%s' % self.bookingNumber
+        return '%s' % (self.bookingNumber)
 
     def rdelete(self):
         venue = None

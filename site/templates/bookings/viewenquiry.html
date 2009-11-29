@@ -153,9 +153,8 @@
 <table class="listing" cellspacing="0">
     <thead>
       <td>Reference</td>
-      <td>&nbsp;</td>
     </thead>
-    {% for contractedbooking in enquiry.contracted_bookings %}
+    {% for contractedbooking in enquiry.getContractedBookings %}
     <tr>
       <td><a href="/bookings/viewcontractedbooking?bookingkey={{ contractedbooking.key }}">{{ contractedbooking.bookingNumber }}</a></td>
       <!-- 
@@ -164,13 +163,13 @@
           href="/bookings/editcontractedbooking?contractedbookingkey={{ contractedbooking.key }}">
           <img src="/images/edit.png"/>
         </a></td>
-        -->
       <td class="action">
         <a title="Delete this booking"
           href="/bookings/deletecontractedbooking?contractedbookingkey={{ contractedbooking.key }}"
                onclick="return confirm('Are you sure?');">
           <img src="/images/delete.png"/>
         </a></td>
+        -->
     </tr>
     {% endfor %}
 </table>
