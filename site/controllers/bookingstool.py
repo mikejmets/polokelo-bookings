@@ -89,8 +89,8 @@ class BookingsTool():
                     if berth_key in selected_keys:
                         #Create Booking
                         booking = ContractedBooking(
-                            bookingNumber=generator.generateBookingNumber(),
-                            enquiry=enquiry)
+                            parent=enquiry,
+                            bookingNumber=generator.generateBookingNumber())
                         booking.put()
                         bookings.append(booking)
                         logger.info('Create booking: %s', booking.bookingNumber) 
