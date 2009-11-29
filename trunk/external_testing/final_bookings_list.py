@@ -7,21 +7,21 @@ url = 'http://localhost:8080/externalbookings'
 
 xml = """
 <enquirylist>
-    <enquirybatchnumber>YHT-4W7-9ZK</enquirybatchnumber>
+    <enquirybatchnumber>YHT-4W7-9ZD</enquirybatchnumber>
     <guestagentcode>Trafalgar-234234324</guestagentcode>
     <action>confirm enquiries</action>
     <creditcardholder>
-        <name>Michael</name>
-        <surname>Jacksonroats</surname>
+        <name>John</name>
+        <surname>O'Groats</surname>
         <passportnumber>777777777777</passportnumber>
-        <email>michael@neverland.com</email>
+        <email>john@ogroats.co.uk</email>
         <telephone>+4493213123123</telephone>
         <address>
             <streetpobox>34 Shady Lane</streetpobox>
             <suburb>Shady Pines</suburb>
             <city>Shadowville</city>
-            <country>USAK</country>
-            <postcode>435345</postcode>
+            <country>UK</country>
+            <postcode>E1 W3</postcode>
         </address>
         <languages>
             <language>English</language>
@@ -29,7 +29,7 @@ xml = """
     </creditcardholder>
     <enquiries>
         <enquiry>
-            <enquirynumber>YK8-DQN-2PM</enquirynumber>
+            <enquirynumber>YK8-DQN-2PG</enquirynumber>
             <city>PCS</city>
             <accommodation>
                 <type>HOM</type>
