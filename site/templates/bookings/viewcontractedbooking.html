@@ -45,8 +45,11 @@
           <tr>
             <td><strong>{{ slot.startDate }}</strong></td>
             <td> {{ slot.city }} </td>
-            <td> {{ slot.type }} </td>
-            <td> {{ slot.berth.bed.bedroom.venue.name }} </td>
+            <td> {{ slot.venueType }} </td>
+            <td> 
+              <a title="View host"
+                 href="/services/owner/viewvenue?venuekey={{ slot.berth.bed.bedroom.venue.key}}&ownerkey={{ slot.berth.bed.bedroom.venue.owner.key }}">
+                 {{ slot.berth.bed.bedroom.venue.name }}</a></td>
             <td> {{ slot.berth.bed.bedroom.name }} </td>
             <td> {{ slot.berth.bed.name }} </td>
           </tr>
