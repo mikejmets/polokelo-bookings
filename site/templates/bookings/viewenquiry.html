@@ -108,6 +108,7 @@
         <td>Select</td>
         <td>Owner</td>
         <td>Venue</td>
+        <td>Bookings</td>
         <td>Room</td>
         <td>Bed</td>
         <td>Type</td>
@@ -118,6 +119,7 @@
         <td> <input type="checkbox" name="berth_{{ berth.key }}" /> </td>
         <td>{{ berth.bed.bedroom.venue.owner.listing_name }}</td>
         <td>{{ berth.bed.bedroom.venue.name }}</td>
+        <td>{{ berth.bed.bedroom.venue.numberOfBookings }}</td>
         <td>{{ berth.bed.bedroom.name }}</td>
         <td>{{ berth.bed.name }}</td>
         <td>{{ berth.bed.bedType }}</td>
