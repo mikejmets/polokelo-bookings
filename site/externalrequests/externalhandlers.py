@@ -1,5 +1,5 @@
 import os
-from datetime import datetime, timedelta
+from datetime import datetime
 import logging
 from google.appengine.ext import webapp
 from google.appengine.ext.webapp import template
