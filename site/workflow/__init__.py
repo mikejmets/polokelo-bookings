@@ -4,6 +4,9 @@ from workflow import Workflow, State, Transition, ExpirationSetting
 
 logger = logging.getLogger('Init Workflow')
 
+
+# Define and load the enquiry workflow
+
 def loadEquiryWorkflow():
     wfl = Workflow(key_name='enquiry_workflow')
     wfl.put()
@@ -109,3 +112,69 @@ if ENQUIRY_WORKFLOW:
     ENQUIRY_WORKFLOW = None
 if not ENQUIRY_WORKFLOW:
     ENQUIRY_WORKFLOW = loadEquiryWorkflow()
+
+
+# Define workflow for payment trackers
+# We define a workflow for the tracker on the enquiry collection
+# and a workflow for the tracker on the enquiry itself.
+# The VCS payment records will affect the workflow
+
+# the collection tracker payment workflow
+def loadCollectionTrackerPaymentWorkflow():
+    wfl = Workflow(key_name='collection_tracker_payment_workflow')
+    wfl.put()
+    wfl.addState('nopayment', title='No payments received')
+    wfl.addState('paymentinprogress', title='Payment in progress')
+    wfl.addState('paidinfull', title='Paid in Full')
+
+    wfl.addTransition('receivepayment', 'nopayment', 'paymentinprogress', 
+                            title='Receive Payment')
+    wfl.addTransition('payinfull', 'paymentinprogress', 'paidinfull', 
+                            title='Pay in full')
+    wfl.setInitialState('nopayment')
+    wfl.put()
+    return wfl
+
+COLL_TRACK_PAY_WORKFLOW = Workflow.get_by_key_name( \
+                                'collection_tracker_payment_workflow')
+if COLL_TRACK_PAY_WORKFLOW:
+    logger.info('Recreate collection tracker payment workflow')
+    for s in State.all().ancestor(COLL_TRACK_PAY_WORKFLOW):
+        s.delete()
+    for t in Transition.all().ancestor(COLL_TRACK_PAY_WORKFLOW):
+        t.delete()
+    COLL_TRACK_PAY_WORKFLOW.delete()
+    COLL_TRACK_PAY_WORKFLOW = None
+
+if not COLL_TRACK_PAY_WORKFLOW:
+    COLL_TRACK_PAY_WORKFLOW = loadCollectionTrackerPaymentWorkflow()
+
+
+# the enquiry tracker payment workflow
+def loadEnquiryTrackerPaymentWorkflow():
+    wfl = Workflow(key_name='enquiry_tracker_payment_workflow')
+    wfl.put()
+    wfl.addState('nopayment', title='No payments received')
+    wfl.addState('depositreceived', title='Deposit Received')
+    wfl.addState('paidinfull', title='Paid in Full')
+
+    wfl.addTransition('receivedeposit', 'nopayment', 'depositreceived', 
+                            title='Receive Deposit')
+    wfl.addTransition('payinfull', 'depositreceived', 'paidinfull', 
+                            title='Pay outstanding amount')
+    wfl.setInitialState('nopayment')
+    wfl.put()
+    return wfl
+
+ENQRY_TRACK_PAY_WORKFLOW = Workflow.get_by_key_name('enquiry_tracker_payment_workflow')
+if ENQRY_TRACK_PAY_WORKFLOW:
+    logger.info('Recreate collection tracker payment workflow')
+    for s in State.all().ancestor(ENQRY_TRACK_PAY_WORKFLOW):
+        s.delete()
+    for t in Transition.all().ancestor(ENQRY_TRACK_PAY_WORKFLOW):
+        t.delete()
+    ENQRY_TRACK_PAY_WORKFLOW.delete()
+    ENQRY_TRACK_PAY_WORKFLOW = None
+
+if not ENQRY_TRACK_PAY_WORKFLOW:
+    ENQRY_TRACK_PAY_WORKFLOW = loadEnquiryTrackerPaymentWorkflow()
