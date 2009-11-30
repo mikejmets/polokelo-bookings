@@ -6,6 +6,8 @@ from models.clientinfo import Client
 from models.codelookup import getChoices
 from workflow.workflow import WorkflowAware
 
+from controllers.emailtool import EmailTool
+
 logger = logging.getLogger('BookingInfo')
 
 class IdSequence(db.Model):
@@ -41,28 +43,45 @@ class Enquiry(WorkflowAware):
     def getContractedBookings(self):
         return ContractedBooking.all().ancestor(self).fetch(1000)
 
+    def expire(self):
+        for b in self.getContractedBookings():
+            b.rdelete()
+
+    def cancel(self):
+        for b in self.getContractedBookings():
+            b.rdelete()
+    
+    def allocate(self):
+        element = AccommodationElement.all().ancestor(self)[0]
+        et = EmailTool()
+        et.notifyClientOfAllocation(self, element)
+
     def ontransition_expiretemporary(self, *args, **kw):
         pass
 
     def ontransition_expireallocated(self, *args, **kw):
-        for b in self.getContractedBookings():
-            b.rdelete()
+        self.expire()
 
     def ontransition_expiredetails(self, *args, **kw):
-        for b in self.getContractedBookings():
-            b.rdelete()
+        self.expire()
 
     def ontransition_expiredeposit(self, *args, **kw):
-        for b in self.getContractedBookings():
-            b.rdelete()
+        self.expire()
 
     def ontransition_canceldeposit(self, *args, **kw):
-        for b in self.getContractedBookings():
-            b.rdelete()
+        self.cancel()
 
     def ontransition_cancelfull(self, *args, **kw):
-        for b in self.getContractedBookings():
-            b.rdelete()
+        self.cancel()
+
+    def ontransition_allocate(self, *args, **kw):
+        self.allocate()
+
+    def ontransition_allocatemanually(self, *args, **kw):
+        self.allocate()
+
+    def ontransition_allocatefromhold(self, *args, **kw):
+        self.allocate()
 
     def listing_name(self):
         return '%s' % self.referenceNumber

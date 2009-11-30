@@ -29,7 +29,6 @@ class ViewEnquiryCollection(webapp.RequestHandler):
         filepath = os.path.join(PROJECT_PATH, 
                       'templates', 'bookings', 'viewenquirycollection.html')
         enquirycollectionkey = self.request.get('enquirycollectionkey')
-        logger.info('---------%s', enquirycollectionkey)
         enquirycollection = EnquiryCollection.get(enquirycollectionkey)
         enquiries = Enquiry.all().ancestor(enquirycollection)
         self.response.out.write(template.render(filepath, 
