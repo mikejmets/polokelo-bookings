@@ -39,7 +39,7 @@ class ViewEnquiry(webapp.RequestHandler):
         show_search = enquiry.workflowState in \
             ['temporary', 'onhold', 'requiresintervention']
         show_transitions = enquiry.workflowState not in \
-            ['temporary', 'requiresintervention', 'expired', 'cancelled']
+            ['temporary', 'onhold', 'requiresintervention', 'expired', 'cancelled']
         transitions = None
         if show_transitions:
             transitions = enquiry.getPossibleTransitions()
