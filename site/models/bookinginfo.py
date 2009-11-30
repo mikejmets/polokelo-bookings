@@ -161,3 +161,56 @@ class ContractedBooking(db.Model):
             venue.recalcNumOfBookings()
         self.delete()
 
+
+# payment tracking classes
+
+class CollectionPaymentTracker(WorkflowAware):
+    """ Track progress of payments for an enquiry collection
+    """
+    created = db.DateTimeProperty(auto_now_add=True)
+    creator = db.UserProperty()
+
+
+class EnquiryPaymentTracker(WorkflowAware):
+    """ Track progress of payments for a specific enquiry
+    """
+    created = db.DateTimeProperty(auto_now_add=True)
+    creator = db.UserProperty()
+
+
+class VCSPaymentNotification(db.Model):
+    """ Store VCS result data for the collection
+    """
+    created = db.DateTimeProperty(auto_now_add=True)
+    creator = db.UserProperty()
+    timeStamp = db.DateTimeProperty(verbose_name="Payment Time Stamp")
+
+    terminalId = db.StringProperty(verbose_name="VCS Terminal ID")
+    txRefNum = db.StringProperty(verbose_name="Unique Transaction Reference Number")
+    txType = db.StringProperty("Transaction Type",
+                            choices=("Authorisation", "Settlement", "Refund"))
+    duplicateTransaction = db.BooleanProperty(verbose_name="Duplicate Transaction")
+    authorised = db.BooleanProperty(default=False)
+    authNumberOrReason = db.StringProperty( \
+                            verbose_name="Approved Indicator or Rejection Reason")
+    authResponseCode = db.StringProperty(verbose_name="Authorise Response Code")
+
+    goodsDescription = db.StringProperty(verbose_name="Description of Goods Delivered")
+    authAmount = db.FloatProperty(verbose_name="Amount Authorised")
+    budgetPeriod = db.StringProperty(verbose_name="Budget Period")
+
+    cardHolderName = db.StringProperty(verbose_name="Card Holder Name")
+    cardHolderEmail = db.EmailProperty(verbose_name="Card Holder Email")
+    cardHolderIP = db.StringProperty(verbose_name="Card Holder IP Address")
+
+    maskedCardNumber = db.StringProperty("Masked Card Number")
+    cardType = db.StringProperty(verbose_name="Card Type")
+    cardExpiry = db.StringProperty(verbose_name="Card Expiry Date")
+
+    pam = db.StringProperty(verbose_name="Personal Authentication Message")
+
+    enquiryCollection = db.StringProperty(verbose_name="Enquiry Collection Number")
+    enquiryList = db.StringListProperty(verbose_name="Enquiries affected by payment")
+    paymentType = db.StringProperty(verbose_name="Payment Type", 
+                            choices=("DEP", "INV"))
+    depositPercentage = db.IntegerProperty(verbose_name="Deposit Percentage")
