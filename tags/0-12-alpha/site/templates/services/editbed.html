@@ -1,0 +1,17 @@
+{% extends base_path %}
+
+{% block breadcrumbs %}
+<a href="{{came_from}}">go back</a>
+{% endblock %}
+
+{% block pagecontent %}
+    <h1>Edit Existing Bed</h1>
+    <form name="bed" method="post" action="/services/owner/venue/editbed">
+        <input type="hidden" name="bedkey" value="{{ bedkey }}" />
+        <input type="hidden" name="came_from" value="{{ came_from }}" />
+        <table>
+            {{ form }}
+        </table>
+        <input type="submit" value="Update Bed" />
+    </form>
+{% endblock pagecontent %}
