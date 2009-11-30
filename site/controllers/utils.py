@@ -1,4 +1,14 @@
+from datetime import datetime,timedelta
 from google.appengine.api import users
+from models.hostinfo import Owner, Venue, Bedroom, Bed, Berth, Bathroom, \
+    Photograph, Address, EmailAddress, PhoneNumber, Inspection, Complaint, \
+    Slot
+from models.clientinfo import Client, Flight, MatchTicket
+from models.bookinginfo import EnquiryCollection, Enquiry, \
+    AccommodationElement, GuestElement, ContractedBooking
+from models.schedule import Match
+from models.codelookup import CodeLookup
+
 def get_authentication_urls(dest_url):
     user = users.get_current_user()
     if user:
@@ -6,14 +16,6 @@ def get_authentication_urls(dest_url):
     else:
         return users.create_login_url(dest_url), 'Sign In'
 
-from datetime import datetime,timedelta
-def datetimeIterator(from_date=datetime.now(), to_date=None):
-    while to_date is None or from_date <= to_date:
-        yield from_date
-        from_date = from_date + timedelta(days = 1)
-    return
-
-from models.hostinfo import *
 def listVenuesValidity():
     results = ""
     total = 0
@@ -66,7 +68,6 @@ def countHostInfoEntities():
       results += "%s: %s\n" % (k, adict[k])
     return results
 
-from models.clientinfo import *
 def countClientInfoEntities():
     adict = {}
     adict['Client'] = len([k for k in Client.all(keys_only=True)])
@@ -79,9 +80,9 @@ def countClientInfoEntities():
       results += "%s: %s\n" % (k, adict[k])
     return results
 
-from models.bookinginfo import *
 def countBookingInfoEntities():
     adict = {}
+    adict['EnquiryCollection'] = len([k for k in Enquiry.all(keys_only=True)])
     adict['Enquiry'] = len([k for k in Enquiry.all(keys_only=True)])
     adict['AccommodationElement'] = \
         len([k for k in AccommodationElement.all(keys_only=True)])
@@ -95,8 +96,6 @@ def countBookingInfoEntities():
       results += "%s: %s\n" % (k, adict[k])
     return results
 
-from models.schedule import *
-from models.codelookup import *
 def countOtherEntities():
     adict = {}
     adict['Match'] = len([k for k in Match.all(keys_only=True)])

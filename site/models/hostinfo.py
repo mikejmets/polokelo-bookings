@@ -8,7 +8,13 @@ from google.appengine.api import users
 from models.codelookup import getChoices
 
 from models.bookinginfo import ContractedBooking
-from controllers.utils import datetimeIterator
+
+def datetimeIterator(from_date=datetime.now(), to_date=None):
+    while to_date is None or from_date <= to_date:
+        yield from_date
+        from_date = from_date + timedelta(days = 1)
+    return
+
 
 logger = logging.getLogger('HostInfo')
 
