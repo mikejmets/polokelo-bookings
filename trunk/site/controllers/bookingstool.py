@@ -1,4 +1,5 @@
 import os
+import sys
 import logging
 import urllib
 from datetime import datetime, timedelta
@@ -90,6 +91,7 @@ class BookingsTool():
         bookings = []
         try:
             people = 0
+            init_enquiry_state = enquiry.workflowState
             #logger.info('AvailableBerths: %s', element.availableBerths)
             #logger.info('selected keys: %s', selected_keys)
             venues = eval(element.availableBerths)
@@ -126,11 +128,13 @@ class BookingsTool():
 
         except WorkflowError, error:
             logger.error('BookingConflict: %s', error) 
-            #Clean up
-            for booking in bookings:
-                booking.rdelete()
         except BookingConflictError, error:
             logger.error('BookingConflict: %s', error) 
+        except:
+            error = sys.exc_info()[1]
+            logger.error('Other error; %s', error)
+
+        if error:
             #Clean up
             for booking in bookings:
                 booking.rdelete()

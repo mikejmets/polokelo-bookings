@@ -48,6 +48,7 @@ The development of a workflow system can be splitted in three steps:
     - send an email to a user or a mailing list;
 """
 
+import sys
 import logging
 from datetime import datetime, timedelta
 from google.appengine.ext import db
@@ -267,7 +268,13 @@ class WorkflowAware(db.Model):
         # call app-specific transition handler if any
         name = 'ontransition_%s' % transname
         if hasattr(self, name):
-            getattr(self, name)(*args, **kw)
+            try:
+                getattr(self, name)(*args, **kw)
+            except:
+                self.workflowState = state.key().name()
+                msg = "Error '%s' occurred on transition"
+                error = sys.exc_info()[1]
+                raise WorkflowError, msg % (error)
 
         # call app-specific enter-state handler if any
         name = 'onenter_%s' % new_state.key().name()
