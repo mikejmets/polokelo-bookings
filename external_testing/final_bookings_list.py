@@ -7,49 +7,49 @@ url = 'http://localhost:8080/externalbookings'
 
 xml = """
 <enquirylist>
-    <enquirybatchnumber>YHT-4W7-9ZJ</enquirybatchnumber>
+    <enquirynumber>YK8-DQN-XX5</enquirynumber>
     <guestagentcode>Trafalgar-234234324</guestagentcode>
     <action>confirm enquiries</action>
     <creditcardholder>
         <name>John</name>
         <surname>O'Groats</surname>
-        <passportnumber>777777777777</passportnumber>
-        <email>john@ogroats.co.uk</email>
+        <passportnumber>3453534533476657</passportnumber>
+        <email>john@scotland.com</email>
         <telephone>+4493213123123</telephone>
         <address>
             <streetpobox>34 Shady Lane</streetpobox>
-            <suburb>Shady Pines</suburb>
-            <city>Shadowville</city>
+            <suburb>Northside</suburb>
+            <city>Glasgow</city>
             <country>UK</country>
-            <postcode>E1 W3</postcode>
+            <postcode>E34 N1</postcode>
         </address>
         <languages>
             <language>English</language>
+            <language>French</language>
         </languages>
     </creditcardholder>
     <enquiries>
         <enquiry>
-            <enquirynumber>YK8-DQN-2P8</enquirynumber>
-            <city>CPT</city>
+            <number>YK8-DQN-2PJ</number>
+            <city>PCS</city>
             <accommodation>
-                <type>GH</type>
+                <type>HOM</type>
                 <rooms>
-                    <single>2</single>
+                    <single>0</single>
                     <twin>0</twin>
-                    <double>1</double>
-                    <family>0</family>
+                    <double>0</double>
+                    <family>1</family>
                 </rooms>
             </accommodation>
             <startdate>2010-06-17</startdate>
             <duration>4</duration>
             <adults>2</adults>
-            <children>2</children>
+            <children>3</children>
             <disability>
                 <wheelchairaccess>no</wheelchairaccess>
                 <otherspecialneeds>no</otherspecialneeds>
             </disability>
-            <quote>27680.0</quote>
-            <vat>3875.2</vat>
+            <quote>134.56</quote>
         </enquiry>
     </enquiries>
 </enquirylist>
