@@ -12,6 +12,7 @@
     <td>Enquiry Number: <strong>{{ enquiry.referenceNumber }}</strong> </td>
     <td>Enquiry Status: <strong>{{ enquiry.getState.title }}</strong> </td>
     <td>Enquiry Expiry Date: <strong>{{ enquiry.expiryDate }}</strong> </td>
+    <td>Collection: <a href="/bookings/collection/viewenquirycollection?enquirycollectionkey={{ enquiry.parent.key}}"> <strong>{{ enquiry.parent.referenceNumber }}</strong> </a></td>
   </tr>
 </table>
 

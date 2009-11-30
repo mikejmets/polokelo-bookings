@@ -11,6 +11,7 @@
 
 <p>Booking Number: {{ booking.bookingNumber }} </p>
 <p>Booking Status: {{ booking.state }} </p>
+<p>Enquiry: <a href="/bookings/enquiry/viewenquiry?enquirykey={{ booking.parent.key}}">{{ booking.parent.referenceNumber }}</a></p>
 {%if client %}
 <p>Guest: 
 <a title="View Guest"
