@@ -2,22 +2,23 @@ import urllib2
 from xml.etree.ElementTree import XML, SubElement, tostring
 
 url = 'http://localhost:8080/externalbookings'
-#url = 'http://0-9-alpha.latest.bookings-dev.appspot.com/externalbookings'
+# url = 'http://bookings-dev.appspot.com/externalbookings'
 
 
 # get a new collection number
-xml = """
-<testgenerator>
-    <action>generate collection number</action>
-</testgenerator>
-"""
-
-req = urllib2.Request(url, xml, headers={'Content-Type':'text/plain'})
-response = urllib2.urlopen(req)
-result = response.read()
-
-xmlroot = XML(result)
-collection_number = xmlroot.findtext('collectionnumber')
+# xml = """
+# <testgenerator>
+#     <action>generate collection number</action>
+# </testgenerator>
+# """
+# 
+# req = urllib2.Request(url, xml, headers={'Content-Type':'text/plain'})
+# response = urllib2.urlopen(req)
+# result = response.read()
+# 
+# xmlroot = XML(result)
+# collection_number = xmlroot.findtext('collectionnumber')
+collection_number = 'YHT-4W7-9ZF'
 
 
 # get a new enquiry number
@@ -43,7 +44,7 @@ xml = """
     <guestagentcode>Trafalgar-234234234</guestagentcode>
     <action>check availability</action>
     <enquirynumber>%s</enquirynumber>
-    <city>CPT</city>
+    <city>PCS</city>
     <accommodation>
         <type>GH</type>
         <rooms>
@@ -53,7 +54,7 @@ xml = """
             <family>0</family>
         </rooms>
     </accommodation>
-    <startdate>2010-06-20</startdate>
+    <startdate>2010-06-25</startdate>
     <duration>4</duration>
     <adults>2</adults>
     <children>2</children>
