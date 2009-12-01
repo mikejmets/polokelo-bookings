@@ -36,8 +36,10 @@ class Enquiry(WorkflowAware):
     expiryDate = db.DateTimeProperty(verbose_name="Expiry Date/Time (YYYY-MM-DD hh:mm)")
     guestEmail = db.StringProperty(verbose_name='Guest Email')
     agentCode = db.StringProperty(verbose_name='Travel Agent Code')
-    quoteInZAR = db.FloatProperty(verbose_name='Quote', default=0.0)
-    vatInZAR = db.FloatProperty(verbose_name='VAT', default=0.0)
+    quoteInZAR = db.IntegerProperty(verbose_name='Quote', default=0L)
+    vatInZAR = db.IntegerProperty(verbose_name='VAT', default=0L)
+    totalAmountInZAR = db.IntegerProperty(verbose_name="Total Due", default=0L)
+    amountPaidInZAR = db.IntegerProperty(verbose_name="Amount Paid", default=0L)
     xmlSource = db.TextProperty(verbose_name='Source Detail')
 
     def getContractedBookings(self):
@@ -64,6 +66,13 @@ class Enquiry(WorkflowAware):
 
     def ontransition_expiredetails(self, *args, **kw):
         self.expire()
+
+    def ontransition_paydeposit(self, *args, **kw):
+        self.amountPaidInZAR = long(self.totalAmountInZAR * \
+                                            kw['deposit_percentage'])
+
+    def ontransition_payfull(self, *args, **kw):
+        self.amountPaidInZAR = self.totalAmountInZAR
 
     def ontransition_expiredeposit(self, *args, **kw):
         self.expire()
@@ -145,8 +154,6 @@ class ContractedBooking(db.Model):
     bookingNumber = db.StringProperty(required=True)
     client = db.ReferenceProperty(
         Client, collection_name='contracted_bookings')
-    state = db.StringProperty(default='Temporary', 
-            choices=getChoices('CBSTA'))
 
     def listing_name(self):
         return '%s' % (self.bookingNumber)
@@ -162,21 +169,7 @@ class ContractedBooking(db.Model):
         self.delete()
 
 
-# payment tracking classes
-
-class CollectionPaymentTracker(WorkflowAware):
-    """ Track progress of payments for an enquiry collection
-    """
-    created = db.DateTimeProperty(auto_now_add=True)
-    creator = db.UserProperty()
-
-
-class EnquiryPaymentTracker(WorkflowAware):
-    """ Track progress of payments for a specific enquiry
-    """
-    created = db.DateTimeProperty(auto_now_add=True)
-    creator = db.UserProperty()
-
+# VCS payment tracking classes
 
 class VCSPaymentNotification(db.Model):
     """ Store VCS result data for the collection
@@ -196,7 +189,7 @@ class VCSPaymentNotification(db.Model):
     authResponseCode = db.StringProperty(verbose_name="Authorise Response Code")
 
     goodsDescription = db.StringProperty(verbose_name="Description of Goods Delivered")
-    authAmount = db.FloatProperty(verbose_name="Amount Authorised")
+    authAmount = db.IntegerProperty(verbose_name="Amount Authorised")
     budgetPeriod = db.StringProperty(verbose_name="Budget Period")
 
     cardHolderName = db.StringProperty(verbose_name="Card Holder Name")

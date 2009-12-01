@@ -101,11 +101,12 @@ class ExternalBookings(webapp.RequestHandler):
         bt = BookingsTool()
 
         # do the availability check
-        available, amount, vat = bt.checkAvailability(enquiry)
+        available, amount = bt.checkAvailability(enquiry)
         if not available:
             enquiry.doTransition('putonhold')
         enquiry.quoteInZAR = amount
-        enquiry.vatInZAR = vat
+        enquiry.vatInZAR = long(amount * 0.14)
+        enquiry.totalAmountInZAR = enquiry.quoteInZAR + enquiry.vatInZAR
         enquiry.put()
 
         # append the result as a sub element to the node element
@@ -113,9 +114,9 @@ class ExternalBookings(webapp.RequestHandler):
         avail_elem = SubElement(search_elem, 'availability')
         avail_elem.text = available and 'available' or 'not available'
         amount_elem = SubElement(search_elem, 'amount')
-        amount_elem.text = str(amount)
+        amount_elem.text = "%0.2f" % (enquiry.quoteInZAR / 100.0)
         amount_elem = SubElement(search_elem, 'vat')
-        amount_elem.text = str(vat)
+        amount_elem.text = "%0.2f" % (enquiry.vatInZAR / 100.0)
 
         # append the error element
         self._addErrorNode(node)

@@ -23,8 +23,7 @@ class BookingsTool():
             used from the public sites to do initial enquiries
         """
         #Defaults
-        quote_amount = 0.0
-        vat_amount = 0.0
+        quote_amount = 0L
 
         #search
         query = AccommodationElement.all().ancestor(enquiry)
@@ -36,7 +35,7 @@ class BookingsTool():
         if element.specialNeeds == True:
             logger.info("specialneeds is %s", element.specialNeeds)
             # SHOULD WE TRANSITION TO MANUAL???
-            return (False, 0.0, 0.0)
+            return (False, 0L)
 
         # Check if we have a package for the accommodation type in the city.
         # This indicates contracted bookings of the type are available
@@ -47,7 +46,7 @@ class BookingsTool():
         package = query.get()
         if not package:
             logger.info('No package found')
-            return (False, 0.0, 0.0)
+            return (False, 0L)
 
         logging.info('Package: %s, %s, %5.2f', \
                                 package.city, package.accommodationType, 
@@ -63,7 +62,7 @@ class BookingsTool():
                     berth = Berth.get(key)
                     berths.append(berth)
             #Simply pull from the top of the list
-            quote_amount, vat_amount = package.calculateQuote(element)
+            quote_amount = package.calculateQuote(element)
             people = element.adults + \
                      element.children 
             selected_berths = berths[:people]
@@ -74,9 +73,9 @@ class BookingsTool():
             self.createBookings(enquiry,
                               element,
                               [str(b.key()) for b in selected_berths])
-            return (True, quote_amount, vat_amount)
+            return (True, quote_amount)
 
-        return (False, 0.0, 0.0)
+        return (False, 0L)
 
 
     def findVenues(self, element):

@@ -18,37 +18,37 @@ class Package(db.Model):
 
 
     def calculateQuote(self, accommodationElement):
-        """ calculate a quote for an accommodation element and return in ZAR
+        """ calculate a quote for an accommodation element and return in ZAR cents
         """
-        result = 0.0
+        resultInCents = 0L
 
         # check for scpecial needs and move on
         if accommodationElement.specialNeeds == True:
-            return result
+            return resultInCents
 
         # calculate the quote for the accommodation element parameters
         people = accommodationElement.adults + accommodationElement.children
         nights = accommodationElement.nights
-        price = self.basePriceInZAR
-        result += people * nights * price
+        price = self.basePriceInZAR * 100     # convert to cents
+        resultInCents += people * nights * price
 
         # subract discounts
-        result -= self.calculateDiscounts(price, accommodationElement)
+        resultInCents -= self.calculateDiscounts(price, accommodationElement)
 
         # add penalties
-        result += self.calculateExtras(price, accommodationElement)
+        resultInCents += self.calculateExtras(price, accommodationElement)
 
-        # return the final result in ZAR
-        return (result, result * 0.14)
+        # return the final result IN CENTS
+        return resultInCents
 
     def calculateDiscounts(self, price, accommodation):
-        """ apply any discount rules and return the discount value
+        """ apply any discount rules and return the discount value in cents
         """
         # at this stage, no discount rules are in place
-        return 0.0
+        return 0L
 
     def calculateExtras(self, price, accommodation):
-        """ apply any extras or fee rules and return the penalty amount
+        """ apply any extras or fee rules and return the penalty amount in cents
         """
         # at this stage, no penalty rules are in place
-        return 0.0
+        return 0L
