@@ -135,6 +135,7 @@ class PaymentNotification(webapp.RequestHandler):
                         outstanding_total -= enquiry.amountPaidInZAR
                         enquiry.doTransition('payfull')
                         outstanding_total += enquiry.amountPaidInZAR
+                    # TODO: create transaction entries on the collection
                 else:
                     SubElement(node, 'payment')
                     self._addErrorNode(node, code='302',
