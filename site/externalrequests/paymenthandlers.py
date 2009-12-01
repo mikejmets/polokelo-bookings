@@ -13,7 +13,7 @@ from xml.etree.ElementTree import Element, SubElement, tostring
 from models.bookinginfo import \
         EnquiryCollection, Enquiry, \
         AccommodationElement, GuestElement, \
-        CollectionPaymentTracker, EnquiryPaymentTracker, VCSPaymentNotification
+        VCSPaymentNotification
 
 from models.clientinfo import Client
 from models.codelookup import getItemDescription
@@ -40,24 +40,28 @@ class PaymentNotification(webapp.RequestHandler):
         """
         pay_rec.creator = users.get_current_user()
         pay_rec.timeStamp = datetime.strptime(self.request.get('timestamp'), 
-                                                '%Y-%m-%d %H:%M').datetime()
+                                                '%Y-%m-%d %H:%M')
 
         pay_rec.terminalId = self.request.get('p1')
         pay_rec.txRefNum =  self.request.get('p2')
         pay_rec.txType =  self.request.get('TransactionType')
-        pay_rec.duplicateTransaction =  self.request.get('p4').tolower() == 'duplicate'
+        pay_rec.duplicateTransaction =  self.request.get('p4') == u'DUPLICATE'
+        pay_rec.authResponseCode =  self.request.get('p12')
         auth_str = self.request.get('p3')
-        if pay_rec.txType == 'Authorisation':
-            if auth_str.rstrip()[6:] == 'APPROVED':
+        if pay_rec.txType == u'Authorisation':
+            if pay_rec.authResponseCode == u'00' or \
+                    pay_rec.authResponseCode == u'0' or \
+                    auth_str.rstrip()[6:] == u'APPROVED':
                 pay_rec.authorised = True
                 pay_rec.authNumberOrReason = auth_str[:6]
             else:
                 pay_rec.authorised = False
                 pay_rec.authNumberOrReason = auth_str.strip()
-        pay_rec.authResponseCode =  self.request.get('p12')
 
         pay_rec.goodsDescription =  self.request.get('p8')
-        pay_rec.authAmount =  float(self.request.get('p6'))
+        amount = float(self.request.get('p6'))
+        iAmount = long(amount * 100.0)       # convert into cents
+        pay_rec.authAmount = iAmount
         pay_rec.budgetPeriod =  self.request.get('p10')
 
         pay_rec.cardHolderName =  self.request.get('p5')
@@ -80,22 +84,19 @@ class PaymentNotification(webapp.RequestHandler):
         pay_rec.depositPercentage =  int(self.request.get('m_4'))
 
 
-
     def post(self):
         """ Primary interface for deposit payments
             coming from the public sites
         """
         # create a xml return node
-
         node = Element('paymentnotification')
-        # creat the VCS payment record for the relevant
-        # payment collection
 
         # get the enquiry collection associated with the payment
-        enquiry_colection_number = self.request.get('m_3')
+        enquiry_colection_number = self.request.get('m_1')
         enquiry_collection = EnquiryCollection.get_by_key_name( \
                                                         enquiry_colection_number)
         if not enquiry_collection:
+            SubElement(node, 'payment')
             self._addErrorNode(node, code="301", 
                     message="Cannot find the enquiry collection: %s." % \
                                                     enquiry_colection_number)
@@ -103,29 +104,72 @@ class PaymentNotification(webapp.RequestHandler):
             self.response.out.write(tostring(node))
             return
 
-        # create or get the collection payment tracker 
-        #    for the enquiry collection
-        collection_tracker = CollectionPaymentTracker.get_or_insert( \
-                                            key_name=enquiry_colection_number,
-                                            parent=enquiry_collection)
-        collection_tracker.creator = users.get_current_user()
-        collection_tracker.put()
-        collection_tracker.enterWorkflow(COLL_TRACK_PAY_WORKFLOW)
-        
-        # create the VCS payment record for the payment collection tracker
-        pay_rec = VCSPaymentNotification(key_name=enquiry_colection_number,
-                                         parent=collection_tracker)
+        # create and add the VCS payment record for the enquiry collection
+        pay_rec = VCSPaymentNotification(parent=enquiry_collection)
         self._populateNotification(pay_rec)
         pay_rec.put()
 
-        # TODO: 
-        # 1. Create enquiry payment trackers for each enquiry and set their 
-        #    workflow appropriately. 
-        # 2. Set the workflow of the enquiry instance appropriately.
-        # 3. Set the workflow of the collection tracker to the collective
-        #    state of the enquiry payment trackers
+        # keep track of amounts paid in cents
+        deposit_total = 0L
+        outstanding_total = 0L
+
+        # Update and set the workflow of the enquiry instance appropriately.
+        for enquiry_number in pay_rec.enquiryList:
+            enquiry = Enquiry.get_by_key_name(enquiry_number, 
+                                              parent=enquiry_collection)
+            if enquiry:
+                logging.info('Found enquiry %s', enquiry_number)
+                if not pay_rec.duplicateTransaction and \
+                        pay_rec.txType == u'Authorisation' and \
+                        pay_rec.authorised:
+
+                    if pay_rec.paymentType == u'DEP' and \
+                                    enquiry.getStateName() == 'detailsreceieved':
+                        logging.info('Transition paydeposit for %s', enquiry_number)
+                        enquiry.doTransition('paydeposit', 
+                                    deposit_percentage=pay_rec.depositPercentage/100.0)
+                        deposit_total += enquiry.amountPaidInZAR
+                    elif pay_rec.paymentType == u'INV' and \
+                                    enquiry.getStateName() == 'depositpaid':
+                        logging.info('Transition payfull for %s', enquiry_number)
+                        outstanding_total -= enquiry.amountPaidInZAR
+                        enquiry.doTransition('payfull')
+                        outstanding_total += enquiry.amountPaidInZAR
+                else:
+                    SubElement(node, 'payment')
+                    self._addErrorNode(node, code='302',
+                            message='Transaction not authorised, or duplicate')
+                    self.response.headers['Content-Type'] = 'text/plain'
+                    self.response.out.write(tostring(node))
+                    return
+            else:
+                SubElement(node, 'payment')
+                self._addErrorNode(node, code='303',
+                    message='Enquiry %s, referenced on payment %s, does not exist'\
+                            % (enquiry_number, enquiry_colection_number))
+                self.response.headers['Content-Type'] = 'text/plain'
+                self.response.out.write(tostring(node))
+                return
+
+        # check that the amounts add up
+        if pay_rec.authAmount != (deposit_total + outstanding_total):
+            logging.error("%f, %f", pay_rec.authAmount, deposit_total + outstanding_total )
+            SubElement(node, 'payment')
+            self._addErrorNode(node, code='304',
+                message='Payment %s, received amount does not add up to outstanding amounts on enquiries' % (enquiry_colection_number))
+            self.response.headers['Content-Type'] = 'text/plain'
+            self.response.out.write(tostring(node))
+            return
+        else:
+            # TODO: store discrepancy somewhere
+            pass
+
  
         # return the result
+        result_node = SubElement(node, 'payment')
+        batch_node = SubElement(result_node, 'enquirybatchnumber')
+        batch_node.text = enquiry_colection_number
+        self._addErrorNode(node)
         self.response.headers['Content-Type'] = 'text/plain'
         self.response.out.write(tostring(node))
 
