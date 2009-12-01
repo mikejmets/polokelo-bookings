@@ -19,6 +19,7 @@ def get_authentication_urls(dest_url):
     else:
         return users.create_login_url(dest_url), 'Sign In'
 
+
 class HomePage(webapp.RequestHandler):
     def get(self):
         auth_url, auth_url_text = get_authentication_urls(self.request.uri)
@@ -51,6 +52,7 @@ class CommonError(webapp.RequestHandler):
         self.redirect(came_from)
 
 application = webapp.WSGIApplication([
+                            ('/', HomePage),
                             ('/index', HomePage),
                             ('/home/showerror', CommonError),
                             ], debug=True)
