@@ -5,7 +5,7 @@ url = 'http://localhost:8080/externalbookings'
 # url = 'http://bookings-dev.appspot.com/externalbookings'
 
 
-# get a new collection number
+# # get a new collection number
 # xml = """
 # <testgenerator>
 #     <action>generate collection number</action>
@@ -18,7 +18,8 @@ url = 'http://localhost:8080/externalbookings'
 # 
 # xmlroot = XML(result)
 # collection_number = xmlroot.findtext('collectionnumber')
-collection_number = 'YHT-4W7-9ZF'
+
+collection_number = 'YHT-4W7-9ZJ'
 
 
 # get a new enquiry number
@@ -44,7 +45,7 @@ xml = """
     <guestagentcode>Trafalgar-234234234</guestagentcode>
     <action>check availability</action>
     <enquirynumber>%s</enquirynumber>
-    <city>PCS</city>
+    <city>CPT</city>
     <accommodation>
         <type>GH</type>
         <rooms>
@@ -54,8 +55,8 @@ xml = """
             <family>0</family>
         </rooms>
     </accommodation>
-    <startdate>2010-06-25</startdate>
-    <duration>4</duration>
+    <startdate>2010-07-10</startdate>
+    <duration>3</duration>
     <adults>2</adults>
     <children>2</children>
     <disability>
