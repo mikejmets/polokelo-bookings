@@ -7,11 +7,13 @@ from google.appengine.ext.db import djangoforms
 from google.appengine.ext.webapp.util import run_wsgi_app
 from google.appengine.api import datastore_errors
 from google.appengine.api import users
+# from google.appengine.ext.db import run_in_transaction
 
 from xml.etree.ElementTree import XML, SubElement, tostring
 
 from models.bookinginfo import EnquiryCollection, Enquiry, \
-            AccommodationElement, GuestElement, ENQUIRY_WORKFLOW
+                                AccommodationElement, GuestElement
+from models.enquiryroot import EnquiryRoot
 from models.hostinfo import EmailAddress, PhoneNumber
 from models.clientinfo import Client
 from models.codelookup import getItemDescription
@@ -23,6 +25,7 @@ class ExternalBookings(webapp.RequestHandler):
     """ Handler class for all enquiry/booking requests from
         the pulic sites.
     """
+
     def _addErrorNode(self, node, code='0', message=None):
         error_element = SubElement(node, 'systemerror')
         error_code = SubElement(error_element, 'errorcode')
@@ -39,6 +42,7 @@ class ExternalBookings(webapp.RequestHandler):
         batch_number = node.findtext('enquirybatchnumber')
         enquiry_collection = EnquiryCollection.get_or_insert( \
                                         key_name=batch_number,
+                                        parent=EnquiryRoot.getEnquiryRoot(),
                                         referenceNumber=batch_number)
         enquiry_collection.creator = users.get_current_user()
         enquiry_collection.put()
@@ -68,7 +72,7 @@ class ExternalBookings(webapp.RequestHandler):
         enquiry.agentCode = node.findtext('guestagentcode')
         enquiry.xmlSource = tostring(node)
         enquiry.put()
-        enquiry.enterWorkflow(ENQUIRY_WORKFLOW)
+        enquiry.enterWorkflow(EnquiryRoot.getEnquiryWorkflow())
 
         accommodation = AccommodationElement(
                             parent=enquiry,
@@ -129,7 +133,9 @@ class ExternalBookings(webapp.RequestHandler):
         """
         # retrieve the enquiry batch number and collection instance
         collection_number = node.findtext('enquirybatchnumber') 
-        enquiry_collection = EnquiryCollection.get_by_key_name(collection_number)
+        enquiry_collection = EnquiryCollection.get_by_key_name( \
+                                        collection_number, 
+                                        parent=EnquiryRoot.getEnquiryRoot())
 
         # locate the primary guest node (credit card holder)
         guest_node = node.find('creditcardholder')

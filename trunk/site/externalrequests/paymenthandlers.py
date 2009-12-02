@@ -1,4 +1,6 @@
 import os
+import sys
+import logging
 from datetime import datetime
 import logging
 from google.appengine.ext import webapp
@@ -7,13 +9,16 @@ from google.appengine.ext.db import djangoforms
 from google.appengine.ext.webapp.util import run_wsgi_app
 from google.appengine.api import datastore_errors
 from google.appengine.api import users
+from google.appengine.ext.db import run_in_transaction
 
 from xml.etree.ElementTree import Element, SubElement, tostring
+from exceptions import Exception
 
+from models.enquiryroot import EnquiryRoot
 from models.bookinginfo import \
-        EnquiryCollection, Enquiry, \
-        AccommodationElement, GuestElement, \
-        VCSPaymentNotification
+                EnquiryCollection, Enquiry, \
+                AccommodationElement, GuestElement, \
+                VCSPaymentNotification
 
 from models.clientinfo import Client
 from models.codelookup import getItemDescription
@@ -21,10 +26,23 @@ from models.codelookup import getItemDescription
 from controllers import generator
 
 
+class EnquiryDoesNotExistException(Exception):
+    """ Enquiry instance for a collection is not found
+    """
+    pass
+
+class AppliedAmountDiscrepancyException(Exception):
+    """ Raise the exception if the amounts applied to each
+        enquiry does not add up to the VCS payment record total
+    """
+    pass
+
+
 class PaymentNotification(webapp.RequestHandler):
     """ Handler class for all enquiry/booking requests from
         the pulic sites.
     """
+
     def _addErrorNode(self, node, code='0', message=None):
         error_element = SubElement(node, 'systemerror')
         error_code = SubElement(error_element, 'errorcode')
@@ -83,6 +101,58 @@ class PaymentNotification(webapp.RequestHandler):
         pay_rec.depositPercentage =  int(self.request.get('m_4'))
 
 
+
+    def _applyfunds(self, pay_rec, enquiry_collection):
+        """ apply the funds from the payment record to the individual
+            enquiry objects. Create a transaction record on the collection
+        """
+        # start with the total amount available on the payment
+        # and subtract each applied amount until we have handled all the
+        # enquiries, and check for discrepancies at the end, and raise an
+        # exception if applicable
+        available_total = pay_rec.authAmount
+
+        # Update and set the workflow of the enquiry instance appropriately.
+        for enquiry_number in pay_rec.enquiryList:
+            enquiry = Enquiry.get_by_key_name(enquiry_number, 
+                                              parent=enquiry_collection)
+            if enquiry:
+                logging.info('Found enquiry %s', enquiry_number)
+
+                if pay_rec.paymentType == u'DEP' and \
+                                enquiry.getStateName() == 'detailsreceieved':
+                    logging.info('Transition paydeposit for %s', enquiry_number)
+                    enquiry.doTransition('paydeposit')
+                    applied_amount = long(enquiry.totalAmountInZAR * \
+                                            (pay_rec.depositPercentage / 100.0))
+
+                elif pay_rec.paymentType == u'INV' and \
+                                enquiry.getStateName() == 'depositpaid':
+                    logging.info('Transition payfull for %s', enquiry_number)
+                    enquiry.doTransition('payfull')
+                    applied_amount = enquiry.totalAmountInZAR - \
+                                            enquiry.amountPaidInZAR
+
+                available_total -= applied_amount
+                # check that applying the amount won't raise a discrepancy
+                if available_total < 0:
+                    logging.info('available_total: %s', available_total)
+                    raise AppliedAmountDiscrepancyException, \
+                                    enquiry_collection.referenceNumber
+                enquiry.amountPaidInZAR += applied_amount
+                enquiry.put()
+
+                # TODO: create a transaction entry on the collection instance
+            else:
+                # we have a rogue enquiry on the payment
+                raise EnquiryDoesNotExistException, enquiry_number
+
+        # check if we have any money left over, indicating too big a payment was made
+        if available_total > 0:
+            logging.info('available_total: %s', available_total)
+            raise AppliedAmountDiscrepancyException, enquiry_collection.referenceNumber
+
+
     def post(self):
         """ Primary interface for deposit payments
             coming from the public sites
@@ -93,7 +163,8 @@ class PaymentNotification(webapp.RequestHandler):
         # get the enquiry collection associated with the payment
         enquiry_colection_number = self.request.get('m_1')
         enquiry_collection = EnquiryCollection.get_by_key_name( \
-                                                        enquiry_colection_number)
+                                                enquiry_colection_number,
+                                                parent=EnquiryRoot.getEnquiryRoot())
         if not enquiry_collection:
             SubElement(node, 'payment')
             self._addErrorNode(node, code="301", 
@@ -108,41 +179,14 @@ class PaymentNotification(webapp.RequestHandler):
         self._populateNotification(pay_rec)
         pay_rec.put()
 
-        # keep track of amounts paid in cents
-        deposit_total = 0L
-        outstanding_total = 0L
+        # check that the payment transaction is state authorised and not a duplicate
+        if not pay_rec.duplicateTransaction and \
+                pay_rec.txType == u'Authorisation' and \
+                pay_rec.authorised:
+            try:
+                run_in_transaction(self._applyfunds, pay_rec, enquiry_collection) 
 
-        # Update and set the workflow of the enquiry instance appropriately.
-        for enquiry_number in pay_rec.enquiryList:
-            enquiry = Enquiry.get_by_key_name(enquiry_number, 
-                                              parent=enquiry_collection)
-            if enquiry:
-                logging.info('Found enquiry %s', enquiry_number)
-                if not pay_rec.duplicateTransaction and \
-                        pay_rec.txType == u'Authorisation' and \
-                        pay_rec.authorised:
-
-                    if pay_rec.paymentType == u'DEP' and \
-                                    enquiry.getStateName() == 'detailsreceieved':
-                        logging.info('Transition paydeposit for %s', enquiry_number)
-                        enquiry.doTransition('paydeposit', 
-                                    deposit_percentage=pay_rec.depositPercentage/100.0)
-                        deposit_total += enquiry.amountPaidInZAR
-                    elif pay_rec.paymentType == u'INV' and \
-                                    enquiry.getStateName() == 'depositpaid':
-                        logging.info('Transition payfull for %s', enquiry_number)
-                        outstanding_total -= enquiry.amountPaidInZAR
-                        enquiry.doTransition('payfull')
-                        outstanding_total += enquiry.amountPaidInZAR
-                    # TODO: create transaction entries on the collection
-                else:
-                    SubElement(node, 'payment')
-                    self._addErrorNode(node, code='302',
-                            message='Transaction not authorised, or duplicate')
-                    self.response.headers['Content-Type'] = 'text/plain'
-                    self.response.out.write(tostring(node))
-                    return
-            else:
+            except EnquiryDoesNotExistException, enquiry_number:
                 SubElement(node, 'payment')
                 self._addErrorNode(node, code='303',
                     message='Enquiry %s, referenced on payment %s, does not exist'\
@@ -151,19 +195,32 @@ class PaymentNotification(webapp.RequestHandler):
                 self.response.out.write(tostring(node))
                 return
 
-        # check that the amounts add up
-        if pay_rec.authAmount != (deposit_total + outstanding_total):
-            logging.error("%f, %f", pay_rec.authAmount, deposit_total + outstanding_total )
+            except AppliedAmountDiscrepancyException, enquiry_number:
+                SubElement(node, 'payment')
+                self._addErrorNode(node, code='304',
+                    message='Payment %s, received amount does not add up to outstanding amounts on enquiries' % (enquiry_colection_number))
+                self.response.headers['Content-Type'] = 'text/plain'
+                self.response.out.write(tostring(node))
+                # TODO: store discrepancy somewhere
+                return
+
+
+            except:
+                error = sys.exc_info()[1]
+                logging.error('Other error; %s', error)
+                SubElement(node, 'payment')
+                self._addErrorNode(node, code='3001', message=error)
+                self.response.headers['Content-Type'] = 'text/plain'
+                self.response.out.write(tostring(node))
+                return
+
+        else:
             SubElement(node, 'payment')
-            self._addErrorNode(node, code='304',
-                message='Payment %s, received amount does not add up to outstanding amounts on enquiries' % (enquiry_colection_number))
+            self._addErrorNode(node, code='302',
+                    message='Transaction not authorised, or duplicate')
             self.response.headers['Content-Type'] = 'text/plain'
             self.response.out.write(tostring(node))
             return
-        else:
-            # TODO: store discrepancy somewhere
-            pass
-
  
         # return the result
         result_node = SubElement(node, 'payment')
