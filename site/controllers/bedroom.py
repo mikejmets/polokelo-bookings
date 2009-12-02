@@ -4,11 +4,13 @@ from google.appengine.api import users
 from google.appengine.ext import webapp
 from google.appengine.ext.webapp import template
 from google.appengine.ext.db import djangoforms
+from django import newforms as forms
 from google.appengine.ext import db
 
 from controllers.home import BASE_PATH, PROJECT_PATH
 from models.hostinfo import Bedroom
 from controllers.utils import get_authentication_urls
+from models.codelookup import getChoicesTuple
 
 logger = logging.getLogger('BedroomHandler')
 
@@ -17,6 +19,9 @@ class BedroomForm(djangoforms.ModelForm):
     class Meta:
         model = Bedroom
         exclude = ['created', 'creator', 'venue']
+
+    bedroomType = forms.ChoiceField(choices=getChoicesTuple('BEDRTYP'))
+    bathroomType = forms.ChoiceField(choices=getChoicesTuple('BRTYP'))
 
 class ViewBedroom(webapp.RequestHandler):
 

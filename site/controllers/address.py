@@ -4,11 +4,13 @@ from google.appengine.api import users
 from google.appengine.ext import webapp
 from google.appengine.ext.webapp import template
 from google.appengine.ext.db import djangoforms
+from django import newforms as forms
 from google.appengine.ext import db
 
 from controllers.home import BASE_PATH, PROJECT_PATH
 from models.hostinfo import Address
 from controllers.utils import get_authentication_urls
+from models.codelookup import getChoicesTuple
 
 logger = logging.getLogger('AddressHandler')
 
@@ -25,6 +27,8 @@ class AddressForm(djangoforms.ModelForm):
         model = Address
         exclude = ['created', 'creator', 'container']
 
+    addressType = forms.ChoiceField(choices=getChoicesTuple(('ADRTYP')))
+    city = forms.ChoiceField(choices=getChoicesTuple(('CTY')))
 
 class CaptureAddress(webapp.RequestHandler):
 

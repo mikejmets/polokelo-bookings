@@ -11,14 +11,13 @@ from google.appengine.api import users
 from xml.etree.ElementTree import XML, SubElement, tostring
 
 from models.bookinginfo import EnquiryCollection, Enquiry, \
-                                AccommodationElement, GuestElement
+            AccommodationElement, GuestElement, ENQUIRY_WORKFLOW
 from models.hostinfo import EmailAddress, PhoneNumber
 from models.clientinfo import Client
 from models.codelookup import getItemDescription
 
 from controllers.bookingstool import BookingsTool
 from controllers import generator
-from workflow.__init__ import ENQUIRY_WORKFLOW
 
 class ExternalBookings(webapp.RequestHandler):
     """ Handler class for all enquiry/booking requests from

@@ -4,10 +4,12 @@ from google.appengine.api import users
 from google.appengine.ext import webapp
 from google.appengine.ext.webapp import template
 from google.appengine.ext.db import djangoforms
+from django import newforms as forms
 from google.appengine.ext import db
 
 from controllers.home import BASE_PATH, PROJECT_PATH
 from models.clientinfo import Flight
+from models.codelookup import getChoicesTuple
 from controllers.utils import get_authentication_urls
 
 logger = logging.getLogger('FlightHandler')
@@ -18,6 +20,7 @@ class FlightForm(djangoforms.ModelForm):
         model = Flight
         exclude = ['created', 'creator']
 
+    direction = forms.ChoiceField(choices=getChoicesTuple(('FLGTYP')))
 
 class CaptureFlight(webapp.RequestHandler):
 

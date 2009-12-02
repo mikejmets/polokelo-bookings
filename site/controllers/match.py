@@ -4,10 +4,12 @@ from google.appengine.api import users
 from google.appengine.ext import webapp
 from google.appengine.ext.webapp import template
 from google.appengine.ext.db import djangoforms
+from django import newforms as forms
 from google.appengine.ext import db
 
 from controllers.home import BASE_PATH, PROJECT_PATH
 from models.schedule import Match
+from models.codelookup import getChoicesTuple
 from controllers.utils import get_authentication_urls
 
 logger = logging.getLogger('MatchHandler')
@@ -33,6 +35,7 @@ class MatchForm(djangoforms.ModelForm):
         model = Match
         exclude = ['created', 'creator']
 
+    city = forms.ChoiceField(choices=getChoicesTuple(('CTY')))
 
 class CaptureMatch(webapp.RequestHandler):
 

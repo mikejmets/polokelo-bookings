@@ -19,7 +19,6 @@ from models.clientinfo import Client
 from models.codelookup import getItemDescription
 
 from controllers import generator
-# from workflow.__init__ import ENQUIRY_WORKFLOW
 
 
 class PaymentNotification(webapp.RequestHandler):

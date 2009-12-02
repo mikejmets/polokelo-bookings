@@ -19,11 +19,9 @@ from controllers.enquiry import \
 from controllers.enquirycollection import ViewEnquiryCollection, \
     CaptureEnquiryCollection, EditEnquiryCollection, DeleteEnquiryCollection
 from models.bookinginfo import EnquiryCollection, ContractedBooking
-from models.codelookup import getChoices
 
 from controllers import generator
 from controllers.utils import get_authentication_urls
-from workflow.__init__ import ENQUIRY_WORKFLOW
 
 logger = logging.getLogger('BookingHandlers')
 
