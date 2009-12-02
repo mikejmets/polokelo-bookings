@@ -53,8 +53,6 @@ import logging
 from datetime import datetime, timedelta
 from google.appengine.ext import db
 
-logger = logging.getLogger('Worlflow')
-
 class WorkflowError(Exception):
     pass
 
@@ -74,7 +72,7 @@ class Workflow(db.Model):
     def addState(self, name, title=None):
         """Adds a new state.
         """
-        state = State(parent=self, key_name=name)
+        state = State(key_name=name, parent=self, name=name)
         if title:
             state.title = title
         state.put()
@@ -83,16 +81,20 @@ class Workflow(db.Model):
     def findState(self, name):
         """Find existing state.
         """
-        states = State.get_by_key_name([name], parent=self)
-        if len(states) == 1:
-            return states[0]
+        # return State.get_by_key_name(name, parent=self)
+        logging.info('Before executing db.Query(State).ancestor(self)')
+        qry = db.Query(State).ancestor(self).filter('name =', name)
+        logging.info('After executing db.Query(State).ancestor(self)')
+        return qry.get()
 
     def findTransition(self, name):
         """Find existing transition.
         """
-        transitions = Transition.get_by_key_name([name], parent=self)
-        if len(transitions) == 1:
-            return transitions[0]
+        # return Transition.get_by_key_name(name, parent=self)
+        logging.info('Before executing db.Query(Transition).ancestor(self)')
+        qry = db.Query(Transition).ancestor(self).filter('name =', name)
+        logging.info('After executing db.Query(Transition).ancestor(self)')
+        return qry.get()
 
     def setInitialState(self, name):
         """Sets the default initial state.
@@ -115,8 +117,8 @@ class Workflow(db.Model):
         state_to = self.findState(state_to)
         if not state_to:
             raise WorkflowError, "unregistered state: '%s'" % state_to
-        transition = Transition(parent=self, 
-            key_name=name, stateFrom=state_from, stateTo=state_to)
+        transition = Transition(key_name=name, parent=self, name=name,
+                                stateFrom=state_from, stateTo=state_to)
         if title:
             transition.title = title
         transition.put()
@@ -124,15 +126,15 @@ class Workflow(db.Model):
         #state_from.put()
 
 
-
 class State(db.Expando):
     """This class is used to describe a state.
 
-    An state has transitions to other states.
+        A state has transitions to other states.
     """
 
     created = db.DateTimeProperty(auto_now_add=True)
     creator = db.UserProperty()
+    name=db.StringProperty()
 
     def addTransition(self, name, transition):
         """Adds a new transition.
@@ -148,6 +150,7 @@ class Transition(db.Expando):
 
     created = db.DateTimeProperty(auto_now_add=True)
     creator = db.UserProperty()
+    name = db.StringProperty()
     stateFrom = db.ReferenceProperty(State, collection_name='transitions_from')
     stateTo = db.ReferenceProperty(State, collection_name='transitions_to')
 
@@ -205,7 +208,10 @@ class WorkflowAware(db.Model):
         """
         # Set the associated workflow
         if workflow is not None:
-            self.workflow = Workflow.get_by_key_name(workflow)
+            self.workflow = workflow
+
+        if self.workflow is None:
+            raise WorkflowError, "No workflow set on WorkflowAware instance"
 
         # Set the initial state
         if initstate is None:
@@ -226,6 +232,7 @@ class WorkflowAware(db.Model):
 
         #Set expiry date
         exp_date = ExpirationSetting.getExpirationDate(
+            self.workflow,
             self.kind(),
             self.workflowState)
         self.expiryDate = exp_date
@@ -240,31 +247,40 @@ class WorkflowAware(db.Model):
         runs any defined state/transition handlers. Extra
         arguments are passed down to all handlers called.
         """
+        logging.info('Getting self.workflow')
         # Get the workflow
         workflow = self.workflow
 
+        logging.info('Getting the transition %s', transname)
         # Get the transition
         transition = workflow.findTransition(transname)
         if not transition:
             error = "transition '%s' not in '%s'"
             raise WorkflowError, error % (transname, self.workflow.key().name())
 
+        logging.info('Getting the current state')
         # Get the current state
         state = workflow.findState(self.workflowState)
-        if transname not in [t.key().name() for t in state.transitions_from]:
-            error = "transition '%s' is invalid from state '%s'"
-            raise WorkflowError, error % (transname, self.workflowState)
+        # logging.info('Before Iterating to check for valid transition state')
+        # if transname not in [t.name for t in state.transitions_from]:
+        #     error = "transition '%s' is invalid from state '%s'"
+        #     raise WorkflowError, error % (transname, self.workflowState)
+        # logging.info('After Iterating to check for valid transition state')
 
+        logging.info('Getting the new state')
         new_state = transition.stateTo
 
+        logging.info('Calling onleave handler')
         # call app-specific leave- state  handler if any
         name = 'onleave_%s' % self.workflowState
         if hasattr(self, name):
             getattr(self, name)(*args, **kw)
 
+        logging.info('Setting the new state')
         # Set the new state
         self.workflowState = new_state.key().name()
 
+        logging.info('Calling ontransition handler')
         # call app-specific transition handler if any
         name = 'ontransition_%s' % transname
         if hasattr(self, name):
@@ -276,18 +292,22 @@ class WorkflowAware(db.Model):
                 error = sys.exc_info()[1]
                 raise WorkflowError, msg % (error)
 
+        logging.info('Calling onenter handler')
         # call app-specific enter-state handler if any
         name = 'onenter_%s' % new_state.key().name()
         if hasattr(self, name):
             getattr(self, name)(*args, **kw)
 
+        logging.info('setting new expiry date')
         #Set expiry date
         exp_date = ExpirationSetting.getExpirationDate(
+            self.workflow,
             self.kind(),
             self.workflowState,
             transname)
         self.expiryDate = exp_date
 
+        logging.info('self.put()')
         self.put()
 
 
@@ -317,16 +337,20 @@ class ExpirationSetting(db.Model):
     hours = db.IntegerProperty(default=1) 
 
     @classmethod
-    def getExpirationDate(cls, entityKind, entityState, entityTransition=None):
-        setting = ExpirationSetting.all()
+    def getExpirationDate(cls, workflow, entityKind, entityState, entityTransition=None):
+        setting = db.Query(ExpirationSetting).ancestor(workflow)
         setting.filter('entityKind =', entityKind)
         setting.filter('entityState =', entityState)
         if entityTransition:
             setting.filter('entityTransition =', entityTransition)
-        records = setting.fetch(1)
-        if records and records[0].hours >= 0:
-            logger.info('Expire in %s hours time', records[0].hours)
-            return datetime.now() + timedelta(hours=records[0].hours)
+        # records = setting.fetch(1)
+        # if records and records[0].hours >= 0:
+        #     logging.info('Expire in %s hours time', records[0].hours)
+        #     return datetime.now() + timedelta(hours=records[0].hours)
+        record = setting.get()
+        if record and record.hours >= 0:
+            logging.info('Expire in %s hours time', record.hours)
+            return datetime.now() + timedelta(hours=record.hours)
 
 ##    # Implements a stack that could be used to keep a record of the
 ##    # object way through the workflow.

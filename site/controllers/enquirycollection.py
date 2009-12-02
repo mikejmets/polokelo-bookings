@@ -8,6 +8,7 @@ from google.appengine.ext.db import djangoforms
 from google.appengine.ext import db
 
 from controllers.home import BASE_PATH, PROJECT_PATH
+from models.enquiryroot import EnquiryRoot
 from models.bookinginfo import EnquiryCollection, Enquiry
 from controllers.utils import get_authentication_urls
 from controllers import generator
@@ -54,8 +55,10 @@ class CaptureEnquiryCollection(webapp.RequestHandler):
 
     def get(self):
         auth_url, auth_url_text = get_authentication_urls(self.request.uri)
-        collection = EnquiryCollection(
-            referenceNumber=generator.generateEnquiryCollectionNumber())
+        er = EnquiryRoot.getEnquiryRoot()
+        coll_num=generator.generateEnquiryCollectionNumber()
+        collection = EnquiryCollection(key_name=coll_num, \
+                                            parent=er, referenceNumber=coll_num)
         collection.put()
         self.redirect('/bookings/collection/viewenquirycollection?enquirycollectionkey=%s' % collection.key())
 

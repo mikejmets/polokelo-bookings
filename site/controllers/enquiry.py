@@ -11,8 +11,9 @@ from google.appengine.ext import db
 from controllers.bookingstool import BookingsTool
 from controllers.home import BASE_PATH, PROJECT_PATH
 from models.hostinfo import Berth
+from models.enquiryroot import EnquiryRoot
 from models.bookinginfo import Enquiry, EnquiryCollection, \
-    AccommodationElement, ENQUIRY_WORKFLOW
+                                    AccommodationElement
 from controllers.utils import get_authentication_urls
 from controllers import generator
 from models.codelookup import getChoices
@@ -116,7 +117,7 @@ class CaptureEnquiry(webapp.RequestHandler):
             parent=collection,
             referenceNumber=generator.generateEnquiryNumber())
         enquiry.put()
-        enquiry.enterWorkflow(ENQUIRY_WORKFLOW)
+        enquiry.enterWorkflow(EnquiryRoot.getEnquiryWorkflow())
         accom_element = AccommodationElement(parent=enquiry)
         accom_element.put()
         self.redirect('/bookings/enquiry/viewenquiry?enquirykey=%s' % enquiry.key())
