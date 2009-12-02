@@ -3,14 +3,12 @@ import logging
 from google.appengine.ext import db
 
 from models.clientinfo import Client
-from workflow.workflow import \
-    WorkflowAware, Workflow, State, Transition, ExpirationSetting
+from workflow import workflow
 
 from controllers.emailtool import EmailTool
 
 logger = logging.getLogger('BookingInfo')
 
-ENQUIRY_WORKFLOW = 'enquiry_workflow'
 
 class IdSequence(db.Model):
     """ keep track of sequences for number generators
@@ -31,7 +29,7 @@ class EnquiryCollection(db.Model):
             e.rdelete()
         self.delete()
 
-class Enquiry(WorkflowAware):
+class Enquiry(workflow.WorkflowAware):
     created = db.DateTimeProperty(auto_now_add=True)
     creator = db.UserProperty()
     referenceNumber = db.StringProperty(verbose_name='Reference Number')
@@ -69,13 +67,6 @@ class Enquiry(WorkflowAware):
     def ontransition_expiredetails(self, *args, **kw):
         self.expire()
 
-    def ontransition_paydeposit(self, *args, **kw):
-        self.amountPaidInZAR = long(self.totalAmountInZAR * \
-                                            kw['deposit_percentage'])
-
-    def ontransition_payfull(self, *args, **kw):
-        self.amountPaidInZAR = self.totalAmountInZAR
-
     def ontransition_expiredeposit(self, *args, **kw):
         self.expire()
 
@@ -105,98 +96,6 @@ class Enquiry(WorkflowAware):
         for b in self.getContractedBookings():
             b.rdelete()
         self.delete()
-
-    @classmethod
-    def createWorkflow(cls):
-        wfl = Workflow(key_name=ENQUIRY_WORKFLOW)
-        wfl.put()
-        wfl.addState('temporary', title='Temporary')
-        wfl.addState('onhold', title='On Hold')
-        wfl.addState('allocated', title='Allocated')
-        wfl.addState('requiresintervention', title='Requires Intervention')
-        wfl.addState('detailsreceieved', title='Details Received')
-        wfl.addState('depositpaid', title='Deposit Paid')
-        wfl.addState('paidinfull', title='Paid In Full')
-        wfl.addState('expired', title='Expired')
-        wfl.addState('cancelled', title='Cancelled')
-
-        wfl.addTransition('expiretemporary', 'temporary', 'expired', 
-            title='Expire')
-        wfl.addTransition('allocate', 'temporary', 'allocated', title='Allocate')
-        wfl.addTransition('expiremanaully', 'temporary', 'expired', title='Expire')
-        wfl.addTransition('putonhold', 'temporary', 'onhold', title='Put on Hold')
-
-        wfl.addTransition('expireonhold', 'onhold', 'expired', title='Expire')
-        wfl.addTransition('assigntouser', 'onhold', 'requiresintervention', 
-            title='Assign to user')
-        wfl.addTransition('allocatefromhold', 'onhold', 'allocated', 
-            title='Allocate')
-
-        wfl.addTransition('allocatemanually', 'requiresintervention', 'allocated', 
-            title='Allocate')
-        wfl.addTransition('expireallocated', 'allocated', 'expired', 
-            title='Expire')
-        wfl.addTransition('receivedetails', 'allocated', 'detailsreceieved', 
-            title='Receive Details')
-
-        wfl.addTransition('expiredetails', 'detailsreceieved', 'expired', 
-            title='Expire')
-        wfl.addTransition('paydeposit', 'detailsreceieved', 'depositpaid', 
-            title='Pay deposit')
-
-        wfl.addTransition(
-            'expiredeposit', 'depositpaid', 'expired', title='Expire')
-        wfl.addTransition(
-            'canceldeposit', 'depositpaid', 'cancelled', title='Cancel')
-        wfl.addTransition(
-            'payfull', 'depositpaid', 'paidinfull', title='Pay in full')
-
-        wfl.addTransition('cancelfull', 'paidinfull', 'cancelled', title='Cancel')
-        
-        wfl.setInitialState('temporary')
-        wfl.put()
-
-        bcs = ExpirationSetting(
-            entityKind = 'Enquiry', 
-            entityState = 'temporary', 
-            hours = 1)
-        bcs.put()
-
-        bcs = ExpirationSetting(
-            entityKind = 'Enquiry', 
-            entityState = 'onhold', 
-            hours = 2)
-        bcs.put()
-
-        bcs = ExpirationSetting(
-            entityKind = 'Enquiry', 
-            entityTransition = 'allocate', 
-            entityState = 'allocated', 
-            hours = 6)
-        bcs.put()
-
-        bcs = ExpirationSetting(
-            entityKind = 'Enquiry', 
-            entityTransition = 'receivedetails', 
-            entityState = 'detailsreceieved', 
-            hours = 24)
-        bcs.put()
-
-        bcs = ExpirationSetting(
-            entityKind = 'Enquiry', 
-            entityTransition = 'paydeposit', 
-            entityState = 'depositpaid', 
-            hours = 72)
-        bcs.put()
-
-        bcs = ExpirationSetting(
-            entityKind = 'Enquiry', 
-            entityTransition = 'payfull', 
-            entityState = 'paidinfull', 
-            hours = -1)
-        bcs.put()
-
-        return wfl
 
 class AccommodationElement(db.Model):
     created = db.DateTimeProperty(auto_now_add=True)
