@@ -29,7 +29,7 @@ xml = """
     </creditcardholder>
     <enquiries>
         <enquiry>
-            <enquirynumber>YK8-DQN-2P0</enquirynumber>
+            <enquirynumber>YK8-DQN-2P8</enquirynumber>
             <city>CPT</city>
             <accommodation>
                 <type>GH</type>
@@ -40,7 +40,7 @@ xml = """
                     <family>0</family>
                 </rooms>
             </accommodation>
-            <startdate>2010-07-10</startdate>
+            <startdate>2010-06-10</startdate>
             <duration>3</duration>
             <adults>2</adults>
             <children>2</children>
@@ -48,11 +48,34 @@ xml = """
                 <wheelchairaccess>no</wheelchairaccess>
                 <otherspecialneeds>no</otherspecialneeds>
             </disability>
-            <quote>20760.00</quote>
-            <vat>2906.40</vat>
+            <quote>34600.00</quote>
+            <vat>4844.00</vat>
         </enquiry>
         <enquiry>
-            <enquirynumber>YK8-DQN-2P8</enquirynumber>
+            <enquirynumber>YK8-DQN-2PM</enquirynumber>
+            <city>DUR</city>
+            <accommodation>
+                <type>GH</type>
+                <rooms>
+                    <single>2</single>
+                    <twin>0</twin>
+                    <double>1</double>
+                    <family>0</family>
+                </rooms>
+            </accommodation>
+            <startdate>2010-06-17</startdate>
+            <duration>4</duration>
+            <adults>2</adults>
+            <children>2</children>
+            <disability>
+                <wheelchairaccess>no</wheelchairaccess>
+                <otherspecialneeds>no</otherspecialneeds>
+            </disability>
+            <quote>0.00</quote>
+            <vat>0.00</vat>
+        </enquiry>
+        <enquiry>
+            <enquirynumber>YK8-DQN-2PN</enquirynumber>
             <city>CPT</city>
             <accommodation>
                 <type>GH</type>
@@ -71,31 +94,8 @@ xml = """
                 <wheelchairaccess>no</wheelchairaccess>
                 <otherspecialneeds>no</otherspecialneeds>
             </disability>
-            <quote>27680.00</quote>
-            <vat>3875.20</vat>
-        </enquiry>
-        <enquiry>
-            <enquirynumber>YK8-DQN-2PN</enquirynumber>
-            <city>PCS</city>
-            <accommodation>
-                <type>GH</type>
-                <rooms>
-                    <single>2</single>
-                    <twin>0</twin>
-                    <double>1</double>
-                    <family>0</family>
-                </rooms>
-            </accommodation>
-            <startdate>2010-07-02</startdate>
-            <duration>4</duration>
-            <adults>2</adults>
-            <children>2</children>
-            <disability>
-                <wheelchairaccess>no</wheelchairaccess>
-                <otherspecialneeds>no</otherspecialneeds>
-            </disability>
-            <quote>0.0</quote>
-            <vat>0.0</vat>
+            <quote>20760.00</quote>
+            <vat>2906.40</vat>
         </enquiry>
     </enquiries>
 </enquirylist>
