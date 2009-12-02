@@ -9,10 +9,21 @@
 
 <table class="listing">
   <tr>
-    <td>Enquiry Number: <strong>{{ enquiry.referenceNumber }}</strong> </td>
-    <td>Enquiry Status: <strong>{{ enquiry.getState.title }}</strong> </td>
-    <td>Enquiry Expiry Date: <strong>{{ enquiry.expiryDate }}</strong> </td>
+    <td>Number: <strong>{{ enquiry.referenceNumber }}</strong> </td>
+    <td>Status: <strong>{{ enquiry.getState.title }}</strong> </td>
+    <td>Expiry Date: <strong>{{ enquiry.expiryDate }}</strong> </td>
     <td>Collection: <a href="/bookings/collection/viewenquirycollection?enquirycollectionkey={{ enquiry.parent.key}}"> <strong>{{ enquiry.parent.referenceNumber }}</strong> </a></td>
+    <td colspan="2">Guest Email: <strong>{{ enquiry.guestEmail }}</strong> </td>
+  </tr>
+  <tr>
+    <td>Agent Code: <strong>{{ enquiry.agentCode }}</strong> </td>
+    <td>Quote: <strong>{{ enquiry.quoteInZAR }}</strong> </td>
+    <td>VAT: <strong>{{ enquiry.vatInZAR }}</strong> </td>
+    <td>Total: <strong>{{ enquiry.totalAmountInZAR }}</strong> </td>
+    <td>Paid: <strong>{{ enquiry.amountPaidInZAR }}</strong> </td>
+    {% ifnotequal enquiry.workflowState 'expired' %}
+    <td><a href="/bookings/enquiry/editenquiry?enquirykey={{ enquiry.key }}"> <img src="/images/edit.png"/></a></td>
+    {% endifnotequal %}
   </tr>
 </table>
 
