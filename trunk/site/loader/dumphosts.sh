@@ -37,8 +37,8 @@ bulkloader.py --dump --app_id=bookings-dev --email=$EMAIL --kind=Berth --url=$HO
 echo "-------------- Dump slots"
 rm -rf loader/data/slots
 bulkloader.py --dump --app_id=bookings-dev --email=$EMAIL --kind=Slot --url=$HOST/unload --filename=loader/data/slots .
-echo "-------------- Dump photographs"
-rm -rf loader/data/photographs
-bulkloader.py --dump --app_id=bookings-dev --email=$EMAIL --kind=Photograph --url=$HOST/unload --filename=loader/data/photographs .
+echo "-------------- Dump photos"
+rm -rf loader/data/photos
+bulkloader.py --dump --app_id=bookings-dev --email=$EMAIL --kind=Photograph --url=$HOST/unload --filename=loader/data/photos .
 rm -rf bulkloader-*
 
