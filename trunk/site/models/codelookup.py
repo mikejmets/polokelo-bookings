@@ -59,7 +59,7 @@ class CodeLookup(db.Model):
 def getChoices(container):
     """ retrieve values to go into choices attributes of properties
     """
-    result = memcache.get(container)
+    result = None #memcache.get(container)
     if result is None:
         items = CodeLookup.all()
         items.filter('container =', container)
@@ -67,6 +67,20 @@ def getChoices(container):
         items.order('sort_order')
         items.order('description')
         result = [item.description for item in items] 
+        memcache.add(container, result)
+    return result
+
+def getChoicesTuple(container):
+    """ retrieve values to go into choices attributes of properties
+    """
+    result = None #memcache.get(container)
+    if result is None:
+        items = CodeLookup.all()
+        items.filter('container =', container)
+        items.filter('state =', 'active')
+        items.order('sort_order')
+        items.order('description')
+        result = [(item.description, item.description) for item in items] 
         memcache.add(container, result)
     return result
 

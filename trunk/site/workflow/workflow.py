@@ -205,7 +205,7 @@ class WorkflowAware(db.Model):
         """
         # Set the associated workflow
         if workflow is not None:
-            self.workflow = workflow
+            self.workflow = Workflow.get_by_key_name(workflow)
 
         # Set the initial state
         if initstate is None:

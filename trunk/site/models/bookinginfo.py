@@ -3,12 +3,14 @@ import logging
 from google.appengine.ext import db
 
 from models.clientinfo import Client
-from models.codelookup import getChoices
-from workflow.workflow import WorkflowAware
+from workflow.workflow import \
+    WorkflowAware, Workflow, State, Transition, ExpirationSetting
 
 from controllers.emailtool import EmailTool
 
 logger = logging.getLogger('BookingInfo')
+
+ENQUIRY_WORKFLOW = 'enquiry_workflow'
 
 class IdSequence(db.Model):
     """ keep track of sequences for number generators
@@ -104,14 +106,105 @@ class Enquiry(WorkflowAware):
             b.rdelete()
         self.delete()
 
+    @classmethod
+    def createWorkflow(cls):
+        wfl = Workflow(key_name=ENQUIRY_WORKFLOW)
+        wfl.put()
+        wfl.addState('temporary', title='Temporary')
+        wfl.addState('onhold', title='On Hold')
+        wfl.addState('allocated', title='Allocated')
+        wfl.addState('requiresintervention', title='Requires Intervention')
+        wfl.addState('detailsreceieved', title='Details Received')
+        wfl.addState('depositpaid', title='Deposit Paid')
+        wfl.addState('paidinfull', title='Paid In Full')
+        wfl.addState('expired', title='Expired')
+        wfl.addState('cancelled', title='Cancelled')
+
+        wfl.addTransition('expiretemporary', 'temporary', 'expired', 
+            title='Expire')
+        wfl.addTransition('allocate', 'temporary', 'allocated', title='Allocate')
+        wfl.addTransition('expiremanaully', 'temporary', 'expired', title='Expire')
+        wfl.addTransition('putonhold', 'temporary', 'onhold', title='Put on Hold')
+
+        wfl.addTransition('expireonhold', 'onhold', 'expired', title='Expire')
+        wfl.addTransition('assigntouser', 'onhold', 'requiresintervention', 
+            title='Assign to user')
+        wfl.addTransition('allocatefromhold', 'onhold', 'allocated', 
+            title='Allocate')
+
+        wfl.addTransition('allocatemanually', 'requiresintervention', 'allocated', 
+            title='Allocate')
+        wfl.addTransition('expireallocated', 'allocated', 'expired', 
+            title='Expire')
+        wfl.addTransition('receivedetails', 'allocated', 'detailsreceieved', 
+            title='Receive Details')
+
+        wfl.addTransition('expiredetails', 'detailsreceieved', 'expired', 
+            title='Expire')
+        wfl.addTransition('paydeposit', 'detailsreceieved', 'depositpaid', 
+            title='Pay deposit')
+
+        wfl.addTransition(
+            'expiredeposit', 'depositpaid', 'expired', title='Expire')
+        wfl.addTransition(
+            'canceldeposit', 'depositpaid', 'cancelled', title='Cancel')
+        wfl.addTransition(
+            'payfull', 'depositpaid', 'paidinfull', title='Pay in full')
+
+        wfl.addTransition('cancelfull', 'paidinfull', 'cancelled', title='Cancel')
+        
+        wfl.setInitialState('temporary')
+        wfl.put()
+
+        bcs = ExpirationSetting(
+            entityKind = 'Enquiry', 
+            entityState = 'temporary', 
+            hours = 1)
+        bcs.put()
+
+        bcs = ExpirationSetting(
+            entityKind = 'Enquiry', 
+            entityState = 'onhold', 
+            hours = 2)
+        bcs.put()
+
+        bcs = ExpirationSetting(
+            entityKind = 'Enquiry', 
+            entityTransition = 'allocate', 
+            entityState = 'allocated', 
+            hours = 6)
+        bcs.put()
+
+        bcs = ExpirationSetting(
+            entityKind = 'Enquiry', 
+            entityTransition = 'receivedetails', 
+            entityState = 'detailsreceieved', 
+            hours = 24)
+        bcs.put()
+
+        bcs = ExpirationSetting(
+            entityKind = 'Enquiry', 
+            entityTransition = 'paydeposit', 
+            entityState = 'depositpaid', 
+            hours = 72)
+        bcs.put()
+
+        bcs = ExpirationSetting(
+            entityKind = 'Enquiry', 
+            entityTransition = 'payfull', 
+            entityState = 'paidinfull', 
+            hours = -1)
+        bcs.put()
+
+        return wfl
+
 class AccommodationElement(db.Model):
     created = db.DateTimeProperty(auto_now_add=True)
     creator = db.UserProperty()
     city = db.StringProperty(verbose_name='City',
-        default='Potchefstroom', choices=getChoices('CTY'))
+        default='Potchefstroom')
     type = db.StringProperty(default='Family Home', 
-        verbose_name='Accommodation Class',
-        choices=getChoices('ACTYP'))
+        verbose_name='Accommodation Class')
     singlerooms = db.IntegerProperty(default=0)
     twinrooms = db.IntegerProperty(default=0)
     doublerooms = db.IntegerProperty(default=1)
@@ -160,10 +253,11 @@ class ContractedBooking(db.Model):
 
     def rdelete(self):
         venue = None
-        for slot in self.slots:
-            venue = slot.berth.bed.bedroom.venue
-            slot.occupied = False
-            slot.put()
+        if hasattr(self, 'slots'):
+            for slot in self.slots:
+                venue = slot.berth.bed.bedroom.venue
+                slot.occupied = False
+                slot.put()
         if venue:
             venue.recalcNumOfBookings()
         self.delete()

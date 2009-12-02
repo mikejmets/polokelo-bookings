@@ -4,11 +4,13 @@ from google.appengine.api import users
 from google.appengine.ext import webapp
 from google.appengine.ext.webapp import template
 from google.appengine.ext.db import djangoforms
+from django import newforms as forms
 from google.appengine.ext import db
 
 from controllers.home import BASE_PATH, PROJECT_PATH
 from models.hostinfo import Bed, Berth
 from controllers.utils import get_authentication_urls
+from models.codelookup import getChoicesTuple
 
 logger = logging.getLogger('BedHandler')
 
@@ -18,6 +20,7 @@ class BedForm(djangoforms.ModelForm):
         model = Bed
         exclude = ['created', 'creator', 'bedroom']
 
+    bedType = forms.ChoiceField(choices=getChoicesTuple(('BEDTP')))
 
 class CaptureBed(webapp.RequestHandler):
 

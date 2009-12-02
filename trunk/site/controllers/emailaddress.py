@@ -4,10 +4,12 @@ from google.appengine.api import users
 from google.appengine.ext import webapp
 from google.appengine.ext.webapp import template
 from google.appengine.ext.db import djangoforms
+from django import newforms as forms
 from google.appengine.ext import db
 
 from controllers.home import BASE_PATH, PROJECT_PATH
 from models.hostinfo import EmailAddress
+from models.codelookup import getChoicesTuple
 from controllers.utils import get_authentication_urls
 
 logger = logging.getLogger('EmailAddressHandler')
@@ -22,6 +24,7 @@ class EmailForm(djangoforms.ModelForm):
         model = EmailAddress
         exclude = ['created', 'creator', 'container']
 
+    emailType = forms.ChoiceField(choices=getChoicesTuple(('EMLTP')))
 
 class CaptureEmailAddress(webapp.RequestHandler):
 

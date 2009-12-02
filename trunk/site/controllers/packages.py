@@ -4,9 +4,11 @@ from google.appengine.api import memcache
 from google.appengine.ext import webapp
 from google.appengine.ext.webapp import template
 from google.appengine.ext.db import djangoforms
+from django import newforms as forms
 
 from controllers.home import BASE_PATH, PROJECT_PATH
 from models.packages import Package
+from models.codelookup import getChoicesTuple
 from controllers.utils import get_authentication_urls
 
 
@@ -30,6 +32,9 @@ class PackageForm(djangoforms.ModelForm):
     class Meta:
         model = Package
         exclude = ['created', 'creator']
+
+    city = forms.ChoiceField(choices=getChoicesTuple(('CTY')))
+    accommodationType = forms.ChoiceField(choices=getChoicesTuple(('ACTYP')))
 
 class CapturePackage(webapp.RequestHandler):
 

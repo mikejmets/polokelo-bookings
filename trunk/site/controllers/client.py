@@ -4,10 +4,12 @@ from google.appengine.api import users
 from google.appengine.ext import webapp
 from google.appengine.ext.webapp import template
 from google.appengine.ext.db import djangoforms
+from django import newforms as forms
 from google.appengine.ext import db
 
 from controllers.home import BASE_PATH, PROJECT_PATH
 from models.clientinfo import Client, Flight, MatchTicket
+from models.codelookup import getChoicesTuple
 from controllers.utils import get_authentication_urls
 
 logger = logging.getLogger('ClientHandler')
@@ -19,6 +21,8 @@ class ClientForm(djangoforms.ModelForm):
         model = Client
         exclude = ['created', 'creator']
 
+    state = forms.ChoiceField(choices=getChoicesTuple(('CLSTA')))
+    identityNumberType = forms.ChoiceField(choices=getChoicesTuple(('IDTYP')))
 
 class ViewClient(webapp.RequestHandler):
 

@@ -5,8 +5,6 @@ from google.appengine.ext import db
 from google.appengine.ext.db import polymodel
 from google.appengine.api import users
 
-from models.codelookup import getChoices
-
 from models.bookinginfo import ContractedBooking
 
 def datetimeIterator(from_date=datetime.now(), to_date=None):
@@ -22,10 +20,10 @@ class Address(db.Model):
     container = db.ReferenceProperty(db.Model, collection_name='entity_addresses')
     created = db.DateTimeProperty(auto_now_add=True)
     creator = db.UserProperty()
-    addressType = db.StringProperty(required=True, choices=getChoices('ADRTYP'))
+    addressType = db.StringProperty(required=True)
     streetAddress = db.StringProperty(required=True)
     suburb = db.StringProperty()
-    city = db.StringProperty(required=True, choices=getChoices('CTY'))
+    city = db.StringProperty(required=True)
     country = db.StringProperty(default='South Africa')
     postCode = db.StringProperty()
 
@@ -43,10 +41,8 @@ class PhoneNumber(db.Model):
     container = db.ReferenceProperty(db.Model, collection_name='entity_phonenumbers')
     created = db.DateTimeProperty(auto_now_add=True)
     creator = db.UserProperty()
-    numberType = db.StringProperty(verbose_name = 'Number Type',
-                            required=True, choices=getChoices('NUMTP'))
+    numberType = db.StringProperty(verbose_name = 'Number Type', required=True)
     number = db.PhoneNumberProperty(verbose_name='Number', required=True)
-
     def rdelete(self):
         self.delete()
 
@@ -55,10 +51,7 @@ class EmailAddress(db.Model):
     container = db.ReferenceProperty(db.Model, collection_name='entity_emails')
     created = db.DateTimeProperty(auto_now_add=True)
     creator = db.UserProperty()
-    emailType = db.StringProperty(
-            verbose_name = 'Email Type',
-            required=True,
-            choices=getChoices('EMLTP'))
+    emailType = db.StringProperty(verbose_name = 'Email Type', required=True)
     email = db.EmailProperty(verbose_name='Email Address', required=True)
 
     def rdelete(self):
@@ -95,8 +88,7 @@ class Venue(db.Model):
     created = db.DateTimeProperty(auto_now_add=True)
     creator = db.UserProperty()
     name = db.StringProperty(verbose_name='Venue Name')
-    venueType = db.StringProperty(verbose_name='Class', 
-        choices=getChoices('ACTYP'))
+    venueType = db.StringProperty(verbose_name='Class') 
     contactPerson = db.StringProperty(verbose_name='Contact Person')
     childFriendly = db.BooleanProperty(
         default=True, verbose_name='Child Friendly')
@@ -107,7 +99,7 @@ class Venue(db.Model):
         default=False, verbose_name='Registration Fee Paid')
     contractStartDate = db.DateProperty(verbose_name='Contracted Start Date (YYYY-MM-DD)')
     contractEndDate = db.DateProperty(verbose_name='Contracted End Date (YYYY-MM-DD)')
-    state = db.StringProperty(default='Closed', choices=getChoices('VNSTA'))
+    state = db.StringProperty(default='Closed')
     numberOfBookings = db.IntegerProperty(default=0)
 
     def get_city(self):
@@ -306,10 +298,9 @@ class Bedroom(db.Model):
     created = db.DateTimeProperty(auto_now_add=True)
     creator = db.UserProperty()
     name = db.StringProperty(required=True, verbose_name='Name')
-    bedroomType = db.StringProperty(
-        verbose_name='Bedroom Type', choices=getChoices('BEDRTYP'))
-    bathroomType = db.StringProperty(required=True, 
-        verbose_name='Bathroom Type', choices=getChoices('BRTYP'))
+    bedroomType = db.StringProperty( verbose_name='Bedroom Type')
+    bathroomType = db.StringProperty(
+        required=True, verbose_name='Bathroom Type')
     childFriendly = db.BooleanProperty(
         default=True, verbose_name='Child Friendly')
     wheelchairAccess = db.BooleanProperty(
@@ -375,7 +366,7 @@ class Bed(db.Model):
     created = db.DateTimeProperty(auto_now_add=True)
     creator = db.UserProperty()
     name = db.StringProperty(required=True)
-    bedType = db.StringProperty(required=True, choices=getChoices('BEDTP'))
+    bedType = db.StringProperty(required=True)
     capacity = db.IntegerProperty(required=True, default=1)
 
     def listing_name(self):

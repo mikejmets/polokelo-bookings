@@ -1,9 +1,14 @@
 import datetime
+import logging
+
+logger = logging.getLogger('venue_loader')
+
 from google.appengine.ext import db
 from google.appengine.tools import bulkloader
-import models.hostinfo 
 from google.appengine.api import users
-import loader_utils
+
+from models.hostinfo import Venue
+from loader_utils import str2datetime, str2datetimedate
 
 class VenueLoader(bulkloader.Loader):
   def __init__(self):
@@ -17,12 +22,6 @@ class VenueLoader(bulkloader.Loader):
         ('contactPerson', str),
         ('disabilityFriendly', bool),
         ('childFriendly', bool),
-        ('addendumADate', 
-          lambda x: str2datetimedate(x)),
-        ('addendumBDate', 
-          lambda x: str2datetimedate(x)),
-        ('addendumCDate', 
-          lambda x: str2datetimedate(x)),
         ('contractStartDate', 
           lambda x: str2datetimedate(x)),
         ('contractEndDate', 
@@ -41,9 +40,6 @@ class VenueExporter(bulkloader.Exporter):
                                 ('contactPerson', str, None),
                                 ('disabilityFriendly', str, None),
                                 ('childFriendly', str, None),
-                                ('addendumADate', str, None),
-                                ('addendumBDate', str, None),
-                                ('addendumCDate', str, None),
                                 ('contractStartDate', str, None),
                                 ('contractEndDate', str, None),
                                ])

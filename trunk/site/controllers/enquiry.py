@@ -11,10 +11,10 @@ from google.appengine.ext import db
 from controllers.bookingstool import BookingsTool
 from controllers.home import BASE_PATH, PROJECT_PATH
 from models.hostinfo import Berth
-from models.bookinginfo import Enquiry, EnquiryCollection, AccommodationElement
+from models.bookinginfo import Enquiry, EnquiryCollection, \
+    AccommodationElement, ENQUIRY_WORKFLOW
 from controllers.utils import get_authentication_urls
 from controllers import generator
-from workflow.__init__ import ENQUIRY_WORKFLOW
 from models.codelookup import getChoices
 
 logger = logging.getLogger('EnquiryHandler')

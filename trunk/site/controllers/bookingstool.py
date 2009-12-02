@@ -126,7 +126,7 @@ class BookingsTool():
                 enquiry.put()
 
         except WorkflowError, error:
-            logger.error('BookingConflict: %s', error) 
+            logger.error('Workflow: %s', error) 
         except BookingConflictError, error:
             logger.error('BookingConflict: %s', error) 
         except:
@@ -134,7 +134,8 @@ class BookingsTool():
             logger.error('Other error; %s', error)
 
         if error:
-            #Clean up
+            #Rollback and Clean up
+            self.workflow = init_enquiry_state
             for booking in bookings:
                 booking.rdelete()
 

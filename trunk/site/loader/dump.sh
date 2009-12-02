@@ -26,7 +26,7 @@ echo Dumping Beds
 bulkloader.py --dump --app_id=bookings-dev --email=mikejmets@gmail.com --kind=Bed --url=$HOST/unload --num_threads=1 --filename=$DATA_DIR/beds $APP_DIR
 echo Dumping Berths
 bulkloader.py --dump --app_id=bookings-dev --email=mikejmets@gmail.com --kind=Berth --url=$HOST/unload --num_threads=1 --filename=$DATA_DIR/berths $APP_DIR
-#echo Dumping Slots
+echo Dumping Slots
 bulkloader.py --dump --app_id=bookings-dev --email=mikejmets@gmail.com --kind=Slot --url=$HOST/unload --num_threads=1 --filename=$DATA_DIR/slots $APP_DIR
 echo Dumping Photos
 bulkloader.py --dump --app_id=bookings-dev --email=mikejmets@gmail.com --kind=Photograph --url=$HOST/unload --num_threads=1 --filename=$DATA_DIR/photos $APP_DIR

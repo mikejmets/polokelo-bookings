@@ -5,10 +5,12 @@ from google.appengine.api import users
 from google.appengine.ext import webapp
 from google.appengine.ext.webapp import template
 from google.appengine.ext.db import djangoforms
+from django import newforms as forms
 
 from controllers.home import BASE_PATH, PROJECT_PATH
 from models.bookinginfo import ContractedBooking
 from models.hostinfo import Owner, Venue
+from models.codelookup import getChoicesTuple
 from controllers.utils import get_authentication_urls
 
 logger = logging.getLogger('VenueHandler')
@@ -18,6 +20,8 @@ class VenueForm(djangoforms.ModelForm):
     class Meta:
         model = Venue
         exclude = ['owner', 'created', 'creator', 'state']
+
+    venueType = forms.ChoiceField(choices=getChoicesTuple(('ACTYP')))
 
 class ViewVenue(webapp.RequestHandler):
 

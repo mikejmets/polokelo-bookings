@@ -1,19 +1,14 @@
 from google.appengine.ext import db
 
-from models.codelookup import getChoices
-
-
 class Package(db.Model):
     """ define the unit price per night for a 
         city and accommodation type
     """
     created = db.DateTimeProperty(auto_now_add=True)
     creator = db.UserProperty()
-    city = db.StringProperty(verbose_name='City', required=True,
-                                choices = getChoices('CTY'))
-    accommodationType = db.StringProperty(verbose_name='Accommodation Type',
-                                required=True,
-                                choices=getChoices('ACTYP'))
+    city = db.StringProperty(verbose_name='City', required=True)
+    accommodationType = db.StringProperty(
+        verbose_name='Accommodation Type', required=True)
     basePriceInZAR = db.IntegerProperty(verbose_name='Base Price in ZAR (no cents)')
 
 
