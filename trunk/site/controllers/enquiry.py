@@ -16,7 +16,9 @@ from models.bookinginfo import Enquiry, EnquiryCollection, \
                                     AccommodationElement
 from controllers.utils import get_authentication_urls
 from controllers import generator
+from models.packages import Package
 from models.codelookup import getChoices
+from workflow.workflow import WorkflowError
 
 logger = logging.getLogger('EnquiryHandler')
 
@@ -100,12 +102,23 @@ class AdvanceEnquiry(webapp.RequestHandler):
         enquirykey = self.request.get('enquirykey')
         enquiry = Enquiry.get(enquirykey)
         transition = self.request.get('transition')
-        enquiry.doTransition(transition)
+        error = None
+        try:
+            enquiry.doTransition(transition)
+        except WorkflowError, e:
+            error = e
+        except:
+            error = sys.exc_info()[1]
 
         params = {}
         params['enquirykey'] = enquirykey
-        params = urllib.urlencode(params)
-        self.redirect('/bookings/enquiry/viewenquiry?%s' % params)
+        if error is None:
+            params = urllib.urlencode(params)
+            self.redirect('/bookings/enquiry/viewenquiry?%s' % params)
+        else:
+            params['error'] = error
+            params = urllib.urlencode(params)
+            self.redirect('/bookings/bookingerror?%s' % params)
 
 class CaptureEnquiry(webapp.RequestHandler):
 
@@ -205,20 +218,35 @@ class BookingsToolFindAccommodation(webapp.RequestHandler):
         tool = BookingsTool()
         venues = tool.findVenues(accom_element)
 
+        # Check if we have a package for the accommodation type in the city.
+        query = Package.all()
+        query.filter('city =', accom_element.city)
+        query.filter('accommodationType =', accom_element.type)
+        package = query.get()
+
         params = {}
         params['enquirykey'] = enquirykey
-        if venues:
+        if venues and package:
             accom_element.availableBerths = str(venues)
             accom_element.put()
             params = urllib.urlencode(params)
             self.redirect('/bookings/enquiry/viewenquiry?%s' % params)
-        else:
+        elif not venues:
             #Clean up
             accom_element.availableBerths = None
             accom_element.put()
             if enquiry.workflowState not in ['onhold', 'requiresintervention']:
                 enquiry.doTransition('putonhold')
             params['error'] = "No results found" 
+            params = urllib.urlencode(params)
+            self.redirect('/bookings/bookingerror?%s' % params)
+        elif not package:
+            #Clean up
+            accom_element.availableBerths = None
+            accom_element.put()
+            if enquiry.workflowState not in ['onhold', 'requiresintervention']:
+                enquiry.doTransition('putonhold')
+            params['error'] = "No package found" 
             params = urllib.urlencode(params)
             self.redirect('/bookings/bookingerror?%s' % params)
 

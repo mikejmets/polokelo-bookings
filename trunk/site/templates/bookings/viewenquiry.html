@@ -233,5 +233,36 @@
 </table>
 {% endif %}
 
+<hr />
+<p><strong>Email Messages</strong>
+  <a title="Add a new email"
+      href="/bookings/email/captureemail?enquirykey={{ enquiry.key }}">
+      <img src="/images/add.png"/>
+    </a> 
+</p>
+<table class="listing" cellspacing="0">
+    <thead>
+      <td>Reference</td>
+    </thead>
+    {% for email in enquiry.getBookingsEmails %}
+    <tr>
+      <!--
+      <td><a href="/bookings/viewemail?emailkey={{ email.key }}">{{ email.listing_name }}</a></td> -->
+      <td>{{ email.listing_name }}</td>
+      <td class="action">
+        <a title="Edit this email"
+          href="/bookings/email/editemail?emailkey={{ email.key }}">
+          <img src="/images/edit.png"/>
+        </a></td>
+      <td class="action">
+        <a title="Delete this email"
+          href="/bookings/email/deleteemail?emailkey={{ email.key }}"
+               onclick="return confirm('Are you sure?');">
+          <img src="/images/delete.png"/>
+        </a></td>
+    </tr>
+    {% endfor %}
+</table>
+
 
 {% endblock pagecontent %}
