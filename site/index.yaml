@@ -47,7 +47,17 @@ indexes:
   - name: __key__
     direction: desc
 
+- kind: Match
+  properties:
+  - name: __key__
+    direction: desc
+
 - kind: Owner
+  properties:
+  - name: __key__
+    direction: desc
+
+- kind: Package
   properties:
   - name: __key__
     direction: desc
@@ -90,6 +100,11 @@ indexes:
   - name: venueType
   - name: wheelchairAccess
   - name: startDate
+
+- kind: Transition
+  properties:
+  - name: __key__
+    direction: desc
 
 - kind: Venue
   properties:

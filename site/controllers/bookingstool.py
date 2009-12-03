@@ -79,8 +79,8 @@ class BookingsTool():
 
 
     def findVenues(self, element):
+        #Create an instance of a search  class and call it
         h1 = SimpleAccommodationSearch()
-        
         return h1.findVenues(element)
 
 
@@ -93,6 +93,12 @@ class BookingsTool():
             init_enquiry_state = enquiry.workflowState
             #logger.info('AvailableBerths: %s', element.availableBerths)
             #logger.info('selected keys: %s', selected_keys)
+            # Check if we have a package for the accommodation type in the city.
+            query = Package.all()
+            query.filter('city =', element.city)
+            query.filter('accommodationType =', element.type)
+            package = query.get()
+            #get venues
             venues = eval(element.availableBerths)
             for venue_key in venues.keys():
                 venue_affected = False
@@ -117,6 +123,8 @@ class BookingsTool():
                     Venue.get(venue_key).recalcNumOfBookings()
 
             if people:
+                quote_amount = package.calculateQuote(element)
+                enquiry.quoteInZAR = quote_amount
                 if enquiry.workflowState == 'temporary':
                     enquiry.doTransition('allocate')
                 elif enquiry.workflowState == 'requiresintervention':

@@ -3,6 +3,7 @@ import logging
 from google.appengine.ext import db
 
 from models.clientinfo import Client
+from models.bookingsemail import BookingsEmail
 from workflow import workflow
 
 from controllers.emailtool import EmailTool
@@ -56,6 +57,9 @@ class Enquiry(workflow.WorkflowAware):
     def getContractedBookings(self):
         return ContractedBooking.all().ancestor(self).fetch(1000)
 
+    def getBookingsEmails(self):
+        return BookingsEmail.all().ancestor(self).fetch(1000)
+
     def expire(self):
         for b in self.getContractedBookings():
             b.rdelete()
@@ -65,9 +69,7 @@ class Enquiry(workflow.WorkflowAware):
             b.rdelete()
     
     def allocate(self):
-        element = AccommodationElement.all().ancestor(self)[0]
-        et = EmailTool()
-        et.notifyClientOfAllocation(self, element)
+        pass
 
     def ontransition_expiretemporary(self, *args, **kw):
         pass
@@ -76,15 +78,37 @@ class Enquiry(workflow.WorkflowAware):
         self.expire()
 
     def ontransition_expiredetails(self, *args, **kw):
+        element = AccommodationElement.all().ancestor(self)[0]
+        et = EmailTool()
+        et.notifyClient('expiredetails', element)
         self.expire()
 
+    def ontransition_paydeposit(self, *args, **kw):
+        element = AccommodationElement.all().ancestor(self)[0]
+        et = EmailTool()
+        et.notifyClient('paydeposit', element)
+
+    def ontransition_payfull(self, *args, **kw):
+        element = AccommodationElement.all().ancestor(self)[0]
+        et = EmailTool()
+        et.notifyClient('payfull', element)
+
     def ontransition_expiredeposit(self, *args, **kw):
+        element = AccommodationElement.all().ancestor(self)[0]
+        et = EmailTool()
+        et.notifyClient('expiredeposit', element)
         self.expire()
 
     def ontransition_canceldeposit(self, *args, **kw):
+        element = AccommodationElement.all().ancestor(self)[0]
+        et = EmailTool()
+        et.notifyClient('canceldeposit', element)
         self.cancel()
 
     def ontransition_cancelfull(self, *args, **kw):
+        element = AccommodationElement.all().ancestor(self)[0]
+        et = EmailTool()
+        et.notifyClient('cancelfull', element)
         self.cancel()
 
     def ontransition_allocate(self, *args, **kw):
@@ -92,6 +116,11 @@ class Enquiry(workflow.WorkflowAware):
 
     def ontransition_allocatemanually(self, *args, **kw):
         self.allocate()
+
+    def ontransition_receivedetails(self, *args, **kw):
+        element = AccommodationElement.all().ancestor(self)[0]
+        et = EmailTool()
+        et.notifyClient('receivedetails', element)
 
     def ontransition_allocatefromhold(self, *args, **kw):
         self.allocate()
@@ -103,6 +132,8 @@ class Enquiry(workflow.WorkflowAware):
         for e in GuestElement.all().ancestor(self):
             e.rdelete()
         for e in AccommodationElement.all().ancestor(self):
+            e.rdelete()
+        for e in BookingsEmail.all().ancestor(self):
             e.rdelete()
         for b in self.getContractedBookings():
             b.rdelete()

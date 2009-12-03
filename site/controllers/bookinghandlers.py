@@ -19,6 +19,8 @@ from controllers.enquiry import \
 from controllers.enquirycollection import ViewEnquiryCollection, \
     CaptureEnquiryCollection, EditEnquiryCollection, DeleteEnquiryCollection
 from models.bookinginfo import EnquiryCollection, ContractedBooking
+from controllers.bookingsemail import \
+    CaptureBookingsEmail, EditBookingsEmail, DeleteBookingsEmail
 
 from controllers import generator
 from controllers.utils import get_authentication_urls
@@ -86,6 +88,9 @@ application = webapp.WSGIApplication([
   ('/bookings/enquiry/deleteenquiry', DeleteEnquiry),
   ('/bookings/enquiry/findaccommodation', BookingsToolFindAccommodation),
   ('/bookings/enquiry/reserveaccommodation', BookingsToolReserveAccommodation),
+  ('/bookings/email/captureemail', CaptureBookingsEmail),
+  ('/bookings/email/editemail', EditBookingsEmail),
+  ('/bookings/email/deleteemail', DeleteBookingsEmail),
     ], debug=True)
 
 
