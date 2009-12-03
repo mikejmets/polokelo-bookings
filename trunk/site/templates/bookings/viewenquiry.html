@@ -11,16 +11,16 @@
   <tr>
     <td>Number: <strong>{{ enquiry.referenceNumber }}</strong> </td>
     <td>Status: <strong>{{ enquiry.getState.title }}</strong> </td>
-    <td>Expiry Date: <strong>{{ enquiry.expiryDate }}</strong> </td>
+    <td>Expiry Date: <strong>{{ enquiry.expiryDate|make_list|slice:":16"|join:"" }}</strong> </td>
     <td>Collection: <a href="/bookings/collection/viewenquirycollection?enquirycollectionkey={{ enquiry.parent.key}}"> <strong>{{ enquiry.parent.referenceNumber }}</strong> </a></td>
     <td colspan="2">Guest Email: <strong>{{ enquiry.guestEmail }}</strong> </td>
   </tr>
   <tr>
     <td>Agent Code: <strong>{{ enquiry.agentCode }}</strong> </td>
-    <td>Quote: <strong>{{ enquiry.quoteInZAR }}</strong> </td>
-    <td>VAT: <strong>{{ enquiry.vatInZAR }}</strong> </td>
-    <td>Total: <strong>{{ enquiry.totalAmountInZAR }}</strong> </td>
-    <td>Paid: <strong>{{ enquiry.amountPaidInZAR }}</strong> </td>
+    <td>Quote: <strong>R{{ enquiry.quoteInZAR|make_list|slice:":-2"|join:""|default:"0" }}</strong> </td>
+    <td>VAT: <strong>R{{ enquiry.vatInZAR|make_list|slice:":-2"|join:""|default:"0" }}</strong> </td>
+    <td>Total: <strong>R{{ enquiry.totalAmountInZAR|make_list|slice:":-2"|join:""|default:"0" }}</strong> </td>
+    <td>Paid: <strong>R{{ enquiry.amountPaidInZAR|make_list|slice:":-2"|join:""|default:"0" }}</strong> </td>
     {% ifnotequal enquiry.workflowState 'expired' %}
     <td><a href="/bookings/enquiry/editenquiry?enquirykey={{ enquiry.key }}"> <img src="/images/edit.png"/></a></td>
     {% endifnotequal %}
