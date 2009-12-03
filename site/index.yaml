@@ -37,6 +37,11 @@ indexes:
   - name: sort_order
   - name: description
 
+- kind: CollectionTransaction
+  ancestor: yes
+  properties:
+  - name: created
+
 - kind: EmailAddress
   properties:
   - name: __key__
