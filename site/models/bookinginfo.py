@@ -42,6 +42,17 @@ class Enquiry(workflow.WorkflowAware):
     amountPaidInZAR = db.IntegerProperty(verbose_name="Amount Paid", default=0L)
     xmlSource = db.TextProperty(verbose_name='Source Detail')
 
+    def getAccommodationDescription(self):
+        accom_element = AccommodationElement.all().ancestor(self).get()
+        return "%s nights from %s in %s (%s) for %s Adults, %s Children" % \
+                (
+                        accom_element.nights,
+                        accom_element.start,
+                        accom_element.city,
+                        accom_element.type,
+                        accom_element.adults,
+                        accom_element.children)
+
     def getContractedBookings(self):
         return ContractedBooking.all().ancestor(self).fetch(1000)
 
@@ -96,6 +107,19 @@ class Enquiry(workflow.WorkflowAware):
         for b in self.getContractedBookings():
             b.rdelete()
         self.delete()
+
+
+class CollectionTransaction(db.Model):
+    """ Stores data about transactions happening on an enquiry collection
+    """
+    created = db.DateTimeProperty(auto_now_add=True)
+    creator = db.UserProperty()
+    description = db.StringProperty(multiline=True, 
+                                    verbose_name="Product Description")
+    cost = db.IntegerProperty(verbose_name="Cost")
+    vat = db.IntegerProperty(verbose_name="VAT")
+    total = db.IntegerProperty(verbose_name="Total")
+
 
 class AccommodationElement(db.Model):
     created = db.DateTimeProperty(auto_now_add=True)
@@ -181,7 +205,8 @@ class VCSPaymentNotification(db.Model):
                             verbose_name="Approved Indicator or Rejection Reason")
     authResponseCode = db.StringProperty(verbose_name="Authorise Response Code")
 
-    goodsDescription = db.StringProperty(verbose_name="Description of Goods Delivered")
+    goodsDescription = db.StringProperty(multiline=True, 
+                                    verbose_name="Description of Goods Delivered")
     authAmount = db.IntegerProperty(verbose_name="Amount Authorised")
     budgetPeriod = db.StringProperty(verbose_name="Budget Period")
 
@@ -200,3 +225,6 @@ class VCSPaymentNotification(db.Model):
     paymentType = db.StringProperty(verbose_name="Payment Type", 
                             choices=("DEP", "INV"))
     depositPercentage = db.IntegerProperty(verbose_name="Deposit Percentage")
+    processingState = db.StringProperty(default='Unprocessed', 
+                            choices=('Unprocessed', 'Completed', 'Failed'), 
+                            verbose_name='Processing State')
