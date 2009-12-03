@@ -65,6 +65,8 @@ class EnquiryRoot(db.Model):
 
         wfl.addTransition('expiredeposit', 'depositpaid', 'expired', title='Expire')
         wfl.addTransition('canceldeposit', 'depositpaid', 'cancelled', title='Cancel')
+        wfl.addTransition('payall', 'detailsreceieved', 'paidinfull', \
+                                title='Pay in full')
         wfl.addTransition('payfull', 'depositpaid', 'paidinfull', title='Pay in full')
 
         wfl.addTransition('cancelfull', 'paidinfull', 'cancelled', title='Cancel')
