@@ -72,7 +72,7 @@ class Workflow(db.Model):
     def addState(self, name, title=None):
         """Adds a new state.
         """
-        state = State(key_name=name, parent=self, name=name)
+        state = State(key_name=name, parent=self)
         if title:
             state.title = title
         state.put()
@@ -81,20 +81,12 @@ class Workflow(db.Model):
     def findState(self, name):
         """Find existing state.
         """
-        # return State.get_by_key_name(name, parent=self)
-        logging.info('Before executing db.Query(State).ancestor(self)')
-        qry = db.Query(State).ancestor(self).filter('name =', name)
-        logging.info('After executing db.Query(State).ancestor(self)')
-        return qry.get()
+        return State.get_by_key_name(name, parent=self)
 
     def findTransition(self, name):
         """Find existing transition.
         """
-        # return Transition.get_by_key_name(name, parent=self)
-        logging.info('Before executing db.Query(Transition).ancestor(self)')
-        qry = db.Query(Transition).ancestor(self).filter('name =', name)
-        logging.info('After executing db.Query(Transition).ancestor(self)')
-        return qry.get()
+        return Transition.get_by_key_name(name, parent=self)
 
     def setInitialState(self, name):
         """Sets the default initial state.
@@ -117,7 +109,7 @@ class Workflow(db.Model):
         state_to = self.findState(state_to)
         if not state_to:
             raise WorkflowError, "unregistered state: '%s'" % state_to
-        transition = Transition(key_name=name, parent=self, name=name,
+        transition = Transition(key_name=name, parent=self, 
                                 stateFrom=state_from, stateTo=state_to)
         if title:
             transition.title = title
@@ -134,7 +126,6 @@ class State(db.Expando):
 
     created = db.DateTimeProperty(auto_now_add=True)
     creator = db.UserProperty()
-    name=db.StringProperty()
 
     def addTransition(self, name, transition):
         """Adds a new transition.
@@ -150,7 +141,6 @@ class Transition(db.Expando):
 
     created = db.DateTimeProperty(auto_now_add=True)
     creator = db.UserProperty()
-    name = db.StringProperty()
     stateFrom = db.ReferenceProperty(State, collection_name='transitions_from')
     stateTo = db.ReferenceProperty(State, collection_name='transitions_to')
 
@@ -343,10 +333,6 @@ class ExpirationSetting(db.Model):
         setting.filter('entityState =', entityState)
         if entityTransition:
             setting.filter('entityTransition =', entityTransition)
-        # records = setting.fetch(1)
-        # if records and records[0].hours >= 0:
-        #     logging.info('Expire in %s hours time', records[0].hours)
-        #     return datetime.now() + timedelta(hours=records[0].hours)
         record = setting.get()
         if record and record.hours >= 0:
             logging.info('Expire in %s hours time', record.hours)
