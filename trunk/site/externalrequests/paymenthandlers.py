@@ -4,8 +4,6 @@ import logging
 from datetime import datetime
 import logging
 from google.appengine.ext import webapp
-from google.appengine.ext.webapp import template
-from google.appengine.ext.db import djangoforms
 from google.appengine.ext.webapp.util import run_wsgi_app
 from google.appengine.api import datastore_errors
 from google.appengine.api import users
@@ -113,8 +111,8 @@ class PaymentNotification(webapp.RequestHandler):
         available_total = pay_rec.authAmount
         
         # the payment transaction description and amounts
-        txn_description = 'Accommodation Payment: REFERENCE %s\n' % \
-                                    enquiry_collection.referenceNumber
+        txn_description = 'Payment on %s: REFERENCE %s\n' % \
+                            (datetime.now().date(), enquiry_collection.referenceNumber)
         txn_total = 0L
 
         # Update and set the workflow of the enquiry instance appropriately.
@@ -122,6 +120,8 @@ class PaymentNotification(webapp.RequestHandler):
             enquiry = Enquiry.get_by_key_name(enquiry_number, 
                                               parent=enquiry_collection)
             if enquiry:
+                # TODO: check that the enquiry has not expired
+
                 logging.info('Found enquiry %s', enquiry_number)
 
                 if pay_rec.paymentType == u'DEP' and \
@@ -169,7 +169,7 @@ class PaymentNotification(webapp.RequestHandler):
         txn = CollectionTransaction(parent=enquiry_collection)
         txn.creator = users.get_current_user()
         txn.description = txn_description
-        txn.total = txn_total
+        txn.total = -1 * txn_total
         txn.put()
 
         # change the processing status of the payment record
@@ -229,18 +229,16 @@ class PaymentNotification(webapp.RequestHandler):
                     message='Payment %s, received amount does not add up to outstanding amounts on enquiries' % (enquiry_colection_number))
                 self.response.headers['Content-Type'] = 'text/plain'
                 self.response.out.write(tostring(node))
-                # TODO: Flag an error
                 return
-
 
             except:
                 pay_rec.processingState = 'Failed'
                 pay_rec.put()
                 error = sys.exc_info()[1]
-                logging.error('Other error; %s', error)
+                logging.error('Unhandled error: %s', error)
                 SubElement(node, 'payment')
                 self._addErrorNode(node, code='3001', \
-                                    message='Seriously Unexpected and Unhandled Error')
+                                message='Seriously Unexpected and Unhandleable Error')
                 self.response.headers['Content-Type'] = 'text/plain'
                 self.response.out.write(tostring(node))
                 return
