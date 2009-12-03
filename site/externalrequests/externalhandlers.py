@@ -2,17 +2,14 @@ import os
 from datetime import datetime
 import logging
 from google.appengine.ext import webapp
-from google.appengine.ext.webapp import template
-from google.appengine.ext.db import djangoforms
 from google.appengine.ext.webapp.util import run_wsgi_app
-from google.appengine.api import datastore_errors
 from google.appengine.api import users
 # from google.appengine.ext.db import run_in_transaction
 
 from xml.etree.ElementTree import XML, SubElement, tostring
 
-from models.bookinginfo import EnquiryCollection, CollectionTransaction, \
-                                Enquiry, AccommodationElement, GuestElement
+from models.bookinginfo import EnquiryCollection, Enquiry, \
+                                AccommodationElement, GuestElement
 from models.enquiryroot import EnquiryRoot
 from models.hostinfo import EmailAddress, PhoneNumber
 from models.clientinfo import Client
@@ -20,6 +17,7 @@ from models.codelookup import getItemDescription
 
 from controllers.bookingstool import BookingsTool
 from controllers import generator
+from externalrequests import retrieveinvoice
 
 class ExternalBookings(webapp.RequestHandler):
     """ Handler class for all enquiry/booking requests from
@@ -131,18 +129,9 @@ class ExternalBookings(webapp.RequestHandler):
     def _confirmEnquiries(self, node):
         """ confirm the final list of enquiries
         """
-        # Polokelo Sport Tours Accommodation: REF YHT-4W7-9ZJ
-        # 7 Nights from 2010-06-11 in Potchefstroom (Hostel) for 2 Adults, 1 Child
-
-        # the confirmation transaction description and amounts
-        txn_description = 'Accommodation Booking: REFERENCE '
-        txn_cost = 0L
-        txn_vat = 0L
-        txn_total = 0L
-
         # retrieve the enquiry batch number and collection instance
         collection_number = node.findtext('enquirybatchnumber') 
-        txn_description += collection_number + '\n'
+        # txn_description += collection_number + '\n'
         enquiry_collection = EnquiryCollection.get_by_key_name( \
                                         collection_number, 
                                         parent=EnquiryRoot.getEnquiryRoot())
@@ -163,12 +152,6 @@ class ExternalBookings(webapp.RequestHandler):
                 # do the transitions
                 if enquiry.getStateName() == 'allocated':
                     enquiry.doTransition('receivedetails')
-                    # create the txn line item and tally the amounts
-                    txn_description += 'Accom REF %s: %s\n' % \
-                            (refnum, enquiry.getAccommodationDescription())
-                    txn_cost += enquiry.quoteInZAR 
-                    txn_vat += enquiry.vatInZAR 
-                    txn_total += enquiry.totalAmountInZAR
                 elif enquiry.getStateName() == 'onhold':
                     enquiry.doTransition('assigntouser')
                 enquiry.put()
@@ -233,15 +216,6 @@ class ExternalBookings(webapp.RequestHandler):
                 # return the result as xml
                 return tostring(node)
 
-        # create the confirmation transaction in the collection
-        txn = CollectionTransaction(parent=enquiry_collection)
-        txn.creator = users.get_current_user()
-        txn.description = txn_description
-        txn.cost = txn_cost
-        txn.vat = txn_vat
-        txn.total = txn_total
-        txn.put()
-
         # append the result
         confirm_elem = SubElement(node, 'confirmationresult')
         result_elem = SubElement(confirm_elem, 'result')
@@ -274,8 +248,13 @@ class ExternalBookings(webapp.RequestHandler):
             result = self._checkAvailability(xmlroot)
 
         elif action.lower() == 'confirm enquiries':
-            # initial enquiry to check for availability
+            # confirm the enquiries in the batch
             result = self._confirmEnquiries(xmlroot)
+
+
+        elif action.lower() == 'retrieve invoice':
+            # retrieve invoice details for a batch
+            result = retrieveinvoice.retrieveInvoice(xmlroot)
 
         elif action.lower() == 'generate enquiry number':
             number_element = SubElement(xmlroot, 'enquirynumber')
