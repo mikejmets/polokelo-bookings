@@ -46,7 +46,7 @@ class ViewVenue(webapp.RequestHandler):
         inspections = venue.venue_inspections
         complaints = venue.venue_complaints
         phonenumbers = venue.entity_phonenumbers
-        bedrooms = venue.venue_bedrooms
+        bedrooms = venue.venue_bedrooms.order('name')
         emails = venue.entity_emails
         bathrooms = venue.venue_bathrooms
         ownerkey = venue.owner.key()
