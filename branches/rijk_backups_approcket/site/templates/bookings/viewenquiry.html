@@ -1,0 +1,268 @@
+{% extends base_path %}
+
+{% block breadcrumbs %}
+<a href="/bookings/collection/viewenquirycollection?enquirycollectionkey={{ enquiry.parent.key }}">go back</a>
+{% endblock %}
+
+{% block pagecontent %}
+<h1>Enquiry</h1>
+
+<table class="listing">
+  <tr>
+    <td>Number: <strong>{{ enquiry.referenceNumber }}</strong> </td>
+    <td>Status: <strong>{{ enquiry.getState.title }}</strong> </td>
+    <td>Expiry Date: <strong>{{ enquiry.expiryDate|make_list|slice:":16"|join:"" }}</strong> </td>
+    <td>Collection: <a href="/bookings/collection/viewenquirycollection?enquirycollectionkey={{ enquiry.parent.key}}"> <strong>{{ enquiry.parent.referenceNumber }}</strong> </a></td>
+    <td colspan="2">Guest Email: <strong>{{ enquiry.guestEmail }}</strong> </td>
+  </tr>
+  <tr>
+    <td>Agent Code: <strong>{{ enquiry.agentCode }}</strong> </td>
+    <td>Quote: <strong>R{{ enquiry.quoteInZAR|make_list|slice:":-2"|join:""|default:"0" }}</strong> </td>
+    <td>VAT: <strong>R{{ enquiry.vatInZAR|make_list|slice:":-2"|join:""|default:"0" }}</strong> </td>
+    <td>Total: <strong>R{{ enquiry.totalAmountInZAR|make_list|slice:":-2"|join:""|default:"0" }}</strong> </td>
+    <td>Paid: <strong>R{{ enquiry.amountPaidInZAR|make_list|slice:":-2"|join:""|default:"0" }}</strong> </td>
+    {% ifnotequal enquiry.workflowState 'expired' %}
+    <td><a href="/bookings/enquiry/editenquiry?enquirykey={{ enquiry.key }}"> <img src="/images/edit.png"/></a></td>
+    {% endifnotequal %}
+  </tr>
+</table>
+
+{% ifnotequal enquiry.workflowState 'temporary' %}
+<form name="advanceEnquiry" method="post" 
+      action="/bookings/enquiry/advanceenquiry">
+
+  <input type="hidden" name="enquirykey" value="{{ enquiry.key }}"/>
+  {% if transitions %}
+    <select name="transition">
+      {% for transition in transitions %}
+      <option value="{{ transition.key.name }}">{{ transition.title }}</option>
+      {% endfor %}
+    </select>
+    <input title="Advance" type="submit" value="Go"/>
+  {% endif %}
+</form>
+{% endifnotequal %}
+
+<hr />
+<form name="findAccommodation" method="post" 
+      action="/bookings/enquiry/findaccommodation">
+  <input type="hidden" name="enquirykey" value="{{ enquiry.key }}"/>
+  <p><strong>Criteria</strong></p>
+  <table class="listing" cellspacing="0">
+    <tr>
+      <td>City</td>
+      <td> 
+      {% if show_search %}
+          <select name="city">
+              {% for description in cities %}
+                  <option {% ifequal element.city description %} selected="1"{%endifequal%}>
+                  {{description}}
+                  </option>
+              {% endfor %}
+          </select>
+      {% else %}
+        {{ element.city }}
+      {% endif %}
+      </td>
+    </tr>
+    <tr>
+      <td>Type</td>
+      <td>
+      {% if show_search %}
+          <select name="type">
+              {% for description in accomtypes %}
+                  <option{%ifequal element.type description %} selected="1"{%endifequal%}>
+                  {{description}}
+                  </option>
+              {% endfor %}
+          </select>
+      {% else %}
+        {{ element.type }}
+      {% endif %}
+      </td>
+    </tr>
+    <tr>
+      <td>Start Date</td>
+      <td> 
+      {% if show_search %}
+       <input type="text" name="start" value="{{ element.start }}" /> </td>
+      {% else %}
+        {{ element.start }}
+      {% endif %}
+    </tr>
+    <tr>
+      <td>Number of nights</td>
+      <td> 
+      {% if show_search %}
+       <input type="text" name="nights" value="{{ element.nights }}" /> </td>
+      {% else %}
+        {{ element.nights }}
+      {% endif %}
+    </tr>
+    <tr>
+      <td>Requires Wheelchair Access</td>
+      <td> 
+      {% if show_search %}
+        <input type="checkbox" name="wheelchairAccess" 
+        {% if element.wheelchairAccess %} checked {% endif %} />
+      {% else %}
+      {% if element.wheelchairAccess %} True {% else %} False {% endif %} 
+      {% endif %}
+      </td>
+    </tr>
+    <tr>
+      <td>Number of adults</td>
+      <td> 
+      {% if show_search %}
+      <input type="text" name="adults" value="{{ element.adults }}" /> 
+      {% else %}
+        {{ element.adults }}
+      {% endif %}
+      </td>
+    </tr>
+    <tr>
+      <td>Number of children</td>
+      <td> 
+      {% if show_search %}
+      <input type="text" name="children" value="{{ element.children }}" /> 
+      {% else %}
+        {{ element.children }}
+      {% endif %}
+      </td>
+    </tr>
+    <tr>
+      <td>Number of double beds</td>
+      <td> 
+      {% if show_search %}
+      <input type="text" name="doublerooms" value="{{ element.doublerooms }}" /> 
+      {% else %}
+        {{ element.doublerooms }}
+      {% endif %}
+      </td>
+    </tr>
+    <tr>
+      <td>Number of single beds</td>
+      <td> 
+      {% if show_search %}
+        <input type="text" name="singlerooms" value="{{ element.singlerooms }}" /> 
+      {% else %}
+        {{ element.singlerooms }}
+      {% endif %}
+      </td>
+    </tr>
+  </table>
+  {% if show_search %}
+  <input title="Find accommodation"
+         type="submit" value="Find Accommodation" />
+  {% endif %}
+</form>
+
+{% if show_results %}
+<hr />
+<form name="reserveAccommodation" method="post" 
+      action="/bookings/enquiry/reserveaccommodation">
+  <table class="listing" cellspacing="0">
+      <thead>
+        <td>Select</td>
+        <td>Owner</td>
+        <td>Venue</td>
+        <td>Bookings</td>
+        <td>Room</td>
+        <td>Bed</td>
+        <td>Type</td>
+        <td>Capacity</td>
+      </thead>
+      {% for berth in berths %}
+      <tr>
+        <td> <input type="checkbox" name="berth_{{ berth.key }}" /> </td>
+        <td>{{ berth.bed.bedroom.venue.owner.listing_name }}</td>
+        <td>{{ berth.bed.bedroom.venue.name }}</td>
+        <td>{{ berth.bed.bedroom.venue.numberOfBookings }}</td>
+        <td>{{ berth.bed.bedroom.name }}</td>
+        <td>{{ berth.bed.name }}</td>
+        <td>{{ berth.bed.bedType }}</td>
+        <td>{{ berth.bed.capacity }}</td>
+      </tr>
+      {% endfor %}
+  </table>
+  <input type="hidden" name="enquirykey" value="{{ enquiry.key }}" />
+  <input type="hidden" name="city" value="{{ element.city }}" /> 
+  <input type="hidden" name="type" value="{{ element.type }}" />
+  <input type="hidden" name="start" value="{{ element.start }}" />
+  <input type="hidden" name="nights" value="{{ element.nights }}" />
+  {% if element.wheelchairAccess %}
+    <input type="hidden" name="wheelchairAccess" checked /> 
+  {% endif %} 
+  <input type="hidden" name="adults" value="{{ element.adults }}" />
+  <input type="hidden" name="children" value="{{ element.children }}" />
+  <input title="Reserve accommodation"
+         type="submit" value="Reserve Accommodation" />
+</form>
+{% endif %}
+
+{% if show_bookings %}
+<hr />
+<p><strong>Contracted Bookings</strong>
+  <!-- <a title="Add a new booking"
+     href="/bookings/capturecontractedbooking">
+      <img src="/images/add.png"/>
+    </a> -->
+</p>
+<table class="listing" cellspacing="0">
+    <thead>
+      <td>Reference</td>
+    </thead>
+    {% for contractedbooking in enquiry.getContractedBookings %}
+    <tr>
+      <td><a href="/bookings/viewcontractedbooking?bookingkey={{ contractedbooking.key }}">{{ contractedbooking.bookingNumber }}</a></td>
+      <!-- 
+      <td class="action">
+        <a title="Edit this booking"
+          href="/bookings/editcontractedbooking?contractedbookingkey={{ contractedbooking.key }}">
+          <img src="/images/edit.png"/>
+        </a></td>
+      <td class="action">
+        <a title="Delete this booking"
+          href="/bookings/deletecontractedbooking?contractedbookingkey={{ contractedbooking.key }}"
+               onclick="return confirm('Are you sure?');">
+          <img src="/images/delete.png"/>
+        </a></td>
+        -->
+    </tr>
+    {% endfor %}
+</table>
+{% endif %}
+
+<hr />
+<p><strong>Email Messages</strong>
+  <a title="Add a new email"
+      href="/bookings/email/captureemail?enquirykey={{ enquiry.key }}">
+      <img src="/images/add.png"/>
+    </a> 
+</p>
+<table class="listing" cellspacing="0">
+    <thead>
+      <td>Reference</td>
+    </thead>
+    {% for email in enquiry.getBookingsEmails %}
+    <tr>
+      <!--
+      <td><a href="/bookings/viewemail?emailkey={{ email.key }}">{{ email.listing_name }}</a></td> -->
+      <td>{{ email.listing_name }}</td>
+      <td class="action">
+        <a title="Edit this email"
+          href="/bookings/email/editemail?emailkey={{ email.key }}">
+          <img src="/images/edit.png"/>
+        </a></td>
+      <td class="action">
+        <a title="Delete this email"
+          href="/bookings/email/deleteemail?emailkey={{ email.key }}"
+               onclick="return confirm('Are you sure?');">
+          <img src="/images/delete.png"/>
+        </a></td>
+    </tr>
+    {% endfor %}
+</table>
+
+
+{% endblock pagecontent %}
