@@ -1,9 +1,12 @@
-application: bookings-dev
-version: 0-12-alpha
+application: qa-mother-of-invention
+version: rijk-0-16
 runtime: python
 api_version: 1
 
 handlers:
+- url: /rocket/.*
+  script: rocket/rocket.py
+
 - url: /viewer/.*
   script: viewer.py
 
