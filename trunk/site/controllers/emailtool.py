@@ -90,7 +90,7 @@ http://www.polokelo.info/getinvoice?ref=%s
         message.to = email.recipients
         message.sender = 'polokelo123@gmail.com'
         message.reply_to = 'polokelo123@gmail.com'
-        message.bcc = 'mikejmets@gmail.com'
+        message.bcc = 'mike@yourbookings.co.za'
         try:
             message.subject = email.subject
             message.body = email.body
