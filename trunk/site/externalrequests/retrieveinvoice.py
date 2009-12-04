@@ -90,6 +90,11 @@ def retrieveInvoice(node):
         _addErrorNode(node, code='4001', \
                         message='Seriously Unexpected and Unhandleable Error')
 
+
+    new_node = SubElement(node, 'allowdeposit')
+    new_node.text = 'no'
+    _addErrorNode(node)
+
     return tostring(node)
 
 
