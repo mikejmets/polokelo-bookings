@@ -34,7 +34,7 @@ class Enquiry(workflow.WorkflowAware):
     created = db.DateTimeProperty(auto_now_add=True)
     creator = db.UserProperty()
     referenceNumber = db.StringProperty(verbose_name='Reference Number')
-    expiryDate = db.DateTimeProperty(verbose_name="Expiry Date/Time (YYYY-MM-DD hh:mm)")
+    expiryDate = db.DateTimeProperty(verbose_name="Expiry Date/Time (YYYY-MM-DD hh:mm:ss)")
     guestEmail = db.StringProperty(verbose_name='Guest Email')
     agentCode = db.StringProperty(verbose_name='Travel Agent Code')
     quoteInZAR = db.IntegerProperty(verbose_name='Quote', default=0L)
