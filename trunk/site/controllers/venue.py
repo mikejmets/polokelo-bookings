@@ -19,7 +19,7 @@ logger = logging.getLogger('VenueHandler')
 class VenueForm(djangoforms.ModelForm):
     class Meta:
         model = Venue
-        exclude = ['owner', 'created', 'creator', 'state']
+        exclude = ['owner', 'created', 'creator', 'state', 'numberOfBookings']
 
     venueType = forms.ChoiceField(choices=getChoicesTuple(('ACTYP')))
 
