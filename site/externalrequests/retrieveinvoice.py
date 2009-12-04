@@ -21,10 +21,11 @@ def _getCardHolderDetails(collection):
         from the original xml source of the enquiry
     """
     guest_node = GuestElement.all().ancestor(collection).get()
-    source = guest_node.xmlSource
-    logging.info('xml source: %s', source)
-    xml = XML(source)
-    return xml
+    if guest_node:
+        source = guest_node.xmlSource
+        logging.info('xml source: %s', source)
+        xml = XML(source)
+        return xml
 
 def retrieveInvoice(node):
     """ retrieve the invoice details given the batch number
@@ -44,7 +45,8 @@ def retrieveInvoice(node):
         # get the credit card holder details from a
         # confirmed or paid enquiry on the collection
         card_holder_node = _getCardHolderDetails(enquiry_collection)
-        node.append(card_holder_node)
+        if card_holder_node:
+            node.append(card_holder_node)
 
         # get the line items
         items_node = SubElement(node, 'items')
