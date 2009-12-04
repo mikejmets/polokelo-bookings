@@ -1,4 +1,5 @@
 import os
+import sys
 from datetime import datetime
 import logging
 from google.appengine.ext import webapp
@@ -8,7 +9,7 @@ from google.appengine.api import users
 
 from xml.etree.ElementTree import XML, SubElement, tostring
 
-from models.bookinginfo import EnquiryCollection, Enquiry, \
+from models.bookinginfo import EnquiryCollection, Enquiry, CollectionTransaction, \
                                 AccommodationElement, GuestElement
 from models.enquiryroot import EnquiryRoot
 from models.hostinfo import EmailAddress, PhoneNumber
@@ -129,12 +130,20 @@ class ExternalBookings(webapp.RequestHandler):
     def _confirmEnquiries(self, node):
         """ confirm the final list of enquiries
         """
+
         # retrieve the enquiry batch number and collection instance
         collection_number = node.findtext('enquirybatchnumber') 
         # txn_description += collection_number + '\n'
         enquiry_collection = EnquiryCollection.get_by_key_name( \
                                         collection_number, 
                                         parent=EnquiryRoot.getEnquiryRoot())
+
+        # initialise the booking transaction data
+        txn_description = 'Booking confirmation on %s: REFERENCE %s\n' % \
+                            (datetime.now().date(), collection_number)
+        txn_total = 0L
+        txn_vat = 0L
+        txn_quote = 0L
 
         # locate the primary guest node (credit card holder)
         guest_node = node.find('creditcardholder')
@@ -152,14 +161,23 @@ class ExternalBookings(webapp.RequestHandler):
                 # do the transitions
                 if enquiry.getStateName() == 'allocated':
                     enquiry.doTransition('receivedetails')
+                    txn_description += '%s: %s\n' % \
+                                    (refnum, enquiry.getAccommodationDescription())
+                    txn_total += enquiry.totalAmountInZAR 
+                    txn_vat += enquiry.vatInZAR
+                    txn_quote += enquiry.quoteInZAR
                 elif enquiry.getStateName() == 'onhold':
                     enquiry.doTransition('assigntouser')
+                else:
+                    # we should not be doing anything to the enquiry
+                    # it is in the wrong state
+                    continue
                 enquiry.put()
 
                 if guest_node:
                     guest_element = GuestElement( \
                                         key_name=guest_node.findtext('passportnumber'),
-                                        parent=enquiry,
+                                        parent=enquiry_collection,
                                         surname=guest_node.findtext('surname'),
                                         firstNames=guest_node.findtext('name'))
                     guest_element.creator = users.get_current_user()
@@ -175,46 +193,55 @@ class ExternalBookings(webapp.RequestHandler):
                         guest_element.enquiries.append(enquiry.key())
                         guest_element.put()
 
-                    # create a client instance
-                    if enquiry.getStateName() == 'detailsreceieved':
-                        client = Client(parent=enquiry, 
-                                        clientNumber = generator.generateClientNumber(),
-                                        surname=guest_element.surname,
-                                        firstNames = guest_element.firstNames)
-                        client.creator = users.get_current_user()
-                        for language_node in \
-                                guest_node.find('languages').findall('language'):
-                            client.languages.append(language_node.text)
-                        client.state = 'Confirmed'
-                        client.identityNumber = guest_element.identifyingNumber
-                        client.identityNumberType = 'Passport'
-                        client.put()
+                    # # create a client instance
+                    # if enquiry.getStateName() == 'detailsreceieved':
+                    #     client = Client(clientNumber = generator.generateClientNumber(),
+                    #                     surname=guest_element.surname,
+                    #                     firstNames = guest_element.firstNames)
+                    #     client.creator = users.get_current_user()
+                    #     for language_node in \
+                    #             guest_node.find('languages').findall('language'):
+                    #         client.languages.append(language_node.text)
+                    #     client.state = 'Confirmed'
+                    #     client.identityNumber = guest_element.identifyingNumber
+                    #     client.identityNumberType = 'Passport'
+                    #     client.put()
 
-                        # create email address and telephone for client
-                        email = EmailAddress(parent=client,
-                                             emailType='Other',
-                                             email=guest_element.email)
-                        email.container = client
-                        email.creator = users.get_current_user()
-                        email.put()
+                    #     # create email address and telephone for client
+                    #     email = EmailAddress(parent=client,
+                    #                          emailType='Other',
+                    #                          email=guest_element.email)
+                    #     email.container = client
+                    #     email.creator = users.get_current_user()
+                    #     email.put()
 
-                        phone = PhoneNumber(parent=client,
-                                            numberType='Other Number',
-                                            number=guest_element.contactNumber) 
-                        phone.container=client
-                        phone.creator = users.get_current_user()
-                        phone.put()
+                    #     phone = PhoneNumber(parent=client,
+                    #                         numberType='Other Number',
+                    #                         number=guest_element.contactNumber) 
+                    #     phone.container=client
+                    #     phone.creator = users.get_current_user()
+                    #     phone.put()
             else:
                 # no enquiry found: send an error back
                 confirm_elem = SubElement(node, 'confirmationresult')
                 result_elem = SubElement(confirm_elem, 'result')
 
                 # append the error element
-                self._addErrorNode(node, '103',
+                self._addErrorNode(node, '102',
                         'Enquiry element %s is not part of enquiry batch %s' \
                                                         % (refnum, collection_number))
                 # return the result as xml
                 return tostring(node)
+
+        # create the payment transaction in the collection
+        txn = CollectionTransaction(parent=enquiry_collection)
+        txn.type = 'Booking'
+        txn.creator = users.get_current_user()
+        txn.description = txn_description
+        txn.total = txn_total
+        txn.vat = txn_vat
+        txn.cost = txn_quote
+        txn.put()
 
         # append the result
         confirm_elem = SubElement(node, 'confirmationresult')
@@ -245,12 +272,27 @@ class ExternalBookings(webapp.RequestHandler):
         # execute the approptiate action
         if action.lower() == 'check availability':
             # initial enquiry to check for availability
-            result = self._checkAvailability(xmlroot)
+            try:
+                result = self._checkAvailability(xmlroot)
+            except:
+                error = sys.exc_info()[1]
+                logging.error('Unhandled error: %s', error)
+                SubElement(xmlroot, 'confirmationresult')
+                self._addErrorNode(xmlroot, code='1001', \
+                                message='Seriously Unexpected and Unhandleable Error')
+                result = tostring(xmlroot)
 
         elif action.lower() == 'confirm enquiries':
             # confirm the enquiries in the batch
-            result = self._confirmEnquiries(xmlroot)
-
+            try:
+                result = self._confirmEnquiries(xmlroot)
+            except:
+                error = sys.exc_info()[1]
+                logging.error('Unhandled error: %s', error)
+                SubElement(xmlroot, 'confirmationresult')
+                self._addErrorNode(xmlroot, code='1001', \
+                                message='Seriously Unexpected and Unhandleable Error')
+                result = tostring(xmlroot)
 
         elif action.lower() == 'retrieve invoice':
             # retrieve invoice details for a batch
@@ -269,8 +311,7 @@ class ExternalBookings(webapp.RequestHandler):
         else:
             # send back an error informing the public site
             # that we have no clue what it wants
-            error_elem = SubElement(xmlroot, 'error')
-            error_elem.text = 'Unable to determine what to do'
+            self._addErrorNode(xmlroot, '201', 'Unable to determine what to do')
             result = tostring(xmlroot)
  
         # return the result
