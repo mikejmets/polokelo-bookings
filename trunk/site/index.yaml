@@ -20,6 +20,11 @@ indexes:
   - name: __key__
     direction: desc
 
+- kind: Bedroom
+  properties:
+  - name: venue
+  - name: name
+
 - kind: CodeLookup
   properties:
   - name: __key__
