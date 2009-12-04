@@ -88,9 +88,9 @@ http://www.polokelo.info/getinvoice?ref=%s
         email.put()
         message = mail.EmailMessage()
         message.to = email.recipients
-        message.sender = 'bookings@polokelo-bookings.co.za'
-        message.reply_to = 'bookings@polokelo-bookings.co.za'
-        message.bcc = 'bookings@polokelo-bookings.co.za'
+        message.sender = 'polokelo123@gmail.com'
+        message.reply_to = 'polokelo123@gmail.com'
+        message.bcc = 'mikejmets@gmail.com'
         try:
             message.subject = email.subject
             message.body = email.body
