@@ -211,10 +211,12 @@
 <table class="listing" cellspacing="0">
     <thead>
       <td>Booking Number</td>
+      <td>Nights</td>
     </thead>
     {% for contractedbooking in enquiry.getContractedBookings %}
     <tr>
       <td><a href="/bookings/viewcontractedbooking?bookingkey={{ contractedbooking.key }}">{{ contractedbooking.bookingNumber }}</a></td>
+      <td>{{ contractedbooking.nights }}</a></td>
       <!-- 
       <td class="action">
         <a title="Edit this booking"

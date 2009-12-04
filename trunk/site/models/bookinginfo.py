@@ -208,6 +208,9 @@ class ContractedBooking(db.Model):
     def listing_name(self):
         return '%s' % (self.bookingNumber)
 
+    def nights(self):
+        return '%s' % (self.slots.count())
+
     def rdelete(self):
         venue = None
         if hasattr(self, 'slots'):
