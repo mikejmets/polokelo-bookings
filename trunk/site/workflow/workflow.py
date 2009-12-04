@@ -295,7 +295,7 @@ class WorkflowAware(db.Model):
             self.kind(),
             self.workflowState,
             transname)
-        self.expiryDate = exp_date
+        self.expiryDate = exp_date.replace(second=0, microsecond=0)
 
         logging.info('self.put()')
         self.put()
