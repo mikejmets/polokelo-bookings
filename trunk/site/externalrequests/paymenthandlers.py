@@ -14,9 +14,8 @@ from exceptions import Exception
 
 from models.enquiryroot import EnquiryRoot
 from models.bookinginfo import \
-                EnquiryCollection, Enquiry, CollectionTransaction, \
-                AccommodationElement, GuestElement, \
-                VCSPaymentNotification
+                EnquiryCollection, Enquiry, \
+                CollectionTransaction, VCSPaymentNotification
 
 from models.clientinfo import Client
 from models.codelookup import getItemDescription
@@ -167,6 +166,7 @@ class PaymentNotification(webapp.RequestHandler):
 
         # create the payment transaction in the collection
         txn = CollectionTransaction(parent=enquiry_collection)
+        txn.type = 'Payment'
         txn.creator = users.get_current_user()
         txn.description = txn_description
         txn.total = -1 * txn_total
