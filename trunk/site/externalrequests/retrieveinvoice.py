@@ -1,17 +1,11 @@
 import os
 import sys
-from datetime import datetime
 import logging
-from google.appengine.api import datastore_errors
-
 from xml.etree.ElementTree import XML, SubElement, tostring
 
+from models.enquiryroot import EnquiryRoot
 from models.bookinginfo import EnquiryCollection, CollectionTransaction, \
                                 Enquiry, AccommodationElement, GuestElement
-from models.enquiryroot import EnquiryRoot
-from models.hostinfo import EmailAddress, PhoneNumber
-from models.clientinfo import Client
-from models.codelookup import getItemDescription
 
 
 def _addErrorNode(node, code='0', message=None):
@@ -22,11 +16,11 @@ def _addErrorNode(node, code='0', message=None):
     if message is not None:
         error_msg.text = message
 
-def _getCardHolderDetails(enquiry):
+def _getCardHolderDetails(collection):
     """ return the credit card holder details xml node 
         from the original xml source of the enquiry
     """
-    guest_node = GuestElement.all().ancestor(enquiry).get()
+    guest_node = GuestElement.all().ancestor(collection).get()
     source = guest_node.xmlSource
     logging.info('xml source: %s', source)
     xml = XML(source)
@@ -49,17 +43,16 @@ def retrieveInvoice(node):
                                                            parent=enquiry_root)
         # get the credit card holder details from a
         # confirmed or paid enquiry on the collection
-        qry = Enquiry.all().ancestor(enquiry_collection)
-        qry.filter('workflowState in', 
-                ['detailsreceieved', 'depositpaid', 'paidinfull'])
-        enquiry = qry.get()
-        card_holder_node = _getCardHolderDetails(enquiry)
+        card_holder_node = _getCardHolderDetails(enquiry_collection)
         node.append(card_holder_node)
 
         # get the line items
         items_node = SubElement(node, 'items')
 
         # get all the enquiries of this collection
+        qry = Enquiry.all().ancestor(enquiry_collection)
+        qry.filter('workflowState in', 
+                ['detailsreceieved', 'depositpaid', 'paidinfull'])
         enquiries = qry.fetch(10)
         for enquiry in enquiries:
             item_node = SubElement(items_node, 'item')
@@ -75,7 +68,9 @@ def retrieveInvoice(node):
             new_node.text = "%0.2f" % (enquiry.vatInZAR / 100.0)
 
         # get the applicable payment transactions
-        items = CollectionTransaction.all().ancestor(enquiry_collection).order('created')
+        items = CollectionTransaction.all().ancestor(enquiry_collection)
+        items.order('created')
+        items.filter('type =', 'Payment')
         for item in items:
             item_node = SubElement(items_node, 'item')
             new_node = SubElement(item_node, 'enquirynumber')
