@@ -185,7 +185,7 @@ class PaymentNotification(webapp.RequestHandler):
         node = Element('paymentnotification')
 
         # get the enquiry collection associated with the payment
-        enquiry_colection_number = self.request.get('m_1')
+        enquiry_colection_number = self.request.get('m_1') or 'unknown'
         enquiry_collection = EnquiryCollection.get_by_key_name( \
                                                 enquiry_colection_number,
                                                 parent=EnquiryRoot.getEnquiryRoot())
