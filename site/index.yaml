@@ -47,6 +47,12 @@ indexes:
   properties:
   - name: created
 
+- kind: CollectionTransaction
+  ancestor: yes
+  properties:
+  - name: type
+  - name: created
+
 - kind: EmailAddress
   properties:
   - name: __key__
