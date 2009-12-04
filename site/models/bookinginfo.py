@@ -145,6 +145,9 @@ class CollectionTransaction(db.Model):
     """
     created = db.DateTimeProperty(auto_now_add=True)
     creator = db.UserProperty()
+    type = db.StringProperty(verbose_name='Transaction Type',
+                                choices=['Booking', 'Payment'],
+                                default='Payment')
     description = db.StringProperty(multiline=True, 
                                     verbose_name="Product Description")
     cost = db.IntegerProperty(verbose_name="Cost")
