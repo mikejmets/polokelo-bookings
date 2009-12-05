@@ -78,6 +78,9 @@ class ViewVenue(webapp.RequestHandler):
         state = self.request.get('state')
         workflow = self.request.get('workflow')
         validate = self.request.get('validate')
+        clear = self.request.get('clear')
+        if clear:
+            venue.deleteAllSlots()
         if validate:
             is_valid, err = venue.validate()
             if not is_valid:
@@ -96,9 +99,17 @@ class ViewVenue(webapp.RequestHandler):
                     #Invalid
                     logger.info('invalid dates')
                 else:
-                    venue.create_slots()
-                    venue.state = 'Open'
-                    venue.put()
+                    try:
+                        if venue.numberOfBookings == 0:
+                            logging.info('Create/recreate slots for berths')
+                            venue.create_slots()
+                        venue.state = 'Open'
+                        venue.put()
+                    except DeadlineExceededError:
+                        self.response.clear()
+                        self.response.set_status(500)
+                        self.response.out.write(
+                            "Operation took too long, please try again")
             elif state == 'Open':
                 venue.state = 'Closed'
                 venue.put()

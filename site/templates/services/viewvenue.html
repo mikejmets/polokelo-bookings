@@ -34,16 +34,22 @@
           {% endfor %}
       </table>
 
+      <hr />
       <form name="stateWorkFlow" method="post" 
             action="/services/owner/viewvenue">
         <input type="hidden" name="venuekey" value="{{ venue.key }}" />
-        <input type="hidden" name="state" value="{{ venue.state }}" />
+        <strong>Status:</strong>
+        <input style="border:0px" type="input" readonly="readonly" name="state" 
+            value="{{ venue.state }}" />
         {% if venue.isValid %}
           {% ifequal venue.state 'Closed' %}
               <input type="submit" name="workflow" value="Open For Bookings" />
           {% else %}
               <input type="submit" name="workflow" value="Close For Bookings" />
           {% endifequal %}
+          {% if not venue.hasBookings  %}
+              <input type="submit" name="clear" value="Clear" />
+          {% endif %}
         {% else %}
           <input type="submit" name="validate" value="Validate" />
           {% ifequal venue.state 'Open' %}

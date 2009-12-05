@@ -142,6 +142,9 @@ class Venue(db.Model):
             berth.bed.bedroom.name,
             berth.bed.name)
 
+    def hasBookings(self):
+        return self.numberOfBookings > 0
+
     def recalcNumOfBookings(self):
         self.numberOfBookings = len(self.getContractedBookings())
         logger.info('Recalc venue %s to %d', self.name, self.numberOfBookings)
@@ -238,6 +241,14 @@ class Venue(db.Model):
                         slot.put()
                         
                         
+    def deleteAllSlots(self):
+        #Beware: this may leave bookings hanging
+        for room in self.venue_bedrooms:
+            for bed in room.bedroom_beds:
+                for berth in bed.bed_berths:
+                    for slot in berth.berth_slots:
+                        slot.rdelete()
+
 
     def rdelete(self):
         for r in self.venue_inspections:
