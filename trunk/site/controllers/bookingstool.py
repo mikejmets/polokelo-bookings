@@ -128,9 +128,9 @@ class BookingsTool():
                 enquiry.vatInZAR = long(quote_amount * 0.14)
                 enquiry.totalAmountInZAR = enquiry.quoteInZAR + enquiry.vatInZAR
                 if enquiry.workflowState == 'temporary':
-                    enquiry.doTransition('allocate')
-                elif enquiry.workflowState == 'requiresintervention':
-                    enquiry.doTransition('allocatemanually')
+                    enquiry.doTransition('allocatetemporary')
+                elif enquiry.workflowState == 'awaitingagent':
+                    enquiry.doTransition('allocatebyagent')
                 else:
                     enquiry.doTransition('allocatefromhold')
                 enquiry.put()

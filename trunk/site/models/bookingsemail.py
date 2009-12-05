@@ -4,8 +4,8 @@ class BookingsEmail(db.Model):
     created = db.DateTimeProperty(auto_now_add=True)
     creator = db.UserProperty()
     recipients = db.StringListProperty(required=True, verbose_name='Recipients')
-    subject = db.TextProperty(required=True, verbose_name='Subject')
-    body = db.StringProperty(required=True, multiline=True, verbose_name='Body')
+    subject = db.StringProperty(required=True, verbose_name='Subject')
+    body = db.TextProperty(required=True, verbose_name='Body')
     includeSummary = db.BooleanProperty(
         verbose_name='Include Enquiry Summary', default=True)
     includeLink = db.BooleanProperty(

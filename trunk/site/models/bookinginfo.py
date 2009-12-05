@@ -65,33 +65,24 @@ class Enquiry(workflow.WorkflowAware):
             b.rdelete()
 
     def cancel(self):
-        for b in self.getContractedBookings():
-            b.rdelete()
+        #for b in self.getContractedBookings():
+        #    b.rdelete()
+        pass
     
     def allocate(self):
         pass
 
     def ontransition_expiretemporary(self, *args, **kw):
-        pass
+        self.expire()
 
     def ontransition_expireallocated(self, *args, **kw):
         self.expire()
 
-    def ontransition_expiredetails(self, *args, **kw):
+    def ontransition_expireconfirmed(self, *args, **kw):
         element = AccommodationElement.all().ancestor(self)[0]
         et = EmailTool()
-        et.notifyClient('expiredetails', element)
+        et.notifyClient('expireconfirmed', element)
         self.expire()
-
-    def ontransition_paydeposit(self, *args, **kw):
-        element = AccommodationElement.all().ancestor(self)[0]
-        et = EmailTool()
-        et.notifyClient('paydeposit', element)
-
-    def ontransition_payfull(self, *args, **kw):
-        element = AccommodationElement.all().ancestor(self)[0]
-        et = EmailTool()
-        et.notifyClient('payfull', element)
 
     def ontransition_expiredeposit(self, *args, **kw):
         element = AccommodationElement.all().ancestor(self)[0]
@@ -99,28 +90,56 @@ class Enquiry(workflow.WorkflowAware):
         et.notifyClient('expiredeposit', element)
         self.expire()
 
-    def ontransition_canceldeposit(self, *args, **kw):
+    def ontransition_expireonhold(self, *args, **kw):
+        self.expire()
+
+    def ontransition_expireawaitingagent(self, *args, **kw):
+        self.expire()
+
+    def ontransition_expireawaitingclient(self, *args, **kw):
+        self.expire()
+
+    def ontransition_receivedeposit(self, *args, **kw):
         element = AccommodationElement.all().ancestor(self)[0]
         et = EmailTool()
-        et.notifyClient('canceldeposit', element)
+        et.notifyClient('receivedeposit', element)
+
+    def ontransition_receiveall(self, *args, **kw):
+        element = AccommodationElement.all().ancestor(self)[0]
+        et = EmailTool()
+        et.notifyClient('receiveall', element)
+
+    def ontransition_receivefinal(self, *args, **kw):
+        element = AccommodationElement.all().ancestor(self)[0]
+        et = EmailTool()
+        et.notifyClient('receivefinal', element)
+
+    def ontransition_canceldeposit(self, *args, **kw):
         self.cancel()
 
     def ontransition_cancelfull(self, *args, **kw):
-        element = AccommodationElement.all().ancestor(self)[0]
-        et = EmailTool()
-        et.notifyClient('cancelfull', element)
         self.cancel()
 
-    def ontransition_allocate(self, *args, **kw):
+    def ontransition_allocatetemporary(self, *args, **kw):
         self.allocate()
 
-    def ontransition_allocatemanually(self, *args, **kw):
+    def ontransition_allocatebyagent(self, *args, **kw):
         self.allocate()
 
-    def ontransition_receivedetails(self, *args, **kw):
+    def ontransition_assigntoclient(self, *args, **kw):
         element = AccommodationElement.all().ancestor(self)[0]
         et = EmailTool()
-        et.notifyClient('receivedetails', element)
+        et.notifyClient('assigntoclient', element)
+
+    def ontransition_confirmfromallocated(self, *args, **kw):
+        element = AccommodationElement.all().ancestor(self)[0]
+        et = EmailTool()
+        et.notifyClient('confirmfromallocated', element)
+
+    def ontransition_confirmfromawaiting(self, *args, **kw):
+        element = AccommodationElement.all().ancestor(self)[0]
+        et = EmailTool()
+        et.notifyClient('confirmfromawaiting', element)
 
     def ontransition_allocatefromhold(self, *args, **kw):
         self.allocate()

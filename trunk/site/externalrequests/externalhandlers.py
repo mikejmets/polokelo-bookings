@@ -160,14 +160,14 @@ class ExternalBookings(webapp.RequestHandler):
             if enquiry:
                 # do the transitions
                 if enquiry.getStateName() == 'allocated':
-                    enquiry.doTransition('receivedetails')
+                    enquiry.doTransition('confirmfromallocated')
                     txn_description += '%s: %s\n' % \
                                     (refnum, enquiry.getAccommodationDescription())
                     txn_total += enquiry.totalAmountInZAR 
                     txn_vat += enquiry.vatInZAR
                     txn_quote += enquiry.quoteInZAR
                 elif enquiry.getStateName() == 'onhold':
-                    enquiry.doTransition('assigntouser')
+                    enquiry.doTransition('assigntoagent')
                 else:
                     # we should not be doing anything to the enquiry
                     # it is in the wrong state
@@ -194,7 +194,7 @@ class ExternalBookings(webapp.RequestHandler):
                         guest_element.put()
 
                     # # create a client instance
-                    # if enquiry.getStateName() == 'detailsreceieved':
+                    # if enquiry.getStateName() == 'confirmed':
                     #     client = Client(clientNumber = generator.generateClientNumber(),
                     #                     surname=guest_element.surname,
                     #                     firstNames = guest_element.firstNames)
