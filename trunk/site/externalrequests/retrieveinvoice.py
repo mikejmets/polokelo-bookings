@@ -25,7 +25,9 @@ def _getCardHolderDetails(collection):
         source = guest_node.xmlSource
         logging.info('xml source: %s', source)
         xml = XML(source)
-        return xml
+    else:
+        xml = XML('<creditcardholder />')
+    return xml
 
 def retrieveInvoice(node):
     """ retrieve the invoice details given the batch number
@@ -87,13 +89,20 @@ def retrieveInvoice(node):
     except:
         error = sys.exc_info()[1]
         logging.error('Unhandled error: %s', error)
+        if not node.find('creditcardholder'):
+            SubElement(node, 'creditcardholder')
+        if not node.find('items'):
+            SubElement(node, 'items')
+        new_node = SubElement(node, 'allowdeposit')
         _addErrorNode(node, code='4001', \
                         message='Seriously Unexpected and Unhandleable Error')
+        return tostring(node)
 
-
-    new_node = SubElement(node, 'allowdeposit')
-    new_node.text = 'no'
-    _addErrorNode(node)
+    if not node.find('allowdeposit'):
+        new_node = SubElement(node, 'allowdeposit')
+        new_node.text = 'no'
+    if not node.find('systemerror'):
+        _addErrorNode(node)
 
     return tostring(node)
 
