@@ -1,0 +1,28 @@
+$datestr = $_POST["timestamp"]; // yyyy-mm-dd hh:mm:ss 
+            // hierdie veld genereer ek net om 'n timestamp te create in my databasis
+$p1 = $_POST["p1"]; // die terminal id van polokelo by vcs (sal wees '1364')
+$p2 = $_POST["p2"]; // die payment reference
+$p3 = $_POST["p3"]; // approved/declined string van vcs (sien vcs callback format spec)
+$p4 = $_POST["p4"]; // vcs string wat aandui of reference number al gebruik was (sien vcs spec)
+$p5 = $_POST["p5"]; // cardholder name on card
+$p6 = $_POST["p6"]; // amount authorized by bank
+$p7 = $_POST["p7"]; // card type (VISA MASTERCARD)
+$p8 = $_POST["p8"]; // Description of goods
+$p9 = $_POST["p9"]; // cardholder e-mail address
+$p10 = $_POST["p10"]; // budget period 00=straight
+$p11 = $_POST["p11"]; // expiry date entered on payment page (expiry date of card)
+$p12 = $_POST["p12"]; // Authorisation Response Code received fromthe bank, e.g. 00/0 = Approved,  05 = Do not honour etc.
+$pam = $_POST["pam"]; // personal authentication message (see vcs spec)
+$m1 = $_POST["m_1"]; // Primary Booking Number (collection enquiry number) met dashes bv PAC-ADG-JKL
+$m2 = $_POST["m_2"]; // All enquiry numbers comma seperated w/o dashes eg: PACADGJHG,PACEDFGHJ,PACASDEDF...
+$m3 = $_POST["m_3"]; // Payment type; DEP = deposit; INV = final payment on invoice
+$m4 = $_POST["m_4"]; // Percentage of total quotation (for DEP payment type) eg: 10 // or 100 if INV
+$m5 = $_POST["m_5"]; // blank for future use
+$m6 = $_POST["m_6"]; // blank for future use
+$m7 = $_POST["m_7"]; // blank for future use
+$m8 = $_POST["m_8"]; // blank for future use
+$m9 = $_POST["m_9"]; // blank for future use
+$m10 = $_POST["m_10"]; // blank for future use
+$ipaddr = $_POST["CardHolderIpAddr"]; // Ip address van creditcard holder
+$mcn = $_POST["MaskedCardNumber"]; // masked card number (see vcs specs)
+$tt = $_POST["TransactionType"]; // (see vcs specs)
