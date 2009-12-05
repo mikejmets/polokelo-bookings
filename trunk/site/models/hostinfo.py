@@ -115,9 +115,16 @@ class Venue(db.Model):
             (self.name, self.venueType, self.contactPerson)
 
     def fairAllocationsIndicator(self, berth, element):
-        #For allocation purposes only
-        #Used as a string for sorting venues
+        #Create a string for fairness sorting
+
+        #Keep allocations within single digits
+        #For home and guest house, ensure unallocated venues are higher
         allocations = min(self.numberOfBookings, 9)
+        if self.venueType in ['Hostel', 'Back Packers']:
+            #fill up one hostel completely first
+            allocations = 9 - allocations
+
+        #If double rooms required, ensure bouble room are higher
         doubles = element.doublerooms
         if doubles > 0:
             double_indicator = 9
