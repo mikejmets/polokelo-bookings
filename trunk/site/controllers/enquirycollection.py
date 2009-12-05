@@ -9,7 +9,7 @@ from google.appengine.ext import db
 
 from controllers.home import BASE_PATH, PROJECT_PATH
 from models.enquiryroot import EnquiryRoot
-from models.bookinginfo import EnquiryCollection, Enquiry
+from models.bookinginfo import EnquiryCollection, Enquiry, VCSPaymentNotification
 from controllers.utils import get_authentication_urls
 from controllers import generator
 
@@ -32,12 +32,14 @@ class ViewEnquiryCollection(webapp.RequestHandler):
         enquirycollectionkey = self.request.get('enquirycollectionkey')
         enquirycollection = EnquiryCollection.get(enquirycollectionkey)
         enquiries = Enquiry.all().ancestor(enquirycollection)
+        vcsrecords = VCSPaymentNotification.all().ancestor(enquirycollection)
         self.response.out.write(template.render(filepath, 
                     {
                         'base_path':BASE_PATH,
                         'enquirycollectionkey': enquirycollectionkey,
                         'enquirycollection': enquirycollection,
                         'enquiries':enquiries,
+                        'vcsrecords':vcsrecords,
                         'auth_url':auth_url,
                         'auth_url_text':auth_url_text
                         }))
@@ -124,3 +126,21 @@ class DeleteEnquiryCollection(webapp.RequestHandler):
 
         self.redirect('/bookings/bookinginfo')
 
+
+class ViewVCSRecord(webapp.RequestHandler):
+
+    def get(self):
+        came_from = self.request.referer
+        auth_url, auth_url_text = get_authentication_urls(self.request.uri)
+        filepath = os.path.join(PROJECT_PATH, 
+                      'templates', 'bookings', 'viewvcsrecord.html')
+        vcskey = self.request.get('vcskey')
+        vcsrec = VCSPaymentNotification.get(vcskey)
+        self.response.out.write(template.render(filepath, 
+                    {
+                        'base_path':BASE_PATH,
+                        'came_from':came_from,
+                        'vcsrec':vcsrec,
+                        'auth_url':auth_url,
+                        'auth_url_text':auth_url_text
+                        }))

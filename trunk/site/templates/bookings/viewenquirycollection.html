@@ -10,29 +10,51 @@
 <p>Enquiry Number: <strong>{{ enquirycollection.referenceNumber }}</strong> </p>
 <hr />
   
-    <p><strong>Enquiries </strong>
-      <a title="Add a new enquiry"
-        href="/bookings/enquiry/captureenquiry?enquirycollectionkey={{ enquirycollectionkey }}">
-          <img src="/images/add.png"/>
-      </a>
-    </p>
-    <table class="listing" cellspacing="0">
-        <thead>
-          <td>Reference</td>
-          <td>Status</td>
-          <td>&nbsp;</td>
-        </thead>
-        {% for enquiry in enquiries %}
-        <tr>
-          <td><a href="/bookings/enquiry/viewenquiry?enquirykey={{ enquiry.key }}">{{ enquiry.referenceNumber }}</td>
-          <td>{{ enquiry.workflowState }}</td>
-          <td class="action">
-            <a title="Edit this enquiry "
-              href="/bookings/enquiry/editenquiry?enquirykey={{ enquiry.key }}">
-              <img src="/images/edit.png"/>
-            </a></td>
-        </tr>
-        {% endfor %}
-    </table>
+    <div style="float: left">
+        <p><strong>Enquiries </strong>
+          <a title="Add a new enquiry"
+            href="/bookings/enquiry/captureenquiry?enquirycollectionkey={{ enquirycollectionkey }}">
+              <img src="/images/add.png"/>
+          </a>
+        </p>
+        <table class="listing" cellspacing="0">
+            <thead>
+              <td>Reference</td>
+              <td>Status</td>
+              <td>&nbsp;</td>
+            </thead>
+            {% for enquiry in enquiries %}
+            <tr>
+              <td><a href="/bookings/enquiry/viewenquiry?enquirykey={{ enquiry.key }}">{{ enquiry.referenceNumber }}</td>
+              <td>{{ enquiry.workflowState }}</td>
+              <td class="action">
+                <a title="Edit this enquiry "
+                  href="/bookings/enquiry/editenquiry?enquirykey={{ enquiry.key }}">
+                  <img src="/images/edit.png"/>
+                </a></td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+
+    <div style="margin-left: 20px; float: left">
+        <p><strong>VCS Payment Records</strong>
+        </p>
+        <table class="listing" cellspacing="0">
+            <thead>
+              <td>Ref. Number</td>
+              <td>Date</td>
+              <td>Type</td>
+              <td>Status</td>
+            </thead>
+            {% for vcsrec in vcsrecords %}
+            <tr>
+              <td><a href="/bookings/collection/viewvcsrecord?vcskey={{ vcsrec.key }}">{{ vcsrec.txRefNum }}</td>
+              <td>{{ vcsrec.created.date }}</td>
+              <td>{{ vcsrec.paymentType }}</td>
+              <td>{{ vcsrec.processingState }}</td>
+            </tr>
+            {% endfor %}
+    </div>
 
 {% endblock pagecontent %}
