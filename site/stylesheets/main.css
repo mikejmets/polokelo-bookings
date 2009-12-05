@@ -165,14 +165,6 @@ table.listing {
     margin: 0;
     padding: 3px 5px;
 }
-.listing th {
-    border-left: 1px solid lightblue;
-    border-top: 1px solid lightblue;
-    width: 25%;
-    text-align: right;
-    vertical-align: top;
-    padding-right: 10px;
-}
 .action {
     text-align: center !important;
 }
