@@ -52,50 +52,56 @@ class PaymentNotification(webapp.RequestHandler):
     def _populateNotification(self, pay_rec):
         """ Populate the VCS payment record from the request
         """
-        pay_rec.creator = users.get_current_user()
-        pay_rec.timeStamp = datetime.strptime(self.request.get('timestamp'), 
-                                                '%Y-%m-%d %H:%M')
+        try:
+            pay_rec.creator = users.get_current_user()
+            pay_rec.timeStamp = datetime.strptime(self.request.get('timestamp'), 
+                                                    '%Y-%m-%d %H:%M')
 
-        pay_rec.terminalId = self.request.get('p1')
-        pay_rec.txRefNum =  self.request.get('p2')
-        pay_rec.txType =  self.request.get('TransactionType')
-        pay_rec.duplicateTransaction =  self.request.get('p4') == u'DUPLICATE'
-        pay_rec.authResponseCode =  self.request.get('p12')
-        auth_str = self.request.get('p3')
-        if pay_rec.txType == u'Authorisation':
-            if pay_rec.authResponseCode == u'00' or \
-                    pay_rec.authResponseCode == u'0' or \
-                    auth_str.rstrip()[6:] == u'APPROVED':
-                pay_rec.authorised = True
-                pay_rec.authNumberOrReason = auth_str[:6]
-            else:
-                pay_rec.authorised = False
-                pay_rec.authNumberOrReason = auth_str.strip()
+            pay_rec.terminalId = self.request.get('p1')
+            pay_rec.txRefNum =  self.request.get('p2')
+            pay_rec.txType =  self.request.get('TransactionType')
+            pay_rec.duplicateTransaction =  self.request.get('p4') == u'DUPLICATE'
+            pay_rec.authResponseCode =  self.request.get('p12')
+            auth_str = self.request.get('p3')
+            if pay_rec.txType == u'Authorisation':
+                if pay_rec.authResponseCode == u'00' or \
+                        pay_rec.authResponseCode == u'0' or \
+                        auth_str.rstrip()[6:] == u'APPROVED':
+                    pay_rec.authorised = True
+                    pay_rec.authNumberOrReason = auth_str[:6]
+                else:
+                    pay_rec.authorised = False
+                    pay_rec.authNumberOrReason = auth_str.strip()
 
-        pay_rec.goodsDescription =  self.request.get('p8')
-        amount = float(self.request.get('p6'))
-        iAmount = long(amount * 100.0)       # convert into cents
-        pay_rec.authAmount = iAmount
-        pay_rec.budgetPeriod =  self.request.get('p10')
+            pay_rec.goodsDescription =  self.request.get('p8')
+            amount = float(self.request.get('p6'))
+            iAmount = long(amount * 100.0)       # convert into cents
+            pay_rec.authAmount = iAmount
+            pay_rec.budgetPeriod =  self.request.get('p10')
 
-        pay_rec.cardHolderName =  self.request.get('p5')
-        pay_rec.cardHolderEmail =  self.request.get('p9')
-        pay_rec.cardHolderIP =  self.request.get('CardHolderIpAddr')
+            pay_rec.cardHolderName =  self.request.get('p5')
+            pay_rec.cardHolderEmail =  self.request.get('p9')
+            pay_rec.cardHolderIP =  self.request.get('CardHolderIpAddr')
 
-        pay_rec.maskedCardNumber =  self.request.get('MaskedCardNumber')
-        pay_rec.cardType =  self.request.get('p7')
-        pay_rec.cardExpiry =  self.request.get('p11')
+            pay_rec.maskedCardNumber =  self.request.get('MaskedCardNumber')
+            pay_rec.cardType =  self.request.get('p7')
+            pay_rec.cardExpiry =  self.request.get('p11')
 
-        pay_rec.pam =  self.request.get('pam')
+            pay_rec.pam =  self.request.get('pam')
 
-        pay_rec.enquiryCollection =  self.request.get('m_1')
-        pay_rec.enquiryList = []
-        for num in self.request.get('m_2').split(','):
-            enq_num = num[:3] + '-' + num[3:6] + '-' + num[6:]
-            pay_rec.enquiryList.append(enq_num)
+            pay_rec.enquiryCollection =  self.request.get('m_1')
+            pay_rec.enquiryList = []
+            for num in self.request.get('m_2').split(','):
+                enq_num = num[:3] + '-' + num[3:6] + '-' + num[6:]
+                pay_rec.enquiryList.append(enq_num)
 
-        pay_rec.paymentType =  self.request.get('m_3')
-        pay_rec.depositPercentage =  int(self.request.get('m_4'))
+            pay_rec.paymentType =  self.request.get('m_3')
+            pay_rec.depositPercentage =  int(self.request.get('m_4'))
+        except Exception:
+            pay_rec.processingState = 'Failed'
+            pay_rec.put()
+            error = sys.exc_info()[1]
+            logging.error('Unhandled error: %s', error)
 
 
 
@@ -119,8 +125,6 @@ class PaymentNotification(webapp.RequestHandler):
             enquiry = Enquiry.get_by_key_name(enquiry_number, 
                                               parent=enquiry_collection)
             if enquiry:
-                # TODO: check that the enquiry has not expired
-
                 logging.info('Found enquiry %s', enquiry_number)
 
                 if pay_rec.paymentType == u'DEP' and \
@@ -202,6 +206,15 @@ class PaymentNotification(webapp.RequestHandler):
         pay_rec = VCSPaymentNotification(parent=enquiry_collection)
         self._populateNotification(pay_rec)
         pay_rec.put()
+
+        # check that the processing of the payment notification did not fail
+        if pay_rec.processingState == 'Failed':
+            SubElement(node, 'payment')
+            self._addErrorNode(node, code='303',
+                    message='Could not successfully process the VCS transaction data. Money was not applied to the enquiries.')
+            self.response.headers['Content-Type'] = 'text/plain'
+            self.response.out.write(tostring(node))
+            return
 
         # check that the payment transaction is state authorised and not a duplicate
         if not pay_rec.duplicateTransaction and \
