@@ -17,7 +17,8 @@ from controllers.enquiry import \
     BookingsToolFindAccommodation, BookingsToolReserveAccommodation, \
     CaptureEnquiry, EditEnquiry, DeleteEnquiry
 from controllers.enquirycollection import ViewEnquiryCollection, \
-    CaptureEnquiryCollection, EditEnquiryCollection, DeleteEnquiryCollection
+    CaptureEnquiryCollection, EditEnquiryCollection, DeleteEnquiryCollection, \
+    ViewVCSRecord
 from models.bookinginfo import EnquiryCollection, ContractedBooking
 from controllers.bookingsemail import \
     CaptureBookingsEmail, EditBookingsEmail, DeleteBookingsEmail
@@ -81,6 +82,7 @@ application = webapp.WSGIApplication([
   ('/bookings/collection/captureenquirycollection', CaptureEnquiryCollection),
   ('/bookings/collection/editenquirycollection', EditEnquiryCollection),
   ('/bookings/collection/deleteenquirycollection', DeleteEnquiryCollection),
+  ('/bookings/collection/viewvcsrecord', ViewVCSRecord),
   ('/bookings/enquiry/viewenquiry', ViewEnquiry),
   ('/bookings/enquiry/advanceenquiry', AdvanceEnquiry),
   ('/bookings/enquiry/captureenquiry', CaptureEnquiry),
