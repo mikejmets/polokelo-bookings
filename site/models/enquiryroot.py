@@ -34,42 +34,69 @@ class EnquiryRoot(db.Model):
         wfl = Workflow(key_name=ENQUIRY_WORKFLOW, parent=self)
         wfl.put()
         wfl.addState('temporary', title='Temporary')
-        wfl.addState('onhold', title='On Hold')
         wfl.addState('allocated', title='Allocated')
-        wfl.addState('requiresintervention', title='Requires Intervention')
-        wfl.addState('detailsreceieved', title='Details Received')
-        wfl.addState('depositpaid', title='Deposit Paid')
-        wfl.addState('paidinfull', title='Paid In Full')
+        wfl.addState('confirmed', title='Confirmed')
+        wfl.addState('receiveddeposit', title='Received Deposit')
+        wfl.addState('receivedfull', title='Received Full Payment')
+        wfl.addState('onhold', title='On Hold')
+        wfl.addState('awaitingagent', title='Awaiting Agent')
+        wfl.addState('awaitingclient', title='Awaiting Guest')
         wfl.addState('expired', title='Expired')
         wfl.addState('cancelled', title='Cancelled')
 
-        wfl.addTransition('expiretemporary', 'temporary', 'expired', title='Expire')
-        wfl.addTransition('allocate', 'temporary', 'allocated', title='Allocate')
-        wfl.addTransition('expiremanaully', 'temporary', 'expired', title='Expire')
-        wfl.addTransition('putonhold', 'temporary', 'onhold', title='Put on Hold')
+        #Grouped my paths
+        #Auto allocate full payment
+        wfl.addTransition('allocatetemporary', 'temporary', 'allocated', 
+            title='Allocate')
+        wfl.addTransition('confirmfromallocated', 'allocated', 'confirmed', \
+            title='Confirm')
+        wfl.addTransition('receiveall', 'confirmed', 'receivedfull', \
+            title='Receive whole payment')
 
-        wfl.addTransition('expireonhold', 'onhold', 'expired', title='Expire')
-        wfl.addTransition('assigntouser', 'onhold', 'requiresintervention', \
-                                title='Assign to user')
-        wfl.addTransition('allocatefromhold', 'onhold', 'allocated', title='Allocate')
+        #Auto allocate deposit and final payment
+        wfl.addTransition('receivedeposit', 'confirmed', 'receiveddeposit', \
+            title='Receive deposit')
+        wfl.addTransition('receivefinal', 'receiveddeposit', 'receivedfull', \
+            title='Receive final payment')
 
-        wfl.addTransition('allocatemanually', 'requiresintervention', 'allocated', \
-                                title='Allocate')
-        wfl.addTransition('expireallocated', 'allocated', 'expired', title='Expire')
-        wfl.addTransition('receivedetails', 'allocated', 'detailsreceieved', \
-                                title='Receive Details')
+        #Auto allocate unsuccessful
+        wfl.addTransition('putonhold', 'temporary', 'onhold', 
+            title='Put on hold')
+        wfl.addTransition('assigntoagent', 'onhold', 'awaitingagent', \
+            title='Assign to agent')
+        wfl.addTransition('allocatebyagent', 'awaitingagent', 'allocated', \
+            title='Allocate')
 
-        wfl.addTransition('expiredetails', 'detailsreceieved', 'expired', title='Expire')
-        wfl.addTransition('paydeposit', 'detailsreceieved', 'depositpaid', \
-                                title='Pay deposit')
+        #Agent allocation
+        wfl.addTransition('temptoagent', 'temporary', 'awaitingagent', \
+            title='Temporary to agent')
+        wfl.addTransition('assigntoclient', 'allocated', 'awaitingclient', \
+            title='Assign to guest')
+        wfl.addTransition('confirmfromawaiting', 'awaitingclient','confirmed', \
+            title='Confirm')
 
-        wfl.addTransition('expiredeposit', 'depositpaid', 'expired', title='Expire')
-        wfl.addTransition('canceldeposit', 'depositpaid', 'cancelled', title='Cancel')
-        wfl.addTransition('payall', 'detailsreceieved', 'paidinfull', \
-                                title='Pay in full')
-        wfl.addTransition('payfull', 'depositpaid', 'paidinfull', title='Pay in full')
+        #Expiries
+        wfl.addTransition('expiretemporary', 'temporary', 'expired', \
+            title='Expire')
+        wfl.addTransition('expireallocated', 'allocated', 'expired', \
+            title='Expire')
+        wfl.addTransition('expireconfirmed', 'confirmed', 'expired', \
+            title='Expire')
+        wfl.addTransition('expiredeposit', 'receiveddeposit', 'expired', 
+            title='Expire')
+        wfl.addTransition('expireonhold', 'onhold', 'expired', \
+            title='Expire')
+        wfl.addTransition('expireawaitingagent', 'awaitingagent', 'expired', \
+            title='Expire')
+        wfl.addTransition('expireawaitingclient', 'awaitingclient', 'expired', \
+            title='Expire')
 
-        wfl.addTransition('cancelfull', 'paidinfull', 'cancelled', title='Cancel')
+        #Cancellation
+        wfl.addTransition('canceldeposit', 'receiveddeposit', 'cancelled', \
+            title='Cancel')
+        wfl.addTransition('cancelfull', 'receivedfull', 'cancelled', \
+            title='Cancel')
+
         wfl.put()
         
         wfl.setInitialState('temporary')
@@ -85,6 +112,13 @@ class EnquiryRoot(db.Model):
         bcs = ExpirationSetting(
             parent=wfl,
             entityKind = 'Enquiry', 
+            entityState = 'awaitingagent', 
+            hours = 1)
+        bcs.put()
+
+        bcs = ExpirationSetting(
+            parent=wfl,
+            entityKind = 'Enquiry', 
             entityState = 'onhold', 
             hours = 2)
         bcs.put()
@@ -92,7 +126,6 @@ class EnquiryRoot(db.Model):
         bcs = ExpirationSetting(
             parent=wfl,
             entityKind = 'Enquiry', 
-            entityTransition = 'allocate', 
             entityState = 'allocated', 
             hours = 6)
         bcs.put()
@@ -100,25 +133,24 @@ class EnquiryRoot(db.Model):
         bcs = ExpirationSetting(
             parent=wfl,
             entityKind = 'Enquiry', 
-            entityTransition = 'receivedetails', 
-            entityState = 'detailsreceieved', 
+            entityState = 'confirmed', 
             hours = 24)
         bcs.put()
 
         bcs = ExpirationSetting(
             parent=wfl,
             entityKind = 'Enquiry', 
-            entityTransition = 'paydeposit', 
-            entityState = 'depositpaid', 
-            hours = 72)
+            entityState = 'awaitingclient', 
+            hours = 24)
         bcs.put()
 
         bcs = ExpirationSetting(
             parent=wfl,
             entityKind = 'Enquiry', 
-            entityTransition = 'payfull', 
-            entityState = 'paidinfull', 
-            hours = -1)
+            entityState = 'receiveddeposit', 
+            hours = 72)
+        bcs.put()
+
         bcs.put()
 
         return wfl

@@ -128,23 +128,24 @@ class PaymentNotification(webapp.RequestHandler):
                 logging.info('Found enquiry %s', enquiry_number)
 
                 if pay_rec.paymentType == u'DEP' and \
-                                enquiry.getStateName() == 'detailsreceieved':
-                    logging.info('Transition paydeposit for %s', enquiry_number)
+                                enquiry.getStateName() == 'confirmed':
+                    logging.info('Transition receivedeposit for %s', enquiry_number)
                     applied_amount = long(enquiry.totalAmountInZAR * \
                                             (pay_rec.depositPercentage / 100.0))
-                    transition_name = 'paydeposit'
+                    transition_name = 'receivedeposit'
                     txn_description += 'Accom REF %s: %d%% Deposit\n' % \
                             (enquiry_number, pay_rec.depositPercentage)
 
                 elif pay_rec.paymentType == u'INV' and \
-                        (enquiry.getStateName() in ['depositpaid', 'detailsreceieved']):
-                    logging.info('Transition payfull for %s', enquiry_number)
+                        (enquiry.getStateName() in ['receiveddeposit', 'confirmed']):
+                    logging.info('Transition receivefinal for %s', 
+                        enquiry_number)
                     applied_amount = enquiry.totalAmountInZAR - \
                                             enquiry.amountPaidInZAR
-                    if enquiry.getStateName() == 'depositpaid':
-                        transition_name = 'payfull'
-                    elif enquiry.getStateName() == 'detailsreceieved': 
-                        transition_name = 'payall'
+                    if enquiry.getStateName() == 'receiveddeposit':
+                        transition_name = 'receivefinal'
+                    elif enquiry.getStateName() == 'confirmed': 
+                        transition_name = 'receiveall'
                     txn_description += 'Accom REF %s: Outstanding Balance\n' % \
                                                         (enquiry_number)
 

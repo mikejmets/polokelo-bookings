@@ -22,7 +22,7 @@ class ExpireEnquiries(webapp.RequestHandler):
             for t in transitions:
                 if t.key().name().startswith('expire'):
                     logger.info("Expire enquiry -- %s", enquiry.referenceNumber)
-                    enquiry.doTransition(t)
+                    enquiry.doTransition(t.key().name())
                     break
 
         auth_url, auth_url_text = get_authentication_urls(self.request.uri)

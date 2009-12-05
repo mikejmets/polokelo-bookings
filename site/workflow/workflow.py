@@ -298,6 +298,8 @@ class WorkflowAware(db.Model):
             transname)
         if exp_date:
             self.expiryDate = exp_date.replace(second=0, microsecond=0)
+        else:
+            self.expiryDate = None
 
         logging.info('self.put()')
         self.put()
@@ -330,15 +332,26 @@ class ExpirationSetting(db.Model):
 
     @classmethod
     def getExpirationDate(cls, workflow, entityKind, entityState, entityTransition=None):
-        setting = db.Query(ExpirationSetting).ancestor(workflow)
-        setting.filter('entityKind =', entityKind)
-        setting.filter('entityState =', entityState)
-        if entityTransition:
-            setting.filter('entityTransition =', entityTransition)
-        record = setting.get()
-        if record and record.hours >= 0:
-            logging.info('Expire in %s hours time', record.hours)
-            return datetime.now() + timedelta(hours=record.hours)
+        settings = ExpirationSetting.all().ancestor(workflow)
+        settings.filter('entityKind =', entityKind)
+        settings.filter('entityState =', entityState)
+        if settings.count() > 1:
+            if entityTransition:
+                settings.filter('entityTransition =', entityTransition)
+        setting = settings.get()
+
+        #if setting:
+        #    logging.info('Found expiration setting e = %s s = %s t = %s', 
+        #      entityKind, setting.entityState, setting.entityTransition)
+        #else:
+        #    logging.info('Nothing expiration setting e = %s s = %s t = %s', 
+        #      entityKind, entityState, entityTransition)
+
+        if setting and setting.hours >= 0: 
+            logging.info('Expires in %s hours time', setting.hours)
+            return datetime.now() + timedelta(hours=setting.hours)
+
+
 
 ##    # Implements a stack that could be used to keep a record of the
 ##    # object way through the workflow.

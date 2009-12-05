@@ -40,9 +40,9 @@ class ViewEnquiry(webapp.RequestHandler):
         enquiry = Enquiry.get(enquirykey)
         element = AccommodationElement.all().ancestor(enquiry)[0]
         show_search = enquiry.workflowState in \
-            ['temporary', 'onhold', 'requiresintervention']
+            ['temporary', 'onhold', 'awaitingagent']
         show_transitions = enquiry.workflowState not in \
-            ['temporary', 'onhold', 'requiresintervention', 'expired', 'cancelled']
+            ['temporary', 'onhold', 'awaitingagent', 'expired', 'cancelled']
         transitions = None
         if show_transitions:
             transitions = enquiry.getPossibleTransitions()
@@ -133,6 +133,7 @@ class CaptureEnquiry(webapp.RequestHandler):
         enquiry.enterWorkflow(EnquiryRoot.getEnquiryWorkflow())
         accom_element = AccommodationElement(parent=enquiry)
         accom_element.put()
+        enquiry.doTransition('temptoagent')
         self.redirect('/bookings/enquiry/viewenquiry?enquirykey=%s' % enquiry.key())
 
 
@@ -235,7 +236,7 @@ class BookingsToolFindAccommodation(webapp.RequestHandler):
             #Clean up
             accom_element.availableBerths = None
             accom_element.put()
-            if enquiry.workflowState not in ['onhold', 'requiresintervention']:
+            if enquiry.workflowState not in ['onhold', 'awaitingagent']:
                 enquiry.doTransition('putonhold')
             params['error'] = "No results found" 
             params = urllib.urlencode(params)
@@ -244,7 +245,7 @@ class BookingsToolFindAccommodation(webapp.RequestHandler):
             #Clean up
             accom_element.availableBerths = None
             accom_element.put()
-            if enquiry.workflowState not in ['onhold', 'requiresintervention']:
+            if enquiry.workflowState not in ['onhold', 'awaitingagent']:
                 enquiry.doTransition('putonhold')
             params['error'] = "No package found" 
             params = urllib.urlencode(params)
