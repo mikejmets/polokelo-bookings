@@ -1,0 +1,22 @@
+{% extends base_path %}
+
+{% block breadcrumbs %}
+<a href="{{came_from}}">go back</a>
+{% endblock %}
+
+{% block pagecontent %}
+    <h1>Edit Bookings Email</h1>
+    <form name="enquiry" method="post" 
+          action="/bookings/email/editemail">
+      <input type="hidden" name="came_from" 
+             value="{{ came_from }}" />
+      <input type="hidden" name="emailkey" 
+             value="{{ emailkey }}" />
+        <table>
+            {{ form }}
+        </table>
+      <input type="submit" name="submit" value="Re-send Email"/>
+      <input type="submit" name="submit" value="Save Email"/>
+      <input type="submit" name="submit" value="Cancel"/>
+    </form>
+{% endblock pagecontent %}

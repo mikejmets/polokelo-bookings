@@ -1,0 +1,15 @@
+{% extends base_path %}
+
+{% block breadcrumbs %}
+<a href="/externalbookings/index">go back</a>
+{% endblock %}
+
+{% block pagecontent %}
+    <h1>Check Availability</h1>
+    <form name="booking" method="post" action="/externalbookings/checkavailability">
+        <table>
+            {{ form }}
+        </table>
+        <input type="submit" value="Check Availability" />
+    </form>
+{% endblock pagecontent %}
