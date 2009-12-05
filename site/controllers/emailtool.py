@@ -59,7 +59,7 @@ Enquiry Summary:
     Nights:           %s
     People:           %s
                 """ % (
-                       element.parent().referenceNumber, 
+                       element.parent().parent().referenceNumber, 
                        element.type, 
                        element.start,
                        element.nights,
@@ -72,9 +72,9 @@ Enquiry Summary:
             if element:
               link = u"""
 Click on the following link to see you invoice:
-http://www.polokelo.info/getinvoice?ref=%s
+http://www.polokelo.info/getinvoice.php?ref=%s
                 """ % \
-                       element.parent().referenceNumber
+                       element.parent().parent().referenceNumber
             return link
 
     def sendEmail(self, email, element):
