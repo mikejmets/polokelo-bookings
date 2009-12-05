@@ -4,6 +4,7 @@ import urllib
 from google.appengine.api import users
 from google.appengine.ext import webapp
 from google.appengine.ext.webapp import template
+from google.appengine.runtime import DeadlineExceededError
 from google.appengine.ext.db import djangoforms
 from django import newforms as forms
 
