@@ -66,14 +66,15 @@ class ManageHosts(webapp.RequestHandler):
 
         filepath = os.path.join(PROJECT_PATH, 'templates', 'services', 'managehosts.html')
         self.response.out.write(template.render(filepath, 
-                                    {
-                                        'base_path':BASE_PATH,
-                                        'start':new_start,
-                                        'owners':owners,
-                                        'user':users.get_current_user(),
-                                        'auth_url':auth_url,
-                                        'auth_url_text':auth_url_text
-                                        }))
+          {
+              'base_path':BASE_PATH,
+              'start':new_start,
+              'owners':owners,
+              'user':users.get_current_user(),
+              'is_admin_user':users.is_current_user_admin(),
+              'auth_url':auth_url,
+              'auth_url_text':auth_url_text
+              }))
 
 application = webapp.WSGIApplication([
                   ('/services/hostinfo', ManageHosts),
