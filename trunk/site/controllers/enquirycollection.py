@@ -10,7 +10,7 @@ from google.appengine.ext import db
 from controllers.home import BASE_PATH, PROJECT_PATH
 from models.enquiryroot import EnquiryRoot
 from models.bookinginfo import EnquiryCollection, Enquiry, \
-                    VCSPaymentNotification, CollectionTransaction
+                VCSPaymentNotification, CollectionTransaction, GuestElement
 from controllers.utils import get_authentication_urls
 from controllers import generator
 
@@ -33,7 +33,11 @@ class ViewEnquiryCollection(webapp.RequestHandler):
         enquirycollectionkey = self.request.get('enquirycollectionkey')
         enquirycollection = EnquiryCollection.get(enquirycollectionkey)
         enquiries = Enquiry.all().ancestor(enquirycollection).order('created')
-        vcsrecords = VCSPaymentNotification.all().ancestor(enquirycollection).order('created')
+        vcsrecords = VCSPaymentNotification.all().ancestor(enquirycollection)
+        vcsrecords.order('created')
+        qry = GuestElement.all().ancestor(enquirycollection)
+        qry.filter('isPrimary =', True).order('created')
+        card_holder = qry.get()
         qry = CollectionTransaction.all().ancestor(enquirycollection).order('created')
         transactions = []
         for txn in qry:
@@ -53,6 +57,7 @@ class ViewEnquiryCollection(webapp.RequestHandler):
                         'enquiries':enquiries,
                         'vcsrecords':vcsrecords,
                         'transactions':transactions,
+                        'cardholder':card_holder,
                         'auth_url':auth_url,
                         'auth_url_text':auth_url_text
                         }))

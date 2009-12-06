@@ -63,6 +63,12 @@ indexes:
   properties:
   - name: created
 
+- kind: GuestElement
+  ancestor: yes
+  properties:
+  - name: isPrimary
+  - name: created
+
 - kind: Match
   properties:
   - name: __key__
