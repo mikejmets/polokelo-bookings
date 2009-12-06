@@ -26,7 +26,7 @@
             {% for enquiry in enquiries %}
             <tr>
               <td><a href="/bookings/enquiry/viewenquiry?enquirykey={{ enquiry.key }}">{{ enquiry.referenceNumber }}</td>
-              <td>{{ enquiry.workflowState }}</td>
+              <td>{{ enquiry.getStateTitle }}</td>
               <td class="action">
                 <a title="Edit this enquiry "
                   href="/bookings/enquiry/editenquiry?enquirykey={{ enquiry.key }}">

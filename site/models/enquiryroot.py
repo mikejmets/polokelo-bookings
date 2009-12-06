@@ -100,6 +100,7 @@ class EnquiryRoot(db.Model):
         wfl.put()
         
         wfl.setInitialState('temporary')
+        wfl.createWorkFlowDict()
         wfl.put()
 
         bcs = ExpirationSetting(
@@ -149,8 +150,6 @@ class EnquiryRoot(db.Model):
             entityKind = 'Enquiry', 
             entityState = 'receiveddeposit', 
             hours = 72)
-        bcs.put()
-
         bcs.put()
 
         return wfl
