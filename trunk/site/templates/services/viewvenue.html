@@ -34,6 +34,7 @@
           {% endfor %}
       </table>
 
+      {% if is_admin_user %}
       <hr />
       <form name="stateWorkFlow" method="post" 
             action="/services/owner/viewvenue">
@@ -58,6 +59,7 @@
         {% endif %}
       </form>
     </td>
+    {% endif %}
 
     <td valign="top">
       <p><strong>Contact Numbers</strong>

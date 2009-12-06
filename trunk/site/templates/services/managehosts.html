@@ -31,7 +31,7 @@
               href="/services/owner/editowner?ownerkey={{ owner.key }}">
               <img src="/images/edit.png"/>
             </a></td>
-          {% if users.is_staff %}
+          {% if is_admin_user %}
           <td class="action">
             <a title="Delete this owner"
               href="/services/owner/deleteowner?ownerkey={{ owner.key }}"
