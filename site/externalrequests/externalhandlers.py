@@ -130,20 +130,11 @@ class ExternalBookings(webapp.RequestHandler):
     def _confirmEnquiries(self, node):
         """ confirm the final list of enquiries
         """
-
         # retrieve the enquiry batch number and collection instance
         collection_number = node.findtext('enquirybatchnumber') 
-        # txn_description += collection_number + '\n'
         enquiry_collection = EnquiryCollection.get_by_key_name( \
                                         collection_number, 
                                         parent=EnquiryRoot.getEnquiryRoot())
-
-        # initialise the booking transaction data
-        txn_description = 'Booking confirmation on %s: REFERENCE %s\n' % \
-                            (datetime.now().date(), collection_number)
-        txn_total = 0L
-        txn_vat = 0L
-        txn_quote = 0L
 
         # locate the primary guest node (credit card holder)
         guest_node = node.find('creditcardholder')
@@ -152,7 +143,15 @@ class ExternalBookings(webapp.RequestHandler):
         # as their parent, and extend their expiry dates for 24 hours
         # in anticipation of the deposit
         enquiry_elements = node.find('enquiries').findall('enquiry')
+
         for enquiry_element in enquiry_elements:
+            # initialise the booking transaction data
+            txn_description = 'Booking confirmation on %s: REFERENCE %s\n' % \
+                                (datetime.now().date(), collection_number)
+            txn_total = 0L
+            txn_vat = 0L
+            txn_quote = 0L
+
             # logging.info(tostring(enquiry_element))
             refnum = enquiry_element.findtext('enquirynumber')
             # retrieve the existing enquiry
@@ -160,19 +159,18 @@ class ExternalBookings(webapp.RequestHandler):
             if enquiry:
                 # do the transitions
                 if enquiry.getStateName() == 'allocated':
-                    enquiry.doTransition('confirmfromallocated')
                     txn_description += '%s: %s\n' % \
-                                    (refnum, enquiry.getAccommodationDescription())
-                    txn_total += enquiry.totalAmountInZAR 
-                    txn_vat += enquiry.vatInZAR
-                    txn_quote += enquiry.quoteInZAR
+                                (refnum, enquiry.getAccommodationDescription())
+                    txn_total = enquiry.totalAmountInZAR 
+                    txn_vat = enquiry.vatInZAR
+                    txn_quote = enquiry.quoteInZAR
+                    enquiry.doTransition('confirmfromallocated', 
+                                        txn_description=txn_description,
+                                        txn_total=txn_total,
+                                        txn_vat=txn_vat,
+                                        txn_quote=txn_quote)
                 elif enquiry.getStateName() == 'onhold':
                     enquiry.doTransition('assigntoagent')
-                else:
-                    # we should not be doing anything to the enquiry
-                    # it is in the wrong state
-                    continue
-                enquiry.put()
 
                 if guest_node:
                     guest_element = GuestElement( \
@@ -232,16 +230,6 @@ class ExternalBookings(webapp.RequestHandler):
                                                         % (refnum, collection_number))
                 # return the result as xml
                 return tostring(node)
-
-        # create the payment transaction in the collection
-        txn = CollectionTransaction(parent=enquiry_collection)
-        txn.type = 'Booking'
-        txn.creator = users.get_current_user()
-        txn.description = txn_description
-        txn.total = txn_total
-        txn.vat = txn_vat
-        txn.cost = txn_quote
-        txn.put()
 
         # append the result
         confirm_elem = SubElement(node, 'confirmationresult')
