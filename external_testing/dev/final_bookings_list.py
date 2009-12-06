@@ -7,7 +7,7 @@ url = 'http://localhost:8080/externalbookings'
 
 xml = """
 <enquirylist>
-    <enquirybatchnumber>YHT-4W7-9ZJ</enquirybatchnumber>
+    <enquirybatchnumber>YCHT-4W7-9ZJ</enquirybatchnumber>
     <guestagentcode>Trafalgar-234234324</guestagentcode>
     <action>confirm enquiries</action>
     <creditcardholder>
@@ -29,7 +29,7 @@ xml = """
     </creditcardholder>
     <enquiries>
         <enquiry>
-            <enquirynumber>YK8-DQN-2P8</enquirynumber>
+            <enquirynumber>YEK8-DQN-2P8</enquirynumber>
             <city>CPT</city>
             <accommodation>
                 <type>GH</type>
@@ -52,7 +52,7 @@ xml = """
             <vat>4844.00</vat>
         </enquiry>
         <enquiry>
-            <enquirynumber>YK8-DQN-2PM</enquirynumber>
+            <enquirynumber>YEK8-DQN-2PM</enquirynumber>
             <city>DUR</city>
             <accommodation>
                 <type>GH</type>
@@ -75,7 +75,7 @@ xml = """
             <vat>0.00</vat>
         </enquiry>
         <enquiry>
-            <enquirynumber>YK8-DQN-2PN</enquirynumber>
+            <enquirynumber>YEK8-DQN-2PN</enquirynumber>
             <city>CPT</city>
             <accommodation>
                 <type>GH</type>
