@@ -1,0 +1,18 @@
+{% extends base_path %}
+
+{% block breadcrumbs %}
+<a href="{{came_from}}">go back</a>
+{% endblock %}
+
+{% block pagecontent %}
+    <h1>Edit Existing Transaction</h1>
+    <form name="transaction" method="post" 
+          action="/bookings/collection/edittxnrecord">
+      <input type="hidden" name="came_from" value="{{ came_from }}" />
+      <input type="hidden" name="txnkey" value="{{ txnkey }}" />
+      <table>
+        {{ form }}
+      </table>
+      <input type="submit" value="Update Transaction" />
+    </form>
+{% endblock pagecontent %}
