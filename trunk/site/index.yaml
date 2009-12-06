@@ -58,6 +58,11 @@ indexes:
   - name: __key__
     direction: desc
 
+- kind: Enquiry
+  ancestor: yes
+  properties:
+  - name: created
+
 - kind: Match
   properties:
   - name: __key__
@@ -116,6 +121,11 @@ indexes:
   properties:
   - name: __key__
     direction: desc
+
+- kind: VCSPaymentNotification
+  ancestor: yes
+  properties:
+  - name: created
 
 - kind: Venue
   properties:
