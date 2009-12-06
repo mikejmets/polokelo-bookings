@@ -93,25 +93,25 @@ def generateEnquiryCollectionNumber():
     """ generate a new enquiry number
     """
     number = _generateNumber('HT4W79ZD', 'enquirycollectionnumber')
-    return 'Y' + number[:2] + '-' + number[2:5] + '-' + number[5:]
+    return 'YC' + number[:2] + '-' + number[2:5] + '-' + number[5:]
 
 
 def generateEnquiryNumber():
     """ generate a new enquiry number
     """
     number = _generateNumber('K8DQN2PG', 'enquirynumber')
-    return 'Y' + number[:2] + '-' + number[2:5] + '-' + number[5:]
+    return 'YE' + number[:2] + '-' + number[2:5] + '-' + number[5:]
 
 
 def generateBookingNumber():
     """ generate a new booking number
     """
     number = _generateNumber('S5HKZ3CE', 'bookingnumber')
-    return 'Y' + number[:2] + '-' + number[2:5] + '-' + number[5:]
+    return 'YB' + number[:2] + '-' + number[2:5] + '-' + number[5:]
 
 
 def generateClientNumber():
     """ generate a new client number
     """
     number = _generateNumber('A9TLW6FV', 'clientnumber')
-    return 'Y' + number
+    return 'YG' + number
