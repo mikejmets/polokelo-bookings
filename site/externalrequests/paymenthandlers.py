@@ -172,7 +172,9 @@ class PaymentNotification(webapp.RequestHandler):
                 enquiry.put()
                 enquiry.doTransition(transition_name,
                             txn_description=txn_description,
-                            txn_total=txn_total)
+                            txn_total=txn_total,
+                            txn_category='Auto',
+                            txn_notes='')
             else:
                 # we have a rogue enquiry on the payment
                 raise EnquiryDoesNotExistException, enquiry_number
