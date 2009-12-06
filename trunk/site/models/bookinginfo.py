@@ -316,8 +316,9 @@ class CollectionTransaction(db.Model):
     type = db.StringProperty(verbose_name='Transaction Type',
                                 choices=['Booking', 'Payment'],
                                 default='Payment')
-    subType = db.StringProperty(verbose_name='Sub Transaction',
-                                choices=['Confirm', 'Deposit', 'Settle'])
+    subType = db.StringProperty(verbose_name='Sub Transaction Type',
+                                choices=['Confirm', 'Cancel', \
+                                        'Deposit', 'Settle', 'Refund'])
     category = db.StringProperty(verbose_name='Category',
                                 choices=['Auto', 'Manual'],
                                 default='Auto')
@@ -326,9 +327,9 @@ class CollectionTransaction(db.Model):
     notes = db.StringProperty(multiline=True,
                                     verbose_name="Clarifying Notes")
     enquiryReference = db.StringProperty(verbose_name='Enquiry Reference')
-    cost = db.IntegerProperty(verbose_name="Cost")
-    vat = db.IntegerProperty(verbose_name="VAT")
-    total = db.IntegerProperty(verbose_name="Total")
+    cost = db.IntegerProperty(verbose_name="Cost in cents")
+    vat = db.IntegerProperty(verbose_name="VAT in cents")
+    total = db.IntegerProperty(verbose_name="Total in cents")
 
 
 class AccommodationElement(db.Model):

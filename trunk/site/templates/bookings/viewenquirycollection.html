@@ -49,12 +49,62 @@
             </thead>
             {% for vcsrec in vcsrecords %}
             <tr>
-              <td><a href="/bookings/collection/viewvcsrecord?vcskey={{ vcsrec.key }}">{{ vcsrec.txRefNum }}</td>
+              <td>
+                <a href="/bookings/collection/viewvcsrecord?vcskey={{ vcsrec.key }}">
+                  {{ vcsrec.txRefNum }}
+                </a>
+              </td>
               <td>{{ vcsrec.created.date }}</td>
               <td>{{ vcsrec.paymentType }}</td>
               <td>{{ vcsrec.processingState }}</td>
             </tr>
             {% endfor %}
+        </table>
+    </div>
+
+    <div style="margin-left: 20px; float: left">
+        <p><strong>Transaction Records</strong>
+          <a title="Add a new transaction"
+            href="/bookings/collection/capturetxnrecord?coll_key={{ enquirycollectionkey }}">
+              <img src="/images/add.png"/>
+          </a>
+        </p>
+        <table class="listing" cellspacing="0">
+            <thead>
+              <td>Ref. Number</td>
+              <td>Date</td>
+              <td>Type</td>
+              <td>Sub Type</td>
+              <td>Amount</td>
+              <td>&nbsp;</td>
+            </thead>
+            {% for txn in transactions %}
+            <tr>
+              <td>
+                <a href="/bookings/collection/viewtxnrecord?txnkey={{ txn.txnkey }}">
+                  {{ txn.enquiryReference }}
+                </a>
+              </td>
+              <td>{{ txn.created.date }}</td>
+              <td>{{ txn.type }}</td>
+              <td>{{ txn.subType }}</td>
+              <td>R{{ txn.total }}</td>
+              <td class="action">
+                {% if txn.can_edit %}
+                <a title="Edit this transaction "
+                  href="/bookings/collection/edittxnrecord?txnkey={{ txn.txnkey }}">
+                  <img src="/images/edit.png"/>
+                <a title="Delete this transaction "
+                    href="/bookings/collection/deletetxnrecord?txnkey={{ txn.txnkey }}" 
+                    onclick="return confirm('Are you sure?');">
+                  <img src="/images/delete.png"/>
+                </a>
+                </a>
+                {% endif %}
+              </td>
+            </tr>
+            {% endfor %}
+        </table>
     </div>
 
 {% endblock pagecontent %}

@@ -50,7 +50,9 @@
     </tr>
     <tr>
         <th>Auth. Amount</th>
-        <td>{{ vcsrec.authAmount }}</td>
+        <td>
+            {{ vcsrec.authAmount|make_list|slice:":-2"|join:""|default:"0" }}.{{ vcsrec.authAmount|make_list|slice:"-2:"|join:""|default:"0" }}
+        </td>
     </tr>
     <tr>
         <th>Budget Period</th>

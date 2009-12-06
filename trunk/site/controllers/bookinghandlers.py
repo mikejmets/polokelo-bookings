@@ -18,7 +18,8 @@ from controllers.enquiry import \
     CaptureEnquiry, EditEnquiry, DeleteEnquiry
 from controllers.enquirycollection import ViewEnquiryCollection, \
     CaptureEnquiryCollection, EditEnquiryCollection, DeleteEnquiryCollection, \
-    ViewVCSRecord
+    ViewVCSRecord, ViewTransactionRecord, \
+    CaptureTransactionRecord, EditTransactionRecord, DeleteTransactionRecord
 from models.bookinginfo import EnquiryCollection, ContractedBooking
 from controllers.bookingsemail import \
     CaptureBookingsEmail, EditBookingsEmail, DeleteBookingsEmail
@@ -71,28 +72,32 @@ class BookingError(webapp.RequestHandler):
 
 
 application = webapp.WSGIApplication([
-  ('/bookings/bookinginfo', ManageBookings),
-  ('/bookings/bookingerror', BookingError),
-  ('/bookings/assignclient', AssignClientToBooking),
-  ('/bookings/viewcontractedbooking', ViewContractedBooking),
-  ('/bookings/capturecontractedbooking', CaptureContractedBooking),
-  ('/bookings/editcontractedbooking', EditContractedBooking),
-  ('/bookings/deletecontractedbooking', DeleteContractedBooking),
-  ('/bookings/collection/viewenquirycollection', ViewEnquiryCollection),
-  ('/bookings/collection/captureenquirycollection', CaptureEnquiryCollection),
-  ('/bookings/collection/editenquirycollection', EditEnquiryCollection),
-  ('/bookings/collection/deleteenquirycollection', DeleteEnquiryCollection),
-  ('/bookings/collection/viewvcsrecord', ViewVCSRecord),
-  ('/bookings/enquiry/viewenquiry', ViewEnquiry),
-  ('/bookings/enquiry/advanceenquiry', AdvanceEnquiry),
-  ('/bookings/enquiry/captureenquiry', CaptureEnquiry),
-  ('/bookings/enquiry/editenquiry', EditEnquiry),
-  ('/bookings/enquiry/deleteenquiry', DeleteEnquiry),
-  ('/bookings/enquiry/findaccommodation', BookingsToolFindAccommodation),
-  ('/bookings/enquiry/reserveaccommodation', BookingsToolReserveAccommodation),
-  ('/bookings/email/captureemail', CaptureBookingsEmail),
-  ('/bookings/email/editemail', EditBookingsEmail),
-  ('/bookings/email/deleteemail', DeleteBookingsEmail),
+      ('/bookings/bookinginfo', ManageBookings),
+      ('/bookings/bookingerror', BookingError),
+      ('/bookings/assignclient', AssignClientToBooking),
+      ('/bookings/viewcontractedbooking', ViewContractedBooking),
+      ('/bookings/capturecontractedbooking', CaptureContractedBooking),
+      ('/bookings/editcontractedbooking', EditContractedBooking),
+      ('/bookings/deletecontractedbooking', DeleteContractedBooking),
+      ('/bookings/collection/viewenquirycollection', ViewEnquiryCollection),
+      ('/bookings/collection/captureenquirycollection', CaptureEnquiryCollection),
+      ('/bookings/collection/editenquirycollection', EditEnquiryCollection),
+      ('/bookings/collection/deleteenquirycollection', DeleteEnquiryCollection),
+      ('/bookings/collection/viewvcsrecord', ViewVCSRecord),
+      ('/bookings/collection/viewtxnrecord', ViewTransactionRecord),
+      ('/bookings/collection/capturetxnrecord', CaptureTransactionRecord),
+      ('/bookings/collection/edittxnrecord', EditTransactionRecord),
+      ('/bookings/collection/deletetxnrecord', DeleteTransactionRecord),
+      ('/bookings/enquiry/viewenquiry', ViewEnquiry),
+      ('/bookings/enquiry/advanceenquiry', AdvanceEnquiry),
+      ('/bookings/enquiry/captureenquiry', CaptureEnquiry),
+      ('/bookings/enquiry/editenquiry', EditEnquiry),
+      ('/bookings/enquiry/deleteenquiry', DeleteEnquiry),
+      ('/bookings/enquiry/findaccommodation', BookingsToolFindAccommodation),
+      ('/bookings/enquiry/reserveaccommodation', BookingsToolReserveAccommodation),
+      ('/bookings/email/captureemail', CaptureBookingsEmail),
+      ('/bookings/email/editemail', EditBookingsEmail),
+      ('/bookings/email/deleteemail', DeleteBookingsEmail),
     ], debug=True)
 
 
