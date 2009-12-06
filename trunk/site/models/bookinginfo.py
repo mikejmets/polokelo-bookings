@@ -1,6 +1,7 @@
 from datetime import datetime
 import logging
 from google.appengine.ext import db
+from google.appengine.api import users
 
 from models.clientinfo import Client
 from models.bookingsemail import BookingsEmail
@@ -8,7 +9,11 @@ from workflow import workflow
 
 from controllers.emailtool import EmailTool
 
-logger = logging.getLogger('BookingInfo')
+from exceptions import Exception
+
+
+class NoGuestElementException(Exception):
+    pass
 
 
 class IdSequence(db.Model):
@@ -26,6 +31,12 @@ class EnquiryCollection(db.Model):
                                             verbose_name='Reference Number')
 
     def rdelete(self):
+        for ct in CollectionTransaction.all().ancestor(self):
+            ct.delete()
+        for vcsrec in VCSPaymentNotification.all().ancestor(self):
+            vcsrec.delete()
+        for ge in GuestElement.all().ancestor(self):
+            ge.delete()
         for e in Enquiry.all().ancestor(self):
             e.rdelete()
         self.delete()
@@ -79,13 +90,13 @@ class Enquiry(workflow.WorkflowAware):
         self.expire()
 
     def ontransition_expireconfirmed(self, *args, **kw):
-        element = AccommodationElement.all().ancestor(self)[0]
+        element = AccommodationElement.all().ancestor(self).get()
         et = EmailTool()
         et.notifyClient('expireconfirmed', element)
         self.expire()
 
     def ontransition_expiredeposit(self, *args, **kw):
-        element = AccommodationElement.all().ancestor(self)[0]
+        element = AccommodationElement.all().ancestor(self).get()
         et = EmailTool()
         et.notifyClient('expiredeposit', element)
         self.expire()
@@ -100,17 +111,75 @@ class Enquiry(workflow.WorkflowAware):
         self.expire()
 
     def ontransition_receivedeposit(self, *args, **kw):
-        element = AccommodationElement.all().ancestor(self)[0]
+        """ Transition to deposit paid
+            1. check that a guest element exists
+            2. create a transaction record
+            3. notify the client
+        """
+        # check for a guest element on the enquiry collection
+        ec = self.parent()
+        ge = GuestElement.all().ancestor(ec).get()
+        if not ge:
+            raise NoGuestElementException, 'No guest element'
+
+        # create the transaction record
+        ct = CollectionTransaction(parent=ec)
+        ct.creator = users.get_current_user()
+        ct.type = 'Payment'
+        ct.description = kw['txn_description']
+        ct.total = kw['txn_total']
+        ct.category = 'Auto'
+        ct.put()
+
+        # notify the client
+        """ Transition to paid in full
+            1. check that a guest element exists
+            2. create a transaction record
+            3. notify the client
+        """
+        element = AccommodationElement.all().ancestor(self).get()
         et = EmailTool()
         et.notifyClient('receivedeposit', element)
 
     def ontransition_receiveall(self, *args, **kw):
-        element = AccommodationElement.all().ancestor(self)[0]
+        # check for a guest element on the enquiry collection
+        ec = self.parent()
+        ge = GuestElement.all().ancestor(ec).get()
+        if not ge:
+            raise NoGuestElementException, 'No guest element'
+
+        # create the transaction record
+        ct = CollectionTransaction(parent=ec)
+        ct.creator = users.get_current_user()
+        ct.type = 'Payment'
+        ct.description = kw['txn_description']
+        ct.total = kw['txn_total']
+        ct.category = 'Auto'
+        ct.put()
+
+        # notify the client
+        element = AccommodationElement.all().ancestor(self).get()
         et = EmailTool()
         et.notifyClient('receiveall', element)
 
     def ontransition_receivefinal(self, *args, **kw):
-        element = AccommodationElement.all().ancestor(self)[0]
+        # check for a guest element on the enquiry collection
+        ec = self.parent()
+        ge = GuestElement.all().ancestor(ec).get()
+        if not ge:
+            raise NoGuestElementException, 'No guest element'
+
+        # create the transaction record
+        ct = CollectionTransaction(parent=ec)
+        ct.creator = users.get_current_user()
+        ct.type = 'Payment'
+        ct.description = kw['txn_description']
+        ct.total = kw['txn_total']
+        ct.category = 'Auto'
+        ct.put()
+
+        # notify the client
+        element = AccommodationElement.all().ancestor(self).get()
         et = EmailTool()
         et.notifyClient('receivefinal', element)
 
@@ -127,16 +196,44 @@ class Enquiry(workflow.WorkflowAware):
         self.allocate()
 
     def ontransition_assigntoclient(self, *args, **kw):
-        element = AccommodationElement.all().ancestor(self)[0]
+        element = AccommodationElement.all().ancestor(self).get()
         et = EmailTool()
         et.notifyClient('assigntoclient', element)
 
     def ontransition_confirmfromallocated(self, *args, **kw):
+        """ Create the confirmation transaxtion
+            and notify the client
+        """
+        # create the confirmation transaction in the collection
+        ec = self.parent()
+        txn = CollectionTransaction(parent=ec)
+        txn.type = 'Booking'
+        txn.creator = users.get_current_user()
+        txn.description = kw['txn_description']
+        txn.total = kw['txn_total']
+        txn.vat = kw['txn_vat']
+        txn.cost = kw['txn_quote']
+        txn.put()
+
         element = AccommodationElement.all().ancestor(self)[0]
         et = EmailTool()
         et.notifyClient('confirmfromallocated', element)
 
     def ontransition_confirmfromawaiting(self, *args, **kw):
+        """ Create the confirmation transaxtion
+            and notify the client
+        """
+        # create the confirmation transaction in the collection
+        ec = self.parent()
+        txn = CollectionTransaction(parent=ec)
+        txn.type = 'Booking'
+        txn.creator = users.get_current_user()
+        txn.description = kw['txn_description']
+        txn.total = kw['txn_total']
+        txn.vat = kw['txn_vat']
+        txn.cost = kw['txn_quote']
+        txn.put()
+
         element = AccommodationElement.all().ancestor(self)[0]
         et = EmailTool()
         et.notifyClient('confirmfromawaiting', element)
@@ -167,6 +264,9 @@ class CollectionTransaction(db.Model):
     type = db.StringProperty(verbose_name='Transaction Type',
                                 choices=['Booking', 'Payment'],
                                 default='Payment')
+    category = db.StringProperty(verbose_name='Category',
+                                choices=['Auto', 'Manual'],
+                                default='Auto')
     description = db.StringProperty(multiline=True, 
                                     verbose_name="Product Description")
     cost = db.IntegerProperty(verbose_name="Cost")
