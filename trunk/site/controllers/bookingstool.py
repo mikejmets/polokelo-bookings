@@ -90,7 +90,7 @@ class BookingsTool():
         bookings = []
         try:
             people = 0
-            init_enquiry_state = enquiry.workflowState
+            init_enquiry_state = enquiry.workflowStateName
             #logger.info('AvailableBerths: %s', element.availableBerths)
             #logger.info('selected keys: %s', selected_keys)
             # Check if we have a package for the accommodation type in the city.
@@ -127,9 +127,9 @@ class BookingsTool():
                 enquiry.quoteInZAR = quote_amount
                 enquiry.vatInZAR = long(quote_amount * 0.14)
                 enquiry.totalAmountInZAR = enquiry.quoteInZAR + enquiry.vatInZAR
-                if enquiry.workflowState == 'temporary':
+                if enquiry.workflowStateName == 'temporary':
                     enquiry.doTransition('allocatetemporary')
-                elif enquiry.workflowState == 'awaitingagent':
+                elif enquiry.workflowStateName == 'awaitingagent':
                     enquiry.doTransition('allocatebyagent')
                 else:
                     enquiry.doTransition('allocatefromhold')

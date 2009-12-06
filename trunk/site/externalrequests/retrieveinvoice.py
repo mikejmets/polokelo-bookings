@@ -55,7 +55,7 @@ def retrieveInvoice(node):
 
         # get all the enquiries of this collection
         qry = Enquiry.all().ancestor(enquiry_collection)
-        qry.filter('workflowState in', 
+        qry.filter('workflowStateName in', 
                 ['allocated', 'confirmed', 'receiveddeposit', 'receivedfull'])
         enquiries = qry.fetch(10)
         for enquiry in enquiries:

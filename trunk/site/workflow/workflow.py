@@ -67,6 +67,7 @@ class Workflow(db.Model):
 
     created = db.DateTimeProperty(auto_now_add=True)
     creator = db.UserProperty()
+    flowdict = db.TextProperty()
     initialState = db.StringProperty()
 
     def addState(self, name, title=None):
@@ -117,6 +118,14 @@ class Workflow(db.Model):
         #state_from.addTransition(name, transition)
         #state_from.put()
 
+    def createWorkFlowDict(self):
+        adict = {}
+        for state in State.all().ancestor(self):
+            adict[state.key().name()] = \
+                [t.key().name() for t in state.transitions_from]
+        #logging.info('-------%s', str(adict))
+        self.flowdict = str(adict)
+        self.put()
 
 class State(db.Expando):
     """This class is used to describe a state.
@@ -180,7 +189,7 @@ class WorkflowAware(db.Model):
     """
 
     workflow = db.ReferenceProperty(Workflow)
-    workflowState = db.StringProperty()
+    workflowStateName = db.StringProperty()
 
     def enterWorkflow(self, workflow=None, initstate=None, *args, **kw):
         """[Re-]Bind this object to a specific workflow.
@@ -213,7 +222,7 @@ class WorkflowAware(db.Model):
         if not self.workflow.findState(initstate):
             raise WorkflowError, "invalid initial state: '%s'" % initstate
 
-        self.workflowState = initstate
+        self.workflowStateName = initstate
 
         # Call app-specific enter-state handler for initial state, if any
         name = 'onenter_%s' % initstate
@@ -224,7 +233,7 @@ class WorkflowAware(db.Model):
         exp_date = ExpirationSetting.getExpirationDate(
             self.workflow,
             self.kind(),
-            self.workflowState)
+            self.workflowStateName)
         if exp_date:
             self.expiryDate = exp_date.replace(second=0, microsecond=0)
 
@@ -241,6 +250,7 @@ class WorkflowAware(db.Model):
         logging.info('Getting self.workflow')
         # Get the workflow
         workflow = self.workflow
+        flowdict = eval(workflow.flowdict)
 
         logging.info('Getting the transition %s', transname)
         # Get the transition
@@ -251,25 +261,26 @@ class WorkflowAware(db.Model):
 
         logging.info('Getting the current state')
         # Get the current state
-        state = workflow.findState(self.workflowState)
-        # logging.info('Before Iterating to check for valid transition state')
-        # if transname not in [t.name for t in state.transitions_from]:
-        #     error = "transition '%s' is invalid from state '%s'"
-        #     raise WorkflowError, error % (transname, self.workflowState)
-        # logging.info('After Iterating to check for valid transition state')
+        state = workflow.findState(self.workflowStateName)
+
+        logging.info('Before Iterating to check for valid transition state')
+        if transname not in flowdict[self.workflowStateName]:
+            error = "transition '%s' is invalid from state '%s'"
+            raise WorkflowError, error % (transname, self.workflowStateName)
+        logging.info('After Iterating to check for valid transition state')
 
         logging.info('Getting the new state')
         new_state = transition.stateTo
 
         logging.info('Calling onleave handler')
         # call app-specific leave- state  handler if any
-        name = 'onleave_%s' % self.workflowState
+        name = 'onleave_%s' % self.workflowStateName
         if hasattr(self, name):
             getattr(self, name)(*args, **kw)
 
         logging.info('Setting the new state')
         # Set the new state
-        self.workflowState = new_state.key().name()
+        self.workflowStateName = new_state.key().name()
 
         logging.info('Calling ontransition handler')
         # call app-specific transition handler if any
@@ -278,7 +289,7 @@ class WorkflowAware(db.Model):
             try:
                 getattr(self, name)(*args, **kw)
             except:
-                self.workflowState = state.key().name()
+                self.workflowStateName = state.key().name()
                 msg = "Error '%s' occurred on transition"
                 error = sys.exc_info()[1]
                 raise WorkflowError, msg % (error)
@@ -294,7 +305,7 @@ class WorkflowAware(db.Model):
         exp_date = ExpirationSetting.getExpirationDate(
             self.workflow,
             self.kind(),
-            self.workflowState,
+            self.workflowStateName,
             transname)
         if exp_date:
             self.expiryDate = exp_date.replace(second=0, microsecond=0)
@@ -308,7 +319,12 @@ class WorkflowAware(db.Model):
     def getStateName(self):
         """Return the name of the current state.
         """
-        return self.workflowState
+        return self.workflowStateName
+
+    def getStateTitle(self):
+        """Return the name of the current state.
+        """
+        return self.getState().title
 
 
     def getState(self):
@@ -320,7 +336,9 @@ class WorkflowAware(db.Model):
     def getPossibleTransitions(self):
         """Returns the list of transition from the current state
         """
-        return self.getState().transitions_from
+        flowdict = eval(self.workflow.flowdict)
+        return [self.workflow.findTransition(t) \
+                  for t in flowdict[self.workflowStateName]]
 
 class ExpirationSetting(db.Model):
     created = db.DateTimeProperty(auto_now_add=True)

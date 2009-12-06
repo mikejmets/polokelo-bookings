@@ -27,7 +27,7 @@ class EnquiryForm(djangoforms.ModelForm):
     class Meta:
         model = Enquiry
         exclude = ['created', 'creator', 'workflow', 'referenceNumber',
-            'workflowState', 'enqColl', 'xmlSource']
+            'workflowStateName', 'enqColl', 'xmlSource']
 
 
 class ViewEnquiry(webapp.RequestHandler):
@@ -39,9 +39,9 @@ class ViewEnquiry(webapp.RequestHandler):
         enquirykey = self.request.get('enquirykey')
         enquiry = Enquiry.get(enquirykey)
         element = AccommodationElement.all().ancestor(enquiry)[0]
-        show_search = enquiry.workflowState in \
+        show_search = enquiry.workflowStateName in \
             ['temporary', 'onhold', 'awaitingagent']
-        show_transitions = enquiry.workflowState not in \
+        show_transitions = enquiry.workflowStateName not in \
             ['temporary', 'onhold', 'awaitingagent', 'expired', 'cancelled']
         transitions = None
         if show_transitions:
@@ -236,7 +236,7 @@ class BookingsToolFindAccommodation(webapp.RequestHandler):
             #Clean up
             accom_element.availableBerths = None
             accom_element.put()
-            if enquiry.workflowState not in ['onhold', 'awaitingagent']:
+            if enquiry.workflowStateName not in ['onhold', 'awaitingagent']:
                 enquiry.doTransition('putonhold')
             params['error'] = "No results found" 
             params = urllib.urlencode(params)
@@ -245,7 +245,7 @@ class BookingsToolFindAccommodation(webapp.RequestHandler):
             #Clean up
             accom_element.availableBerths = None
             accom_element.put()
-            if enquiry.workflowState not in ['onhold', 'awaitingagent']:
+            if enquiry.workflowStateName not in ['onhold', 'awaitingagent']:
                 enquiry.doTransition('putonhold')
             params['error'] = "No package found" 
             params = urllib.urlencode(params)

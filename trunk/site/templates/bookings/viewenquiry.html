@@ -10,7 +10,7 @@
 <table class="listing">
   <tr>
     <td>Number: <strong>{{ enquiry.referenceNumber }}</strong> </td>
-    <td>Status: <strong>{{ enquiry.getState.title }}</strong> </td>
+    <td>Status: <strong>{{ enquiry.getStateTitle }}</strong> </td>
     <td>Expiry Date: <strong>{{ enquiry.expiryDate|make_list|slice:":16"|join:"" }}</strong> </td>
     <td>Collection: <a href="/bookings/collection/viewenquirycollection?enquirycollectionkey={{ enquiry.parent.key}}"> <strong>{{ enquiry.parent.referenceNumber }}</strong> </a></td>
     <td colspan="2">Guest Email: <strong>{{ enquiry.guestEmail }}</strong> </td>
@@ -21,13 +21,13 @@
     <td>VAT: <strong>R{{ enquiry.vatInZAR|make_list|slice:":-2"|join:""|default:"0" }}</strong> </td>
     <td>Total: <strong>R{{ enquiry.totalAmountInZAR|make_list|slice:":-2"|join:""|default:"0" }}</strong> </td>
     <td>Paid: <strong>R{{ enquiry.amountPaidInZAR|make_list|slice:":-2"|join:""|default:"0" }}</strong> </td>
-    {% ifnotequal enquiry.workflowState 'expired' %}
+    {% ifnotequal enquiry.workflowStateName 'expired' %}
     <td><a href="/bookings/enquiry/editenquiry?enquirykey={{ enquiry.key }}"> <img src="/images/edit.png"/></a></td>
     {% endifnotequal %}
   </tr>
 </table>
 
-{% ifnotequal enquiry.workflowState 'temporary' %}
+{% ifnotequal enquiry.workflowStateName 'temporary' %}
 <form name="advanceEnquiry" method="post" 
       action="/bookings/enquiry/advanceenquiry">
 
