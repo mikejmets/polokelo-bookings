@@ -106,5 +106,49 @@
             {% endfor %}
         </table>
     </div>
+    <br/>
+  
+    <div style="float: left">
+        <p><strong>Credit Card Holder</strong>
+         {% if not cardholder %}
+          <a title="Add a new credit card holder"
+            href="/bookings/guests/captureguest?coll_key={{ enquirycollectionkey }}">
+              <img src="/images/add.png"/>
+          </a>
+          {% endif %}
+        </p>
+        <table class="listing" cellspacing="0">
+            <thead>
+              <td>Identifying Number</td>
+              <td>Surname</td>
+              <td>First Names</td>
+              <td>&nbsp;</td>
+            </thead>
+            {% if cardholder %}
+            <tr>
+              <td>
+                <a href="/bookings/guests/viewguest?guestkey={{ cardholder.key }}">
+                    {{ cardholder.identifyingNumber }}</a>
+              </td>
+              <td>{{ cardholder.surname }}</td>
+              <td>{{ cardholder.firstNames }}</td>
+              <td class="action">
+                <a title="Edit card holder "
+                  href="/bookings/guests/editguest?guestkey={{ cardholder.key }}">
+                  <img src="/images/edit.png"/>
+                </a>
+                {% comment %}
+                <a title="Delete card holder "
+                    href="/bookings/guests/deleteguest?guestkey={{ cardholder.txnkey }}" 
+                    onclick="return confirm('Are you sure?');">
+                  <img src="/images/delete.png"/>
+                </a>
+                {% endcomment %}
+              </td>
+            </tr>
+            {% endif %}
+        </table>
+    </div>
+
 
 {% endblock pagecontent %}
