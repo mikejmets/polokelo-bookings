@@ -99,7 +99,10 @@ class PaymentNotification(webapp.RequestHandler):
             pay_rec.enquiryCollection =  self.request.get('m_1')
             pay_rec.enquiryList = []
             for num in self.request.get('m_2').split(','):
-                enq_num = num[:3] + '-' + num[3:6] + '-' + num[6:]
+                if num[0] == 'P':
+                    enq_num = num[:3] + '-' + num[3:6] + '-' + num[6:]
+                else:
+                    enq_num = num[:4] + '-' + num[4:7] + '-' + num[7:]
                 pay_rec.enquiryList.append(enq_num)
 
             pay_rec.paymentType =  self.request.get('m_3')
