@@ -15,7 +15,9 @@ from exceptions import Exception
 from models.enquiryroot import EnquiryRoot
 from models.bookinginfo import \
                 EnquiryCollection, Enquiry, \
-                CollectionTransaction, VCSPaymentNotification
+                CollectionTransaction, VCSPaymentNotification, \
+                NoGuestElementException
+from workflow.workflow import WorkflowError
 
 from models.clientinfo import Client
 from models.codelookup import getItemDescription
@@ -31,6 +33,11 @@ class EnquiryDoesNotExistException(Exception):
 class AppliedAmountDiscrepancyException(Exception):
     """ Raise the exception if the amounts applied to each
         enquiry does not add up to the VCS payment record total
+    """
+    pass
+
+class WrongEnquiryStateException(Exception):
+    """ The enquiry is in the wrong stat for the payment transaction
     """
     pass
 
@@ -115,11 +122,6 @@ class PaymentNotification(webapp.RequestHandler):
         # exception if applicable
         available_total = pay_rec.authAmount
         
-        # the payment transaction description and amounts
-        txn_description = 'Payment on %s: REFERENCE %s\n' % \
-                            (datetime.now().date(), enquiry_collection.referenceNumber)
-        txn_total = 0L
-
         # Update and set the workflow of the enquiry instance appropriately.
         for enquiry_number in pay_rec.enquiryList:
             enquiry = Enquiry.get_by_key_name(enquiry_number, 
@@ -127,13 +129,19 @@ class PaymentNotification(webapp.RequestHandler):
             if enquiry:
                 logging.info('Found enquiry %s', enquiry_number)
 
+                # initialise transition tracking variables
+                txn_description = ''
+                txn_total = 0
+                applied_amount = 0
+                transition_name = 'paydeposit'
+
                 if pay_rec.paymentType == u'DEP' and \
                                 enquiry.getStateName() == 'confirmed':
                     logging.info('Transition receivedeposit for %s', enquiry_number)
                     applied_amount = long(enquiry.totalAmountInZAR * \
                                             (pay_rec.depositPercentage / 100.0))
                     transition_name = 'receivedeposit'
-                    txn_description += 'Accom REF %s: %d%% Deposit\n' % \
+                    txn_description = 'Payment REF %s: %d%% Deposit\n' % \
                             (enquiry_number, pay_rec.depositPercentage)
 
                 elif pay_rec.paymentType == u'INV' and \
@@ -146,11 +154,14 @@ class PaymentNotification(webapp.RequestHandler):
                         transition_name = 'receivefinal'
                     elif enquiry.getStateName() == 'confirmed': 
                         transition_name = 'receiveall'
-                    txn_description += 'Accom REF %s: Outstanding Balance\n' % \
+                    txn_description = 'Payment REF %s: Outstanding Balance\n' % \
                                                         (enquiry_number)
+                else:
+                    raise WrongEnquiryStateException, \
+                            'Enquiry in incorrect state for payment'
 
                 available_total -= applied_amount
-                txn_total += applied_amount
+                txn_total = -1 * applied_amount
 
                 # check that applying the amount won't raise a discrepancy
                 if available_total < 0:
@@ -159,7 +170,9 @@ class PaymentNotification(webapp.RequestHandler):
                                     enquiry_collection.referenceNumber
                 enquiry.amountPaidInZAR += applied_amount
                 enquiry.put()
-                enquiry.doTransition(transition_name)
+                enquiry.doTransition(transition_name,
+                            txn_description=txn_description,
+                            txn_total=txn_total)
             else:
                 # we have a rogue enquiry on the payment
                 raise EnquiryDoesNotExistException, enquiry_number
@@ -168,14 +181,6 @@ class PaymentNotification(webapp.RequestHandler):
         if available_total > 0:
             logging.info('available_total: %s', available_total)
             raise AppliedAmountDiscrepancyException, enquiry_collection.referenceNumber
-
-        # create the payment transaction in the collection
-        txn = CollectionTransaction(parent=enquiry_collection)
-        txn.type = 'Payment'
-        txn.creator = users.get_current_user()
-        txn.description = txn_description
-        txn.total = -1 * txn_total
-        txn.put()
 
         # change the processing status of the payment record
         pay_rec.processingState = 'Completed'
@@ -240,7 +245,36 @@ class PaymentNotification(webapp.RequestHandler):
                 pay_rec.put()
                 SubElement(node, 'payment')
                 self._addErrorNode(node, code='304',
-                    message='Payment %s, received amount does not add up to outstanding amounts on enquiries' % (enquiry_colection_number))
+                    message='Received amount does not add up to outstanding enquiry amounts')
+                self.response.headers['Content-Type'] = 'text/plain'
+                self.response.out.write(tostring(node))
+                return
+
+            except NoGuestElementException, msg:
+                pay_rec.processingState = 'Failed'
+                pay_rec.put()
+                SubElement(node, 'payment')
+                self._addErrorNode(node, code='305', 
+                        message='No credit card holder details available')
+                self.response.headers['Content-Type'] = 'text/plain'
+                self.response.out.write(tostring(node))
+                return
+
+            except WorkflowError, msg:
+                pay_rec.processingState = 'Failed'
+                pay_rec.put()
+                SubElement(node, 'payment')
+                self._addErrorNode(node, code='306', message=msg)
+                self.response.headers['Content-Type'] = 'text/plain'
+                self.response.out.write(tostring(node))
+                return
+
+            except WrongEnquiryStateException, msg:
+                pay_rec.processingState = 'Failed'
+                pay_rec.put()
+                SubElement(node, 'payment')
+                self._addErrorNode(node, code='306', 
+                        message='Enquiry in incorrect state for payment')
                 self.response.headers['Content-Type'] = 'text/plain'
                 self.response.out.write(tostring(node))
                 return
