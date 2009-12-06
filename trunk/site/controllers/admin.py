@@ -1,11 +1,15 @@
 import os
+import sys
 import logging
+import urllib
 from google.appengine.ext import webapp
 from google.appengine.ext.webapp.util import run_wsgi_app
 from google.appengine.ext.webapp import template
 
 from controllers.home import BASE_PATH, PROJECT_PATH
 from controllers.match import MatchSchedule, CaptureMatch, EditMatch, DeleteMatch
+from models.hostinfo import Owner
+
 from controllers.codelookup import \
     LookupTablesRoot, CaptureLookupTable, EditLookupTable, DeleteLookupTable, \
     ViewLookupTable, CaptureLookupItem, EditLookupItem, DeleteLookupItem
@@ -27,6 +31,24 @@ class AdminHomePage(webapp.RequestHandler):
                                         'auth_url_text':auth_url_text
                                         }))
 
+class ClearData(webapp.RequestHandler):
+    def get(self):
+        error = None
+        try:
+          for owner in Owner.all().fetch(50):
+                owner.rdelete()
+        except:
+            error = sys.exc_info()[1]
+
+        params = {}
+        if error is None:
+            params = urllib.urlencode(params)
+            self.redirect('/admin/home')
+        else:
+            params['error'] = error
+            params = urllib.urlencode(params)
+            self.redirect('/bookings/bookingerror?%s' % params)
+
 
 application = webapp.WSGIApplication([
           ('/admin/home', AdminHomePage),
@@ -47,6 +69,7 @@ application = webapp.WSGIApplication([
           ('/admin/packages/capturepackage', CapturePackage),
           ('/admin/packages/editpackage', EditPackage),
           ('/admin/packages/deletepackage', DeletePackage),
+          ('/admin/deletehosts', ClearData),
           ], debug=True)
 
 def main():
