@@ -15,6 +15,9 @@ from exceptions import Exception
 class NoGuestElementException(Exception):
     pass
 
+class NoPrecedingTransaction(Exception):
+    pass
+
 
 class IdSequence(db.Model):
     """ keep track of sequences for number generators
@@ -122,14 +125,27 @@ class Enquiry(workflow.WorkflowAware):
         if not ge:
             raise NoGuestElementException, 'No guest element'
 
+        # check for a booking confirmation
+        qry = CollectionTransaction.all().ancestor(ec)
+        qry.filter('enquiryReference =', self.referenceNumber)
+        qry.filter('type =', 'Booking')
+        qry.filter('subType =', 'Confirm')
+        if not qry.get():
+            raise NoPrecedingTransaction, \
+                    'Deposit transaction cannot be applied to an unconfirmed enquiry'
+
         # create the transaction record
-        ct = CollectionTransaction(parent=ec)
-        ct.creator = users.get_current_user()
-        ct.type = 'Payment'
-        ct.description = kw['txn_description']
-        ct.total = kw['txn_total']
-        ct.category = 'Auto'
-        ct.put()
+        if kw['txn_category'] == 'Auto':
+            ct = CollectionTransaction(parent=ec)
+            ct.creator = users.get_current_user()
+            ct.type = 'Payment'
+            ct.subType = 'Deposit'
+            ct.description = kw['txn_description']
+            ct.notes=''
+            ct.enquiryReference = self.referenceNumber
+            ct.total = kw['txn_total']
+            ct.category = 'Auto'
+            ct.put()
 
         # notify the client
         """ Transition to paid in full
@@ -148,14 +164,27 @@ class Enquiry(workflow.WorkflowAware):
         if not ge:
             raise NoGuestElementException, 'No guest element'
 
+        # check for a booking confirmation
+        qry = CollectionTransaction.all().ancestor(ec)
+        qry.filter('enquiryReference =', self.referenceNumber)
+        qry.filter('type =', 'Booking')
+        qry.filter('subType =', 'Confirm')
+        if not qry.get():
+            raise NoPrecedingTransaction, \
+                    'Settlement transaction cannot be applied to an unconfirmed enquiry'
+
         # create the transaction record
-        ct = CollectionTransaction(parent=ec)
-        ct.creator = users.get_current_user()
-        ct.type = 'Payment'
-        ct.description = kw['txn_description']
-        ct.total = kw['txn_total']
-        ct.category = 'Auto'
-        ct.put()
+        if kw['txn_category'] == 'Auto':
+            ct = CollectionTransaction(parent=ec)
+            ct.creator = users.get_current_user()
+            ct.type = 'Payment'
+            ct.subType = 'Settle'
+            ct.description = kw['txn_description']
+            ct.notes=''
+            ct.enquiryReference = self.referenceNumber
+            ct.total = kw['txn_total']
+            ct.category = 'Auto'
+            ct.put()
 
         # notify the client
         element = AccommodationElement.all().ancestor(self).get()
@@ -169,14 +198,27 @@ class Enquiry(workflow.WorkflowAware):
         if not ge:
             raise NoGuestElementException, 'No guest element'
 
+        # check for a booking confirmation
+        qry = CollectionTransaction.all().ancestor(ec)
+        qry.filter('enquiryReference =', self.referenceNumber)
+        qry.filter('type =', 'Payment')
+        qry.filter('subType =', 'Deposit')
+        if not qry.get():
+            raise NoPrecedingTransaction, \
+                    'Settlement transaction cannot be applied without deposit'
+
         # create the transaction record
-        ct = CollectionTransaction(parent=ec)
-        ct.creator = users.get_current_user()
-        ct.type = 'Payment'
-        ct.description = kw['txn_description']
-        ct.total = kw['txn_total']
-        ct.category = 'Auto'
-        ct.put()
+        if kw['txn_category'] == 'Auto':
+            ct = CollectionTransaction(parent=ec)
+            ct.creator = users.get_current_user()
+            ct.type = 'Payment'
+            ct.subType = 'Settle'
+            ct.description = kw['txn_description']
+            ct.notes=''
+            ct.enquiryReference = self.referenceNumber
+            ct.total = kw['txn_total']
+            ct.category = 'Auto'
+            ct.put()
 
         # notify the client
         element = AccommodationElement.all().ancestor(self).get()
@@ -205,15 +247,20 @@ class Enquiry(workflow.WorkflowAware):
             and notify the client
         """
         # create the confirmation transaction in the collection
-        ec = self.parent()
-        txn = CollectionTransaction(parent=ec)
-        txn.type = 'Booking'
-        txn.creator = users.get_current_user()
-        txn.description = kw['txn_description']
-        txn.total = kw['txn_total']
-        txn.vat = kw['txn_vat']
-        txn.cost = kw['txn_quote']
-        txn.put()
+        if kw['txn_category'] == 'Auto':
+            ec = self.parent()
+            txn = CollectionTransaction(parent=ec)
+            txn.type = 'Booking'
+            txn.subType = 'Confirm'
+            txn.category = 'Auto'
+            txn.creator = users.get_current_user()
+            txn.description = kw['txn_description']
+            txn.notes=''
+            txn.enquiryReference = self.referenceNumber
+            txn.total = kw['txn_total']
+            txn.vat = kw['txn_vat']
+            txn.cost = kw['txn_quote']
+            txn.put()
 
         element = AccommodationElement.all().ancestor(self)[0]
         et = EmailTool()
@@ -224,15 +271,20 @@ class Enquiry(workflow.WorkflowAware):
             and notify the client
         """
         # create the confirmation transaction in the collection
-        ec = self.parent()
-        txn = CollectionTransaction(parent=ec)
-        txn.type = 'Booking'
-        txn.creator = users.get_current_user()
-        txn.description = kw['txn_description']
-        txn.total = kw['txn_total']
-        txn.vat = kw['txn_vat']
-        txn.cost = kw['txn_quote']
-        txn.put()
+        if kw['txn_category'] == 'Auto':
+            ec = self.parent()
+            txn = CollectionTransaction(parent=ec)
+            txn.type = 'Booking'
+            txn.subType = 'Confirm'
+            txn.category = 'Auto'
+            txn.creator = users.get_current_user()
+            txn.description = kw['txn_description']
+            txn.notes=''
+            txn.enquiryReference = self.referenceNumber
+            txn.total = kw['txn_total']
+            txn.vat = kw['txn_vat']
+            txn.cost = kw['txn_quote']
+            txn.put()
 
         element = AccommodationElement.all().ancestor(self)[0]
         et = EmailTool()
@@ -264,11 +316,16 @@ class CollectionTransaction(db.Model):
     type = db.StringProperty(verbose_name='Transaction Type',
                                 choices=['Booking', 'Payment'],
                                 default='Payment')
+    subType = db.StringProperty(verbose_name='Sub Transaction',
+                                choices=['Confirm', 'Deposit', 'Settle'])
     category = db.StringProperty(verbose_name='Category',
                                 choices=['Auto', 'Manual'],
                                 default='Auto')
     description = db.StringProperty(multiline=True, 
                                     verbose_name="Product Description")
+    notes = db.StringProperty(multiline=True,
+                                    verbose_name="Clarifying Notes")
+    enquiryReference = db.StringProperty(verbose_name='Enquiry Reference')
     cost = db.IntegerProperty(verbose_name="Cost")
     vat = db.IntegerProperty(verbose_name="VAT")
     total = db.IntegerProperty(verbose_name="Total")

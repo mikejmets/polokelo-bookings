@@ -168,7 +168,9 @@ class ExternalBookings(webapp.RequestHandler):
                                         txn_description=txn_description,
                                         txn_total=txn_total,
                                         txn_vat=txn_vat,
-                                        txn_quote=txn_quote)
+                                        txn_quote=txn_quote,
+                                        txn_category='Auto',
+                                        txn_notes='')
                 elif enquiry.getStateName() == 'onhold':
                     enquiry.doTransition('assigntoagent')
 
