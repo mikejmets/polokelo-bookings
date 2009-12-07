@@ -185,6 +185,8 @@ class AccommodationSearch():
         venues = {}
         for slot in slots:
             #logger.info('Found berth %s', slot.berth.key())
+            if slot.berth.bed.bedroom.venue.state == 'Closed':
+                continue
             venue_key = str(slot.berth.bed.bedroom.venue.key())
             berth_key = str(slot.berth.key())
             if not venues.has_key(venue_key):
