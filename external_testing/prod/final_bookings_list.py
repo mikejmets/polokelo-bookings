@@ -1,12 +1,12 @@
 import urllib2
 from xml.etree.ElementTree import XML, SubElement, tostring
 
-url = 'http://bookings-dev.appspot.com/externalbookings'
+url = 'http://0-14-alpha.latest.bookings-dev.appspot.com/externalbookings'
 
 
 xml = """
 <enquirylist>
-    <enquirybatchnumber>YHT-4W7-9Z6</enquirybatchnumber>
+    <enquirybatchnumber>YCHT-4W7-9Z2</enquirybatchnumber>
     <guestagentcode>Trafalgar-234234324</guestagentcode>
     <action>confirm enquiries</action>
     <creditcardholder>
@@ -28,7 +28,7 @@ xml = """
     </creditcardholder>
     <enquiries>
         <enquiry>
-            <enquirynumber>YK8-DQN-2R6</enquirynumber>
+            <enquirynumber>YEK8-DQN-2R9</enquirynumber>
             <city>CPT</city>
             <accommodation>
                 <type>GH</type>
@@ -51,7 +51,7 @@ xml = """
             <vat>4844.00</vat>
         </enquiry>
         <enquiry>
-            <enquirynumber>YK8-DQN-2RK</enquirynumber>
+            <enquirynumber>YEK8-DQN-2RZ</enquirynumber>
             <city>DBN</city>
             <accommodation>
                 <type>GH</type>
@@ -74,7 +74,7 @@ xml = """
             <vat>0.00</vat>
         </enquiry>
         <enquiry>
-            <enquirynumber>YK8-DQN-2RL</enquirynumber>
+            <enquirynumber>YEK8-DQN-2R3</enquirynumber>
             <city>CPT</city>
             <accommodation>
                 <type>GH</type>

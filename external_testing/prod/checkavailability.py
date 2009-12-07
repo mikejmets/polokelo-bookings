@@ -1,7 +1,7 @@
 import urllib2
 from xml.etree.ElementTree import XML, SubElement, tostring
 
-url = 'http://bookings-dev.appspot.com/externalbookings'
+url = 'http://0-14-alpha.latest.bookings-dev.appspot.com/externalbookings'
 
 
 # get a new collection number
