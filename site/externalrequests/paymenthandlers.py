@@ -93,7 +93,7 @@ class PaymentNotification(webapp.RequestHandler):
                 pay_rec.enquiryList = enq_list
             else:
                 # non enquiry payment/refund
-                pay_rec.enquiryList = self.request.get('m_2')
+                pay_rec.enquiryList = [self.request.get('m_2')]
         except Exception:
             pay_rec.processingState = 'Failed'
             pay_rec.put()
@@ -183,7 +183,7 @@ class PaymentNotification(webapp.RequestHandler):
             logging.info('available_total: %s', available_total)
             ct = CollectionTransaction(parent=enquiry_collection)
             ct.type = 'Payment'
-            ct.subType = 'Payment'
+            ct.subType = (available_total > 0) and 'Payment' or 'Refund'
             ct.category = 'Auto'
             ct.description = pay_rec.goodsDescription
             if isinstance(pay_rec.enquiryList, list):
