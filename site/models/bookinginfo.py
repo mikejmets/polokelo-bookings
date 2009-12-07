@@ -318,7 +318,7 @@ class CollectionTransaction(db.Model):
                                 default='Payment')
     subType = db.StringProperty(verbose_name='Sub Transaction Type',
                                 choices=['Confirm', 'Cancel', \
-                                        'Deposit', 'Settle', 'Refund'])
+                                        'Deposit', 'Settle', 'Refund', 'Payment'])
     category = db.StringProperty(verbose_name='Category',
                                 choices=['Auto', 'Manual'],
                                 default='Auto')
