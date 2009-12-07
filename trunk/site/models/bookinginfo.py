@@ -436,8 +436,7 @@ class VCSPaymentNotification(db.Model):
 
     enquiryCollection = db.StringProperty(verbose_name="Enquiry Collection Number")
     enquiryList = db.StringListProperty(verbose_name="Enquiries affected by payment")
-    paymentType = db.StringProperty(verbose_name="Payment Type", 
-                            choices=("DEP", "INV"))
+    paymentType = db.StringProperty(verbose_name="Payment Type")
     depositPercentage = db.IntegerProperty(verbose_name="Deposit Percentage")
     processingState = db.StringProperty(default='Unprocessed', 
                             choices=('Unprocessed', 'Completed', 'Failed'), 
