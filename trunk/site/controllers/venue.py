@@ -51,7 +51,8 @@ class ViewVenue(webapp.RequestHandler):
         emails = venue.entity_emails
         bathrooms = venue.venue_bathrooms
         ownerkey = venue.owner.key()
-        contractedbookings = [ContractedBooking.get(k) for k in venue.getContractedBookings()]
+        contractedbookings = \
+            [ContractedBooking.get(k) for k in venue.getContractedBookings()]
         self.response.out.write(template.render(filepath, 
                   {
                       'base_path':BASE_PATH,
@@ -81,38 +82,54 @@ class ViewVenue(webapp.RequestHandler):
         state = self.request.get('state')
         workflow = self.request.get('workflow')
         validate = self.request.get('validate')
-        clear = self.request.get('clear')
-        if clear:
-            venue.deleteAllSlots()
-        if validate:
-            is_valid, err = venue.validate()
-            if not is_valid:
+        clear_slots = self.request.get('clear')
+        create_slots = self.request.get('create')
+        if clear_slots:
+            try:
+                venue.deleteAllSlots()
+            except DeadlineExceededError:
+                self.response.clear()
+                self.response.set_status(500)
+                self.response.out.write(
+                    "Operation took too long, please try again")
                 params = {}
-                params['error'] = err
+                params['error'] = 'Operation timed out'
                 params['came_from'] = self.request.referer
                 params = urllib.urlencode(params)
                 url = '/home/showerror?%s' % params
                 self.redirect(url)
-                return
+        if create_slots:
+            params = {}
+            params['came_from'] = self.request.referer
+            try:
+                numCreated = venue.createSlots()
+                params['error'] = 'Created %s slots' % numCreated
+            except DeadlineExceededError:
+                self.response.clear()
+                self.response.set_status(500)
+                self.response.out.write(
+                    "Operation took too long, please try again")
+                params['error'] = 'Operation timed out'
+            params = urllib.urlencode(params)
+            url = '/home/showerror?%s' % params
+            self.redirect(url)
+            return
+        if validate:
+            is_valid, err = venue.validate()
+            params = {}
+            if is_valid:
+                params['error'] = venue.validateSlots()
+            else:
+                params['error'] = err
+            params['came_from'] = self.request.referer
+            params = urllib.urlencode(params)
+            url = '/home/showerror?%s' % params
+            self.redirect(url)
+            return
         if workflow:
             if state == 'Closed':
-                #validate before transition
-                if not venue.contractStartDate or \
-                   not venue.contractEndDate:
-                    #Invalid
-                    logger.info('invalid dates')
-                else:
-                    try:
-                        if venue.numberOfBookings == 0:
-                            logging.info('Create/recreate slots for berths')
-                            venue.create_slots()
-                        venue.state = 'Open'
-                        venue.put()
-                    except DeadlineExceededError:
-                        self.response.clear()
-                        self.response.set_status(500)
-                        self.response.out.write(
-                            "Operation took too long, please try again")
+                venue.state = 'Open'
+                venue.put()
             elif state == 'Open':
                 venue.state = 'Closed'
                 venue.put()

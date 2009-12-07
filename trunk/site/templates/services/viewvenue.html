@@ -39,24 +39,25 @@
       <form name="stateWorkFlow" method="post" 
             action="/services/owner/viewvenue">
         <input type="hidden" name="venuekey" value="{{ venue.key }}" />
-        <strong>Status:</strong>
-        <input style="border:0px" type="input" readonly="readonly" name="state" 
-            value="{{ venue.state }}" />
-        {% if venue.isValid %}
-          {% ifequal venue.state 'Closed' %}
-              <input type="submit" name="workflow" value="Open For Bookings" />
-          {% else %}
-              <input type="submit" name="workflow" value="Close For Bookings" />
-          {% endifequal %}
-          {% if not venue.hasBookings  %}
-              <input type="submit" name="clear" value="Clear" />
-          {% endif %}
-        {% else %}
-          <input type="submit" name="validate" value="Validate" />
-          {% ifequal venue.state 'Open' %}
-              <input type="submit" name="workflow" value="Close For Bookings" />
-          {% endifequal %}
-        {% endif %}
+        <p>
+          <strong>Status:</strong>
+          <input style="border:0px" type="input" readonly="readonly" 
+              name="state" value="{{ venue.state }}" />
+            {% ifequal venue.state 'Closed' %}
+                <input type="submit" name="workflow" value="Open For Bookings" />
+            {% else %}
+                <input type="submit" name="workflow" value="Close For Bookings" />
+            {% endifequal %}
+        </p>
+        <hr />
+        <strong>Validation</strong>
+        <p>
+            <input type="submit" name="validate" value="Validate Venue" />
+            {% if not venue.hasBookings  %}
+                <input type="submit" name="clear" value="Clear Slots" />
+            {% endif %}
+            <input type="submit" name="create" value="Create Slots" />
+        </p>
       </form>
     </td>
     {% endif %}

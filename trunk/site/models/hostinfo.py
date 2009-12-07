@@ -209,21 +209,20 @@ class Venue(db.Model):
         #Otherwise
         return True, ""
 
-    def create_slots(self):
+    def createSlots(self):
         #logging.info('Create slots for venue %s', self.name)
+        counter = 0
         for room in self.venue_bedrooms:
             for bed in room.bedroom_beds:
                 for berth in bed.bed_berths:
-                    #logging.info('Create slot for berth %s', berth)
-                    for slot in berth.berth_slots:
-                        slot.delete()
-
                     for d in datetimeIterator(
                                   self.contractStartDate, 
                                   self.contractEndDate):
                         t = time(14, 00)
-                        #logging.info('Create slot for %s', 
-                        #    datetime.combine(d, t))
+                        slots = Slot.all().ancestor(berth)
+                        slots.filter('startDate =', d)
+                        if slots.get():
+                            continue
                         slot = Slot(parent=berth)
                         slot.creator = users.get_current_user()
                         slot.ownerReference = self.owner.referenceNumber
@@ -239,7 +238,29 @@ class Venue(db.Model):
                             self.wheelchairAccess or \
                             room.wheelchairAccess 
                         slot.put()
-                        
+                        counter += 1
+                    if counter > 50:
+                        #Jump out so that the request doesn't timeout
+                        return counter
+        return counter
+
+    def validateSlots(self):
+        #logging.info('Create slots for venue %s', self.name)
+        numNights = 0
+        numSlots = 0
+        for room in self.venue_bedrooms:
+            for bed in room.bedroom_beds:
+                for berth in bed.bed_berths:
+                    for d in datetimeIterator(
+                                  self.contractStartDate, 
+                                  self.contractEndDate):
+                        numNights += 1
+                        t = time(14, 00)
+                        slots = Slot.all().ancestor(berth)
+                        slots.filter('startDate =', d)
+                        if slots.get():
+                            numSlots += 1 
+        return "Total %s, Created %s" % (numNights, numSlots)
                         
     def deleteAllSlots(self):
         #Beware: this may leave bookings hanging
