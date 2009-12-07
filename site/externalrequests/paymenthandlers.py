@@ -186,7 +186,10 @@ class PaymentNotification(webapp.RequestHandler):
             ct.subType = 'Payment'
             ct.category = 'Auto'
             ct.description = pay_rec.goodsDescription
-            ct.notes = pay_rec.enquiryList     # try this for now 
+            if isinstance(pay_rec.enquiryList, list):
+                ct.notes = "\n".join(pay_rec.enquiryList)     # try this for now 
+            else:
+                ct.notes = str(pay_rec.enquiryList)     # try this for now 
             ct.enquiryReference = enquiry_collection.referenceNumber
             ct.total = -1 * available_total
             ct.put()
