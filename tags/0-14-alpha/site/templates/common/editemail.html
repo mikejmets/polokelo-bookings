@@ -1,0 +1,17 @@
+{% extends base_path %}
+
+{% block breadcrumbs %}
+<a href="{{came_from}}">go back</a>
+{% endblock %}
+
+{% block pagecontent %}
+    <h1>Edit Existing Email Address</h1>
+    <form name="emailaddress" method="post" action="{{ post_url }}">
+        <input type="hidden" name="emailkey" value="{{ emailkey }}" />
+        <input type="hidden" name="came_from" value="{{ came_from }}" />
+        <table>
+            {{ form }}
+        </table>
+        <input type="submit" value="Update Email" />
+    </form>
+{% endblock pagecontent %}

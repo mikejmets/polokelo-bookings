@@ -1,0 +1,48 @@
+{% extends base_path %}
+
+{% block breadcrumbs %}
+<a href="/admin/home">go back</a>
+{% endblock %}
+
+{% block pagecontent %}
+    <h1>Accommodation Packages and Pricing</h1>
+
+    <table class="listing" cellspacing="0">
+        <thead>
+          <td colspan="5">Accommodation Package
+            <a title="Add a new package"
+               href="/admin/packages/capturepackage">
+              <img src="/images/add.png"/>
+            </a>
+          </td>
+        </thead>
+        {% for package in packages %}
+        <tr valign="top">
+          <td style="width: 10em">
+            {{ package.city }}
+          </td>
+          <td style="width: 10em">
+            {{ package.accommodationType }}
+          </td>
+          <td>
+            ZAR {{ package.basePriceInZAR }}.00
+          </td>
+          <td width="20px">
+            <a title="Edit this package"
+              href="/admin/packages/editpackage?packagekey={{ package.key }}">
+              <img src="/images/edit.png"/>
+            </a>
+          </td>
+          <td width="20px">
+            <a title="Delete this package"
+              href="/admin/packages/deletepackage?packagekey={{ package.key }}"
+                   onclick="return confirm('Are you sure?');">
+              <img src="/images/delete.png"/>
+            </a>
+          </td>
+        </tr>
+        {% endfor %}
+    </table>
+
+{% endblock pagecontent %}
+

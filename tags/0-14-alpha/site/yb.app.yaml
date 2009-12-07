@@ -1,0 +1,62 @@
+application: myyourbookings
+version: 0-12-alpha
+runtime: python
+api_version: 1
+
+handlers:
+- url: /viewer/.*
+  script: viewer.py
+
+- url: /images/(.*\.(gif|png|jpg))
+  static_files: images/\1
+  upload: images/(.*\.(gif|png|jpg))
+
+- url: /stylesheets
+  static_dir: stylesheets
+
+- url: /admin/.*
+  script: controllers/admin.py
+  login: required
+
+- url: /services/.*
+  script: controllers/servicehandlers.py
+  login: required
+
+- url: /clients/.*
+  script: controllers/clienthandlers.py
+  login: required
+
+- url: /bookings/.*
+  script: controllers/bookinghandlers.py
+  login: admin
+
+- url: /externalbookings
+  script: externalrequests/externalhandlers.py
+
+- url: /tasks/.*
+  script: controllers/tasks.py
+
+- url: /unload
+  script: $PYTHON_LIB/google/appengine/ext/remote_api/handler.py
+  login: required
+
+- url: /
+  script: controllers/home.py
+  login: required
+
+- url: /.*
+  script: controllers/home.py
+  login: required
+
+skip_files:
+- ^(.*/)?app\.yaml
+- ^(.*/)?app\.yml
+- ^(.*/)?index\.yaml
+- ^(.*/)?index\.yml
+- ^(.*/)?#.*#
+- ^(.*/)?.*~
+- ^(.*/)?.*\.py[co]
+- ^(.*/)?.*/RCS/.*
+- ^(.*/)?\..*
+- ^(.*/)?tags$
+

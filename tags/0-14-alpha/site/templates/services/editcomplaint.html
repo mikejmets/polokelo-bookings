@@ -1,0 +1,17 @@
+{% extends base_path %}
+
+{% block breadcrumbs %}
+<a href="{{came_from}}">go back</a>
+{% endblock %}
+
+{% block pagecontent %}
+    <h1>Edit Existing Complaint</h1>
+    <form name="instspection" method="post" action="/services/owner/venue/editcomplaint">
+        <input type="hidden" name="complaintkey" value="{{ complaintkey }}" />
+        <input type="hidden" name="came_from" value="{{ came_from }}" />
+        <table>
+            {{ form }}
+        </table>
+        <input type="submit" value="Update Complaint" />
+    </form>
+{% endblock pagecontent %}

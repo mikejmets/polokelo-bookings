@@ -1,0 +1,8 @@
+cron:
+- description: Transition expired enquiries to expired
+  url: /tasks/expireenquiries
+  schedule: every 1 hours
+
+- description: Email Guests
+  url: /tasks/emailguests
+  schedule: every 1 hours
