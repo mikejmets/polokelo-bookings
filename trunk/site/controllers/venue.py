@@ -103,7 +103,10 @@ class ViewVenue(webapp.RequestHandler):
             params['came_from'] = self.request.referer
             try:
                 numCreated = venue.createSlots()
-                params['error'] = 'Created %s slots' % numCreated
+                if numCreated == 0:
+                    params['error'] = 'All slots have been created'
+                else:
+                    params['error'] = 'Created %s slots' % numCreated
             except DeadlineExceededError:
                 self.response.clear()
                 self.response.set_status(500)
