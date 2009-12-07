@@ -1,6 +1,6 @@
 #!/bin/bash
-DIR=$1
-bulkloader.py --kind=Owner --url=http://bookings-dev.appspot.com/unload --filename=$DIR/owners.csv --config_file=owner_loader.py
-bulkloader.py --kind=Venue --url=http://bookings-dev.appspot.com/unload --filename=$DIR/venues.csv --config_file=venue_loader.py
-bulkloader.py --kind=PhoneNumber --url=http://bookings-dev.appspot.com/unload --filename=$DIR/phone_numbers.csv --config_file=number_loader.py
+SRC=$1
+DIR=$2
+appcfg.py upload_data --kind=Owner --filename=$SRC/owners.csv --config_file=loader/owner_loader.py --email=mikejmets@gmail.com -v --url=http://localhost:8080/unload $DIR
+#appcfg.py upload_data --kind=Venue --filename=$SRC/venues.csv --config_file=loader/venue_loader.py --email=mikejmets@gmail.com -v --url=http://localhost:8080/unload $DIR
 
