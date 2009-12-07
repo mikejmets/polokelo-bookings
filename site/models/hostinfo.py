@@ -260,7 +260,8 @@ class Venue(db.Model):
                         slots.filter('startDate =', d)
                         if slots.get():
                             numSlots += 1 
-        return "Total %s, Created %s" % (numNights, numSlots)
+        return "Of the total of %s contracted nights, %s slots exist" % \
+            (numNights, numSlots)
                         
     def deleteAllSlots(self):
         #Beware: this may leave bookings hanging
