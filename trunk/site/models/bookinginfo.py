@@ -15,7 +15,10 @@ from exceptions import Exception
 class NoGuestElementException(Exception):
     pass
 
-class NoPrecedingTransaction(Exception):
+class NoDepositException(Exception):
+    pass
+
+class NoSettlementException(Exception):
     pass
 
 
@@ -115,37 +118,18 @@ class Enquiry(workflow.WorkflowAware):
 
     def ontransition_receivedeposit(self, *args, **kw):
         """ Transition to deposit paid
-            1. check that a guest element exists
-            2. create a transaction record
-            3. notify the client
+            1. check for a deposit transaction record
+            2. notify the client
         """
-        # check for a guest element on the enquiry collection
-        ec = self.parent()
-        ge = GuestElement.all().ancestor(ec).get()
-        if not ge:
-            raise NoGuestElementException, 'No guest element'
-
-        # check for a booking confirmation
-        qry = CollectionTransaction.all().ancestor(ec)
-        qry.filter('enquiryReference =', self.referenceNumber)
-        qry.filter('type =', 'Booking')
-        qry.filter('subType =', 'Confirm')
-        if not qry.get():
-            raise NoPrecedingTransaction, \
-                    'Deposit transaction cannot be applied to an unconfirmed enquiry'
-
-        # create the transaction record
-        if kw and kw['txn_category'] == 'Auto':
-            ct = CollectionTransaction(parent=ec)
-            ct.creator = users.get_current_user()
-            ct.type = 'Payment'
-            ct.subType = 'Deposit'
-            ct.description = kw['txn_description']
-            ct.notes=''
-            ct.enquiryReference = self.referenceNumber
-            ct.total = kw['txn_total']
-            ct.category = 'Auto'
-            ct.put()
+        # check for a transaction record
+        if kw and kw['txn_category'] != 'Auto':
+            qry = CollectionTransaction.all().ancestor(self.parent())
+            qry.filter('enquiryReference =', self.referenceNumber)
+            qry.filter('type =', 'Payment')
+            qry.filter('subType =', 'Deposit')
+            if qry.get() is None:
+                raise NoDepositException, \
+                        'No deposit transaction exists for %s' % self.referenceNumber
 
         # notify the client
         """ Transition to paid in full
@@ -158,33 +142,15 @@ class Enquiry(workflow.WorkflowAware):
         et.notifyClient('receivedeposit', element)
 
     def ontransition_receiveall(self, *args, **kw):
-        # check for a guest element on the enquiry collection
-        ec = self.parent()
-        ge = GuestElement.all().ancestor(ec).get()
-        if not ge:
-            raise NoGuestElementException, 'No guest element'
-
-        # check for a booking confirmation
-        qry = CollectionTransaction.all().ancestor(ec)
-        qry.filter('enquiryReference =', self.referenceNumber)
-        qry.filter('type =', 'Booking')
-        qry.filter('subType =', 'Confirm')
-        if not qry.get():
-            raise NoPrecedingTransaction, \
-                    'Settlement transaction cannot be applied to an unconfirmed enquiry'
-
-        # create the transaction record
-        if kw and kw['txn_category'] == 'Auto':
-            ct = CollectionTransaction(parent=ec)
-            ct.creator = users.get_current_user()
-            ct.type = 'Payment'
-            ct.subType = 'Settle'
-            ct.description = kw['txn_description']
-            ct.notes=''
-            ct.enquiryReference = self.referenceNumber
-            ct.total = kw['txn_total']
-            ct.category = 'Auto'
-            ct.put()
+        # check for a settlement transaction
+        if kw and kw['txn_category'] != 'Auto':
+            qry = CollectionTransaction.all().ancestor(self.parent())
+            qry.filter('enquiryReference =', self.referenceNumber)
+            qry.filter('type =', 'Payment')
+            qry.filter('subType =', 'Settle')
+            if qry.get() is None:
+                raise NoSettlementException, \
+                        'No settlement transaction exists for %s' % self.referenceNumber
 
         # notify the client
         element = AccommodationElement.all().ancestor(self).get()
@@ -192,33 +158,15 @@ class Enquiry(workflow.WorkflowAware):
         et.notifyClient('receiveall', element)
 
     def ontransition_receivefinal(self, *args, **kw):
-        # check for a guest element on the enquiry collection
-        ec = self.parent()
-        ge = GuestElement.all().ancestor(ec).get()
-        if not ge:
-            raise NoGuestElementException, 'No guest element'
-
-        # check for a booking confirmation
-        qry = CollectionTransaction.all().ancestor(ec)
-        qry.filter('enquiryReference =', self.referenceNumber)
-        qry.filter('type =', 'Payment')
-        qry.filter('subType =', 'Deposit')
-        if not qry.get():
-            raise NoPrecedingTransaction, \
-                    'Settlement transaction cannot be applied without deposit'
-
-        # create the transaction record
-        if kw and kw['txn_category'] == 'Auto':
-            ct = CollectionTransaction(parent=ec)
-            ct.creator = users.get_current_user()
-            ct.type = 'Payment'
-            ct.subType = 'Settle'
-            ct.description = kw['txn_description']
-            ct.notes=''
-            ct.enquiryReference = self.referenceNumber
-            ct.total = kw['txn_total']
-            ct.category = 'Auto'
-            ct.put()
+        # check for a settlement transaction
+        if kw and kw['txn_category'] != 'Auto':
+            qry = CollectionTransaction.all().ancestor(self.parent())
+            qry.filter('enquiryReference =', self.referenceNumber)
+            qry.filter('type =', 'Payment')
+            qry.filter('subType =', 'Settle')
+            if not qry.get():
+                raise NoSettlementException, \
+                        'No settlement transaction exists for %s' % self.referenceNumber
 
         # notify the client
         element = AccommodationElement.all().ancestor(self).get()
@@ -254,7 +202,6 @@ class Enquiry(workflow.WorkflowAware):
 
         # create the confirmation transaction in the collection
         if kw and kw['txn_category'] == 'Auto':
-            ec = self.parent()
             txn = CollectionTransaction(parent=ec)
             txn.type = 'Booking'
             txn.subType = 'Confirm'
@@ -284,7 +231,6 @@ class Enquiry(workflow.WorkflowAware):
 
         # create the confirmation transaction in the collection
         if kw and kw['txn_category'] == 'Auto':
-            ec = self.parent()
             txn = CollectionTransaction(parent=ec)
             txn.type = 'Booking'
             txn.subType = 'Confirm'

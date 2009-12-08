@@ -8,6 +8,7 @@ from google.appengine.ext.webapp.util import run_wsgi_app
 from google.appengine.api import datastore_errors
 from google.appengine.api import users
 from google.appengine.ext.db import run_in_transaction
+# from google.appengine.ext.remote_api.throttle import InterruptibleSleep
 
 from xml.etree.ElementTree import Element, SubElement, tostring
 from exceptions import Exception
@@ -136,11 +137,23 @@ class PaymentNotification(webapp.RequestHandler):
                         transition_name = 'receivedeposit'
                         txn_description = 'Payment REF %s: %d%% Deposit\n' % \
                                 (enquiry_number, pay_rec.depositPercentage)
+                        txn_total = -1 * applied_amount
+
+                        # create the transaction record
+                        ct = CollectionTransaction(parent=enquiry_collection)
+                        ct.creator = users.get_current_user()
+                        ct.type = 'Payment'
+                        ct.subType = 'Deposit'
+                        ct.description = txn_description
+                        ct.notes=''
+                        ct.enquiryReference = enquiry.referenceNumber
+                        ct.total = txn_total
+                        ct.category = 'Auto'
+                        ct.put()
 
                     elif pay_rec.paymentType == u'INV' and \
                             (enquiry.getStateName() in ['receiveddeposit', 'confirmed']):
-                        logging.info('Transition receivefinal for %s', 
-                            enquiry_number)
+                        logging.info('Transition receivefinal for %s', enquiry_number)
                         applied_amount = enquiry.totalAmountInZAR - \
                                                 enquiry.amountPaidInZAR
                         if enquiry.getStateName() == 'receiveddeposit':
@@ -149,13 +162,26 @@ class PaymentNotification(webapp.RequestHandler):
                             transition_name = 'receiveall'
                         txn_description = 'Payment REF %s: Outstanding Balance\n' % \
                                                             (enquiry_number)
+                        txn_total = -1 * applied_amount
+
+                        # create the transaction record
+                        ct = CollectionTransaction(parent=enquiry_collection)
+                        ct.creator = users.get_current_user()
+                        ct.type = 'Payment'
+                        ct.subType = 'Settle'
+                        ct.description = txn_description
+                        ct.notes=''
+                        ct.enquiryReference = enquiry.referenceNumber
+                        ct.total = txn_total
+                        ct.category = 'Auto'
+                        ct.put()
+
                     else:
                         # We will end with a discrepancy. Store it as a 
                         # transaction to be sorted out manually
                         continue
 
                     available_total -= applied_amount
-                    txn_total = -1 * applied_amount
 
                     # check that applying the amount does not cause
                     # an error larger than 10 cents
@@ -167,11 +193,7 @@ class PaymentNotification(webapp.RequestHandler):
                     enquiry.amountPaidInZAR += applied_amount
                     enquiry.put()
                     try:
-                        enquiry.doTransition(transition_name,
-                                    txn_description=txn_description,
-                                    txn_total=txn_total,
-                                    txn_category='Auto',
-                                    txn_notes='')
+                        enquiry.doTransition(transition_name, txn_category='Auto')
                     except WorkflowError, msg:
                         logging.error('Workflow error: %s', msg)
                         continue
