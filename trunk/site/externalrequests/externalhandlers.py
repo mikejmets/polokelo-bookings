@@ -139,6 +139,23 @@ class ExternalBookings(webapp.RequestHandler):
         # locate the primary guest node (credit card holder)
         guest_node = node.find('creditcardholder')
 
+        # Create guest node and element doesn't exist
+        if guest_node:
+            guest_element = GuestElement.get_or_insert( \
+                                key_name=guest_node.findtext('passportnumber'),
+                                parent=enquiry_collection,
+                                surname=guest_node.findtext('surname'),
+                                firstNames=guest_node.findtext('name'))
+            guest_element.creator = users.get_current_user()
+            guest_element.isPrimary = True
+            guest_element.email = guest_node.findtext('email')
+            guest_element.contactNumber = guest_node.findtext('telephone')
+            guest_element.identifyingNumber = guest_node.findtext('passportnumber')
+            guest_element.xmlSource = tostring(guest_node)
+            guest_element.put()
+            # logging.info(tostring(guest_node))
+
+
         # update the individual enquiries to have the collection
         # as their parent, and extend their expiry dates for 24 hours
         # in anticipation of the deposit
@@ -157,6 +174,12 @@ class ExternalBookings(webapp.RequestHandler):
             # retrieve the existing enquiry
             enquiry = Enquiry.get_by_key_name(refnum, parent=enquiry_collection)
             if enquiry:
+
+                if guest_element:
+                    if enquiry.key() not in guest_element.enquiries:
+                        guest_element.enquiries.append(enquiry.key())
+                        guest_element.put()
+
                 # do the transitions
                 if enquiry.getStateName() == 'allocated':
                     txn_description += '%s: %s\n' % \
@@ -171,56 +194,23 @@ class ExternalBookings(webapp.RequestHandler):
                                         txn_quote=txn_quote,
                                         txn_category='Auto',
                                         txn_notes='')
+                elif enquiry.getStateName() == 'awaitingclient':
+                    txn_description += '%s: %s\n' % \
+                                (refnum, enquiry.getAccommodationDescription())
+                    txn_total = enquiry.totalAmountInZAR 
+                    txn_vat = enquiry.vatInZAR
+                    txn_quote = enquiry.quoteInZAR
+                    enquiry.doTransition('confirmfromawaiting', 
+                                        txn_description=txn_description,
+                                        txn_total=txn_total,
+                                        txn_vat=txn_vat,
+                                        txn_quote=txn_quote,
+                                        txn_category='Auto',
+                                        txn_notes='')
                 elif enquiry.getStateName() == 'onhold':
                     enquiry.doTransition('assigntoagent')
 
-                if guest_node:
-                    guest_element = GuestElement( \
-                                        key_name=guest_node.findtext('passportnumber'),
-                                        parent=enquiry_collection,
-                                        surname=guest_node.findtext('surname'),
-                                        firstNames=guest_node.findtext('name'))
-                    guest_element.creator = users.get_current_user()
-                    guest_element.isPrimary = True
-                    guest_element.email = guest_node.findtext('email')
-                    guest_element.contactNumber = guest_node.findtext('telephone')
-                    guest_element.identifyingNumber = guest_node.findtext('passportnumber')
-                    guest_element.xmlSource = tostring(guest_node)
-                    guest_element.put()
-                    # logging.info(tostring(guest_node))
 
-                    if enquiry.key() not in guest_element.enquiries:
-                        guest_element.enquiries.append(enquiry.key())
-                        guest_element.put()
-
-                    # # create a client instance
-                    # if enquiry.getStateName() == 'confirmed':
-                    #     client = Client(clientNumber = generator.generateClientNumber(),
-                    #                     surname=guest_element.surname,
-                    #                     firstNames = guest_element.firstNames)
-                    #     client.creator = users.get_current_user()
-                    #     for language_node in \
-                    #             guest_node.find('languages').findall('language'):
-                    #         client.languages.append(language_node.text)
-                    #     client.state = 'Confirmed'
-                    #     client.identityNumber = guest_element.identifyingNumber
-                    #     client.identityNumberType = 'Passport'
-                    #     client.put()
-
-                    #     # create email address and telephone for client
-                    #     email = EmailAddress(parent=client,
-                    #                          emailType='Other',
-                    #                          email=guest_element.email)
-                    #     email.container = client
-                    #     email.creator = users.get_current_user()
-                    #     email.put()
-
-                    #     phone = PhoneNumber(parent=client,
-                    #                         numberType='Other Number',
-                    #                         number=guest_element.contactNumber) 
-                    #     phone.container=client
-                    #     phone.creator = users.get_current_user()
-                    #     phone.put()
             else:
                 # no enquiry found: send an error back
                 confirm_elem = SubElement(node, 'confirmationresult')
