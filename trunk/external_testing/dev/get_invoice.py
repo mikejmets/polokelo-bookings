@@ -1,12 +1,11 @@
 xml = """
 <invoice>
     <action>retrieve invoice</action>
-    <enquirybatchnumber>YCHT-4W7-9ZJ</enquirybatchnumber>
+    <enquirybatchnumber>YCHT-4W7-9ZD</enquirybatchnumber>
 </invoice>
 """
 
 url = 'http://localhost:8080/externalbookings'
-# url = 'http://0-9-alpha.latest.bookings-dev.appspot.com/externalbookings'
 
 import urllib2
 
