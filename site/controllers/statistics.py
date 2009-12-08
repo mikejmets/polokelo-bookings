@@ -20,7 +20,7 @@ class ViewStatistics(webapp.RequestHandler):
         auth_url, auth_url_text = get_authentication_urls(self.request.uri)
         filepath = os.path.join(PROJECT_PATH, 
                       'templates', 'admin', 'viewstatistics.html')
-        valid_venues = listVenuesValidity()
+        valid_venues = '' #listVenuesValidity()
         entity_count = countAllEntities()
         self.response.out.write(template.render(filepath, 
                   {
