@@ -104,7 +104,7 @@ class AdvanceEnquiry(webapp.RequestHandler):
         transition = self.request.get('transition')
         error = None
         try:
-            enquiry.doTransition(transition)
+            enquiry.doTransition(transition, txn_category='manual')
         except WorkflowError, e:
             error = e
         except:
