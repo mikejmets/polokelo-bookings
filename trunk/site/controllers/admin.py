@@ -70,7 +70,7 @@ application = webapp.WSGIApplication([
           ('/admin/packages/editpackage', EditPackage),
           ('/admin/packages/deletepackage', DeletePackage),
           ('/admin/deletehosts', ClearData),
-          ], debug=True)
+          ], debug=False)
 
 def main():
     run_wsgi_app(application)
