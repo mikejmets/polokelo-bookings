@@ -1,4 +1,4 @@
-application: bookings-dev
+application: polokelo-bookings
 version: 0-14-alpha
 runtime: python
 api_version: 1
@@ -20,15 +20,15 @@ handlers:
 
 - url: /services/.*
   script: controllers/servicehandlers.py
-  login: admin
+  login: required
 
 - url: /clients/.*
   script: controllers/clienthandlers.py
-  login: admin
+  login: required
 
 - url: /bookings/.*
   script: controllers/bookinghandlers.py
-  login: admin
+  login: required
 
 - url: /externalbookings
   script: externalrequests/externalhandlers.py
@@ -41,7 +41,7 @@ handlers:
 
 - url: /unload
   script: $PYTHON_LIB/google/appengine/ext/remote_api/handler.py
-  login: admin
+  login: required
 
 - url: /
   script: controllers/home.py
@@ -49,7 +49,7 @@ handlers:
 
 - url: /.*
   script: controllers/home.py
-  login: admin
+  login: required
 
 skip_files:
 - ^(.*/)?app\.yaml
