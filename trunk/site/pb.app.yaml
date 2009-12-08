@@ -33,15 +33,15 @@ handlers:
 - url: /externalbookings
   script: externalrequests/externalhandlers.py
 
+- url: /paymentnotify
+  script: externalrequests/paymenthandlers.py
+
 - url: /tasks/.*
   script: controllers/tasks.py
 
 - url: /unload
   script: $PYTHON_LIB/google/appengine/ext/remote_api/handler.py
   login: required
-
-- url: /rocket/.*
-  script: rocket/rocket.py
 
 - url: /
   script: controllers/home.py
