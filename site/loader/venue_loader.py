@@ -20,8 +20,12 @@ class VenueLoader(bulkloader.Loader):
         ('venueType', str),
         ('contactPerson', str),
         ('childFriendly', bool),
+        ('wheelchairAccess', bool),
+        ('specialNeeds', str),
+        ('registrationFeePaid', bool),
         ('contractStartDate', lambda x: str2datetimedate(x)),
         ('contractEndDate', lambda x: str2datetimedate(x)),
+        ('state', str),
        ])
 
 loaders = [VenueLoader]
@@ -42,12 +46,13 @@ class VenueExporter(bulkloader.Exporter):
             ('name', str, None),
             ('venueType', str, None),
             ('contactPerson', str, None),
-            ('childFriendly', str, None),
-            ('wheelchairAccess', str, False),
+            ('childFriendly', str, 'True'),
+            ('wheelchairAccess', str, 'False'),
             ('specialNeeds', str, ''),
-            ('registrationFeePaid', str, None),
+            ('registrationFeePaid', str, 'False'),
             ('contractStartDate', str, None),
             ('contractEndDate', str, None),
+            ('state', str, 'Closed'),
            ])
 
     def output_entities(self, entity_generator):

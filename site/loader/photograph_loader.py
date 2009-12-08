@@ -7,9 +7,8 @@ from google.appengine.tools import bulkloader
 from google.appengine.api import datastore
 from google.appengine.api import users
 
-from models.hostinfo import Owner 
+from models.hostinfo import Photograph 
 
-#DOESN"T FCKING WORK from loader_utils import str2datetime
 def str2datetime(x):
     if x != 'None':
         x = x.split(".")[0]
@@ -24,17 +23,16 @@ def noneStr(x):
 def getUser(x):
     return users.User(x)
 
-class OwnerLoader(bulkloader.Loader):
+class PhotographLoader(bulkloader.Loader):
     def __init__(self):
-        bulkloader.Loader.__init__(self, 'Owner', [
+        bulkloader.Loader.__init__(self, 'Photograph', [
             ('key', str),
             ('parent', noneStr),
             ('created', str2datetime),
             ('creator', users.User),
-            ('referenceNumber', str),
-            ('surname', str),
-            ('firstNames', str),
-            ('languages', eval),
+            ('caption', str),
+            ('thumbnail', str),
+            ('fullsize', str),
            ])
 
     def generate_key(self, i, values):
@@ -43,11 +41,10 @@ class OwnerLoader(bulkloader.Loader):
         return key
 
     def handle_entity(self, entity):
-        logger.info('Handle===========%s', entity.key().__dict__)
         return entity
 
 
-loaders = [OwnerLoader]
+loaders = [PhotographLoader]
 
 """
 Exporting
@@ -58,20 +55,20 @@ def AddKeys(entity_generator):
         entity['parent'] = entity.parent()
         yield entity 
 
-class OwnerExporter(bulkloader.Exporter):
+class PhotographExporter(bulkloader.Exporter):
     def __init__(self):
-      bulkloader.Exporter.__init__(self, 'Owner', [
+      bulkloader.Exporter.__init__(self, 'Photograph', [
           ('key', str, None),
           ('parent', str, None),
+          ('venue', str, None),
           ('created', str, None),
           ('creator', str, None),
-          ('referenceNumber', str, None),
-          ('surname', str, None),
-          ('firstNames', str, None),
-          ('languages', list, None),
+          ('caption', str, None),
+          #('thumbnail', str, None),
+          #('fullsize', str, None),
          ])
 
     def output_entities(self, entity_generator):
         bulkloader.Exporter.output_entities(self, AddKeys(entity_generator)) 
 
-exporters = [OwnerExporter]
+exporters = [PhotographExporter]
