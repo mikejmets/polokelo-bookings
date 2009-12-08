@@ -140,14 +140,14 @@ class PaymentNotification(webapp.RequestHandler):
                         txn_total = -1 * applied_amount
 
                         # create the transaction record
-                        ct = CollectionTransaction(parent=enquiry_collection)
+                        ct = CollectionTransaction(parent=enquiry_collection,
+                                    subType = 'Deposit',
+                                    description = txn_description,
+                                    enquiryReference = enquiry.referenceNumber,
+                                    total = txn_total)
                         ct.creator = users.get_current_user()
                         ct.type = 'Payment'
-                        ct.subType = 'Deposit'
-                        ct.description = txn_description
                         ct.notes=''
-                        ct.enquiryReference = enquiry.referenceNumber
-                        ct.total = txn_total
                         ct.category = 'Auto'
                         ct.put()
 
@@ -165,14 +165,14 @@ class PaymentNotification(webapp.RequestHandler):
                         txn_total = -1 * applied_amount
 
                         # create the transaction record
-                        ct = CollectionTransaction(parent=enquiry_collection)
+                        ct = CollectionTransaction(parent=enquiry_collection,
+                                    subType = 'Settle',
+                                    description = txn_description,
+                                    enquiryReference = enquiry.referenceNumber,
+                                    total = txn_total)
                         ct.creator = users.get_current_user()
                         ct.type = 'Payment'
-                        ct.subType = 'Settle'
-                        ct.description = txn_description
                         ct.notes=''
-                        ct.enquiryReference = enquiry.referenceNumber
-                        ct.total = txn_total
                         ct.category = 'Auto'
                         ct.put()
 
@@ -203,17 +203,17 @@ class PaymentNotification(webapp.RequestHandler):
         # We may also be dealing with a non enquiry payment, e.g. food parcel
         if available_total != 0:
             logging.info('available_total: %s', available_total)
-            ct = CollectionTransaction(parent=enquiry_collection)
+            ct = CollectionTransaction(parent=enquiry_collection,
+                        subType = (available_total > 0) and 'Payment' or 'Refund',
+                        description = pay_rec.goodsDescription,
+                        enquiryReference = enquiry_collection.referenceNumber,
+                        total = -1 * available_total)
             ct.type = 'Payment'
-            ct.subType = (available_total > 0) and 'Payment' or 'Refund'
             ct.category = 'Auto'
-            ct.description = pay_rec.goodsDescription
             if isinstance(pay_rec.enquiryList, list):
                 ct.notes = "\n".join(pay_rec.enquiryList)     # try this for now 
             else:
                 ct.notes = str(pay_rec.enquiryList)     # try this for now 
-            ct.enquiryReference = enquiry_collection.referenceNumber
-            ct.total = -1 * available_total
             ct.put()
 
         # change the processing status of the payment record
