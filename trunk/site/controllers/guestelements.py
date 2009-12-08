@@ -64,7 +64,7 @@ class CaptureGuestElement(webapp.RequestHandler):
         data = GuestElementForm(data=self.request.POST)
         valid = data.is_valid()
         if valid:
-            guest = GuestElement(parent=theparent).all().filter('isPrimary =', True).get()
+            guest = GuestElement.all().ancestor(theparent).filter('isPrimary =', True).get()
             if guest:
                 guest.rdelete()
             clean_data = data._cleaned_data()
