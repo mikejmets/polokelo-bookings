@@ -7,9 +7,8 @@ from google.appengine.tools import bulkloader
 from google.appengine.api import datastore
 from google.appengine.api import users
 
-from models.hostinfo import Owner 
+from models.hostinfo import Address 
 
-#DOESN"T FCKING WORK from loader_utils import str2datetime
 def str2datetime(x):
     if x != 'None':
         x = x.split(".")[0]
@@ -24,9 +23,9 @@ def noneStr(x):
 def getUser(x):
     return users.User(x)
 
-class OwnerLoader(bulkloader.Loader):
+class AddressLoader(bulkloader.Loader):
     def __init__(self):
-        bulkloader.Loader.__init__(self, 'Owner', [
+        bulkloader.Loader.__init__(self, 'Address', [
             ('key', str),
             ('parent', noneStr),
             ('created', str2datetime),
@@ -47,7 +46,7 @@ class OwnerLoader(bulkloader.Loader):
         return entity
 
 
-loaders = [OwnerLoader]
+loaders = [AddressLoader]
 
 """
 Exporting
@@ -58,20 +57,23 @@ def AddKeys(entity_generator):
         entity['parent'] = entity.parent()
         yield entity 
 
-class OwnerExporter(bulkloader.Exporter):
+class AddressExporter(bulkloader.Exporter):
     def __init__(self):
-      bulkloader.Exporter.__init__(self, 'Owner', [
+      bulkloader.Exporter.__init__(self, 'Address', [
           ('key', str, None),
           ('parent', str, None),
+          ('container', str, None),
           ('created', str, None),
           ('creator', str, None),
-          ('referenceNumber', str, None),
-          ('surname', str, None),
-          ('firstNames', str, None),
-          ('languages', list, None),
+          ('addressType', str, None),
+          ('streetAddress', str, None),
+          ('suburb', str, None),
+          ('city', str, None),
+          ('country', str, None),
+          ('postCode', str, None),
          ])
 
     def output_entities(self, entity_generator):
         bulkloader.Exporter.output_entities(self, AddKeys(entity_generator)) 
 
-exporters = [OwnerExporter]
+exporters = [AddressExporter]
