@@ -69,7 +69,6 @@ application = webapp.WSGIApplication([
           ('/admin/packages/capturepackage', CapturePackage),
           ('/admin/packages/editpackage', EditPackage),
           ('/admin/packages/deletepackage', DeletePackage),
-          ('/admin/deletehosts', ClearData),
           ], debug=False)
 
 def main():
