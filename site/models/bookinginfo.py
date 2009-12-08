@@ -246,6 +246,12 @@ class Enquiry(workflow.WorkflowAware):
         """ Create the confirmation transaxtion
             and notify the client
         """
+        # check for a guest element on the enquiry collection
+        ec = self.parent()
+        ge = GuestElement.all().ancestor(ec).get()
+        if not ge:
+            raise NoGuestElementException, 'No guest element'
+
         # create the confirmation transaction in the collection
         if kw and kw['txn_category'] == 'Auto':
             ec = self.parent()
@@ -270,6 +276,12 @@ class Enquiry(workflow.WorkflowAware):
         """ Create the confirmation transaxtion
             and notify the client
         """
+        # check for a guest element on the enquiry collection
+        ec = self.parent()
+        ge = GuestElement.all().ancestor(ec).get()
+        if not ge:
+            raise NoGuestElementException, 'No guest element'
+
         # create the confirmation transaction in the collection
         if kw and kw['txn_category'] == 'Auto':
             ec = self.parent()
