@@ -135,7 +135,7 @@ class Enquiry(workflow.WorkflowAware):
                     'Deposit transaction cannot be applied to an unconfirmed enquiry'
 
         # create the transaction record
-        if kw['txn_category'] == 'Auto':
+        if kw and kw['txn_category'] == 'Auto':
             ct = CollectionTransaction(parent=ec)
             ct.creator = users.get_current_user()
             ct.type = 'Payment'
@@ -174,7 +174,7 @@ class Enquiry(workflow.WorkflowAware):
                     'Settlement transaction cannot be applied to an unconfirmed enquiry'
 
         # create the transaction record
-        if kw['txn_category'] == 'Auto':
+        if kw and kw['txn_category'] == 'Auto':
             ct = CollectionTransaction(parent=ec)
             ct.creator = users.get_current_user()
             ct.type = 'Payment'
@@ -208,7 +208,7 @@ class Enquiry(workflow.WorkflowAware):
                     'Settlement transaction cannot be applied without deposit'
 
         # create the transaction record
-        if kw['txn_category'] == 'Auto':
+        if kw and kw['txn_category'] == 'Auto':
             ct = CollectionTransaction(parent=ec)
             ct.creator = users.get_current_user()
             ct.type = 'Payment'
@@ -247,7 +247,7 @@ class Enquiry(workflow.WorkflowAware):
             and notify the client
         """
         # create the confirmation transaction in the collection
-        if kw['txn_category'] == 'Auto':
+        if kw and kw['txn_category'] == 'Auto':
             ec = self.parent()
             txn = CollectionTransaction(parent=ec)
             txn.type = 'Booking'
@@ -271,7 +271,7 @@ class Enquiry(workflow.WorkflowAware):
             and notify the client
         """
         # create the confirmation transaction in the collection
-        if kw['txn_category'] == 'Auto':
+        if kw and kw['txn_category'] == 'Auto':
             ec = self.parent()
             txn = CollectionTransaction(parent=ec)
             txn.type = 'Booking'
