@@ -202,17 +202,17 @@ class Enquiry(workflow.WorkflowAware):
 
         # create the confirmation transaction in the collection
         if kw and kw['txn_category'] == 'Auto':
-            txn = CollectionTransaction(parent=ec)
+            txn = CollectionTransaction(parent=ec,
+                            subType = 'Confirm',
+                            description = kw['txn_description'],
+                            enquiryReference = self.referenceNumber,
+                            total = kw['txn_total'])
             txn.type = 'Booking'
-            txn.subType = 'Confirm'
             txn.category = 'Auto'
             txn.creator = users.get_current_user()
-            txn.description = kw['txn_description']
             txn.notes=''
-            txn.enquiryReference = self.referenceNumber
-            txn.total = kw['txn_total']
-            txn.vat = kw['txn_vat']
             txn.cost = kw['txn_quote']
+            txn.vat = kw['txn_vat']
             txn.put()
 
         element = AccommodationElement.all().ancestor(self)[0]
@@ -231,17 +231,17 @@ class Enquiry(workflow.WorkflowAware):
 
         # create the confirmation transaction in the collection
         if kw and kw['txn_category'] == 'Auto':
-            txn = CollectionTransaction(parent=ec)
+            txn = CollectionTransaction(parent=ec,
+                            subType = 'Confirm',
+                            description = kw['txn_description'],
+                            enquiryReference = self.referenceNumber,
+                            total = kw['txn_total'])
             txn.type = 'Booking'
-            txn.subType = 'Confirm'
             txn.category = 'Auto'
             txn.creator = users.get_current_user()
-            txn.description = kw['txn_description']
             txn.notes=''
-            txn.enquiryReference = self.referenceNumber
-            txn.total = kw['txn_total']
-            txn.vat = kw['txn_vat']
             txn.cost = kw['txn_quote']
+            txn.vat = kw['txn_vat']
             txn.put()
 
         element = AccommodationElement.all().ancestor(self)[0]
