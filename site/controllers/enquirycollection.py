@@ -5,6 +5,7 @@ from google.appengine.api import users
 from google.appengine.ext import webapp
 from google.appengine.ext.webapp import template
 from google.appengine.ext.db import djangoforms
+from django import newforms as forms
 from google.appengine.ext import db
 
 from controllers.home import BASE_PATH, PROJECT_PATH
@@ -200,12 +201,20 @@ class CollectionTransactionForm(djangoforms.ModelForm):
         model = CollectionTransaction
         exclude = ['created', 'creator', 'category']
 
+    enquiryReference = forms.ChoiceField(choices=[])
+     
+
 
 class CaptureTransactionRecord(webapp.RequestHandler):
 
     def get(self):
         came_from = self.request.referer
         coll_key = self.request.get('coll_key')
+        theparent = EnquiryCollection.get(coll_key)
+        enquiries = [(e.referenceNumber, e.referenceNumber) for e in  
+            Enquiry.all().ancestor(theparent)]
+        tx_form = CollectionTransactionForm()
+        tx_form.fields['enquiryReference'].choices = enquiries
         auth_url, auth_url_text = get_authentication_urls(self.request.uri)
         filepath = os.path.join(PROJECT_PATH, 
                         'templates', 'bookings', 'capturetxnrecord.html')
@@ -213,7 +222,7 @@ class CaptureTransactionRecord(webapp.RequestHandler):
                                     {
                                         'base_path':BASE_PATH,
                                         'coll_key':coll_key,
-                                        'form':CollectionTransactionForm(),
+                                        'form':tx_form,
                                         'came_from':came_from,
                                         'auth_url':auth_url,
                                         'auth_url_text':auth_url_text
@@ -227,23 +236,27 @@ class CaptureTransactionRecord(webapp.RequestHandler):
         valid = data.is_valid()
         if valid:
             clean_data = data._cleaned_data()
-            txn = CollectionTransaction(parent=theparent)
+            txn = CollectionTransaction(parent=theparent,
+                        subType = clean_data.get('subType'),
+                        description = clean_data.get('description'),
+                        enquiryReference = clean_data.get('enquiryReference'),
+                        total = clean_data.get('total') and \
+                                int(clean_data.get('total')) or 0)
             txn.creator = users.get_current_user()
             txn.type = clean_data.get('type')
-            txn.subType = clean_data.get('subType')
             txn.category = 'Manual'
-            txn.description = clean_data.get('description')
             txn.notes = clean_data.get('notes')
-            txn.enquiryReference = clean_data.get('enquiryReference')
             txn.cost = clean_data.get('cost') and int(clean_data.get('cost')) or None
             txn.vat = clean_data.get('vat') and int(clean_data.get('vat')) or None
-            txn.total = clean_data.get('total') and int(clean_data.get('total')) or None
             txn.put()
             self.redirect(came_from)
         else:
             auth_url, auth_url_text = get_authentication_urls(self.request.uri)
             filepath = os.path.join(PROJECT_PATH, 
                           'templates', 'bookings', 'capturetxnrecord.html')
+            enquiries = [(e.referenceNumber, e.referenceNumber) for e in  
+                Enquiry.all().ancestor(theparent)]
+            data.fields['enquiryReference'].choices = enquiries
             self.response.out.write(template.render(filepath, 
                                     {
                                         'base_path':BASE_PATH,
@@ -264,10 +277,14 @@ class EditTransactionRecord(webapp.RequestHandler):
         auth_url, auth_url_text = get_authentication_urls(self.request.uri)
         filepath = os.path.join(PROJECT_PATH, 
                         'templates', 'bookings', 'edittxnrecord.html')
+        enquiries = [(e.referenceNumber, e.referenceNumber) for e in  
+            Enquiry.all().ancestor(txn.parent())]
+        tx_form = CollectionTransactionForm(instance=txn)
+        tx_form.fields['enquiryReference'].choices = enquiries
         self.response.out.write(template.render(filepath, 
                                     {
                                         'base_path':BASE_PATH,
-                                        'form':CollectionTransactionForm(instance=txn),
+                                        'form':tx_form,
                                         'txnkey':txnkey,
                                         'came_from':came_from,
                                         'auth_url':auth_url,
@@ -289,6 +306,9 @@ class EditTransactionRecord(webapp.RequestHandler):
             auth_url, auth_url_text = get_authentication_urls(self.request.uri)
             filepath = os.path.join(PROJECT_PATH, 
                           'templates', 'bookings', 'edittxnrecord.html')
+            enquiries = [(e.referenceNumber, e.referenceNumber) for e in  
+                Enquiry.all().ancestor(txn.parent())]
+            data.fields['enquiryReference'].choices = enquiries
             self.response.out.write(template.render(filepath, 
                                     {
                                         'base_path':BASE_PATH,
