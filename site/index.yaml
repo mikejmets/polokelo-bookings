@@ -50,6 +50,13 @@ indexes:
 - kind: CollectionTransaction
   ancestor: yes
   properties:
+  - name: subType
+  - name: type
+  - name: created
+
+- kind: CollectionTransaction
+  ancestor: yes
+  properties:
   - name: type
   - name: created
 
