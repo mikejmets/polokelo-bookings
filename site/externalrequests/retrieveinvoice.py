@@ -56,7 +56,8 @@ def retrieveInvoice(node):
         # get all the enquiries of this collection
         qry = Enquiry.all().ancestor(enquiry_collection)
         qry.filter('workflowStateName in', 
-                ['allocated', 'confirmed', 'receiveddeposit', 'receivedfull'])
+                [ 'allocated', 'awaitingagent', 'awaitingclient', 
+                  'confirmed', 'receiveddeposit', 'receivedfull'])
         enquiries = qry.fetch(10)
         for enquiry in enquiries:
             item_node = SubElement(items_node, 'item')
@@ -75,6 +76,7 @@ def retrieveInvoice(node):
         items = CollectionTransaction.all().ancestor(enquiry_collection)
         items.order('created')
         items.filter('type =', 'Payment')
+        # items.filter('subType in', ['Deposit', 'Settle', 'Refund', 'Payment'])
         for item in items:
             item_node = SubElement(items_node, 'item')
             new_node = SubElement(item_node, 'enquirynumber')
