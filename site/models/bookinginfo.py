@@ -202,11 +202,22 @@ class Enquiry(workflow.WorkflowAware):
 
         # create the confirmation transaction in the collection
         if kw and kw['txn_category'] == 'Auto':
-            txn = CollectionTransaction(parent=ec,
-                            subType = 'Confirm',
-                            description = kw['txn_description'],
-                            enquiryReference = self.referenceNumber,
-                            total = kw['txn_total'])
+            qry = CollectionTransaction.all().ancestor(ec)
+            qry.filter('type = ', 'Booking')
+            qry.filter('subType =', 'Confirm')
+            qry.filter('enquiryReference =', self.referenceNumber)
+            txn = qry.get()
+            if not txn:
+                txn = CollectionTransaction(parent=ec,
+                                subType = 'Confirm',
+                                description = kw['txn_description'],
+                                enquiryReference = self.referenceNumber,
+                                total = kw['txn_total'])
+            else:
+                txn.subType = 'Confirm',
+                txn.description = kw['txn_description'],
+                txn.enquiryReference = self.referenceNumber,
+                txn.total = kw['txn_total']
             txn.type = 'Booking'
             txn.category = 'Auto'
             txn.creator = users.get_current_user()
@@ -277,7 +288,9 @@ class CollectionTransaction(db.Model):
     subType = db.StringProperty(required=True,
         verbose_name='Sub Transaction Type',
         choices=['Confirm', 'Cancel', \
-                  'Deposit', 'Settle', 'Refund', 'Payment'])
+                  'Deposit', 'Settle', \
+                  'Refund', 'Payment', \
+                  'Unapplied', 'Shortfall'])
     category = db.StringProperty(verbose_name='Category',
                                 choices=['Auto', 'Manual'],
                                 default='Auto')
