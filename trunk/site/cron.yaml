@@ -9,4 +9,4 @@ cron:
 
 - description: Create Slots
   url: /tasks/createslots
-  schedule: every 5 minutes
+  schedule: every 10 minutes
