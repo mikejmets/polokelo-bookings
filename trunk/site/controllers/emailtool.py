@@ -95,12 +95,14 @@ Thank you for your enquiry about accommodation
                 summary = u"""
 Enquiry Summary:
     Reference Number: %s
+    Enquiry Number:   %s
     Venue Type:       %s
     From Date         %s
     Nights:           %s
     People:           %s
                 """ % (
                        element.parent().parent().referenceNumber, 
+                       element.parent().referenceNumber, 
                        element.type, 
                        element.start,
                        element.nights,
@@ -129,9 +131,9 @@ http://www.polokelo.info/getinvoice.php?ref=%s
         email.put()
         message = mail.EmailMessage()
         message.to = email.recipients
-        message.sender = 'polokelo123@gmail.com'
-        message.reply_to = 'polokelo123@gmail.com'
-        message.bcc = 'mike@yourbookings.co.za'
+        message.sender = 'bookings@polokelo-bookings.co.za'
+        message.reply_to = 'bookings@polokelo-bookings.co.za'
+        message.bcc = 'mike@polokelo-bookings.co.za'
         try:
             message.subject = email.subject
             message.body = email.body
