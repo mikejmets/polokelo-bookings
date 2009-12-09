@@ -17,7 +17,7 @@ echo "-------------- Dump emails"
 rm -rf loader/data/emails
 bulkloader.py --dump --app_id=bookings-dev --email=$EMAIL --kind=EmailAddress --url=$HOST/unload --filename=loader/data/emails .
 echo "-------------- Dump complaints"
-rm -rf loader/data/com plaints
+rm -rf loader/data/complaints
 bulkloader.py --dump --app_id=bookings-dev --email=$EMAIL --kind=Complaint --url=$HOST/unload --filename=loader/data/complaints .
 echo "-------------- Dump inspections"
 rm -rf loader/data/inspections
