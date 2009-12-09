@@ -124,49 +124,48 @@ class PaymentNotification(webapp.RequestHandler):
                     logging.info('Found enquiry %s', enquiry_number)
 
                     # initialise transition tracking variables
+                    # and figure out what we must do with the money
                     txn_description = ''
                     txn_total = 0
                     applied_amount = 0
-                    transition_name = 'paydeposit'
+                    txn_subtype = 'Deposit'
+                    transition_name = 'receivedeposit'
 
                     if pay_rec.paymentType == u'DEP' and \
                                     enquiry.getStateName() == 'confirmed':
-                        logging.info('Transition receivedeposit for %s', enquiry_number)
+                        logging.info('Receive Deposit on %s', enquiry_number)
                         applied_amount = long(enquiry.totalAmountInZAR * \
                                                 (pay_rec.depositPercentage / 100.0))
                         transition_name = 'receivedeposit'
+                        txn_subtype = 'Deposit'
                         txn_description = 'Payment REF %s: %d%% Deposit\n' % \
                                 (enquiry_number, pay_rec.depositPercentage)
-                        txn_total = -1 * applied_amount
-
-                        # create the transaction record
-                        ct = CollectionTransaction(parent=enquiry_collection,
-                                    subType = 'Deposit',
-                                    description = txn_description,
-                                    enquiryReference = enquiry.referenceNumber,
-                                    total = txn_total)
-                        ct.creator = users.get_current_user()
-                        ct.type = 'Payment'
-                        ct.notes=''
-                        ct.category = 'Auto'
-                        ct.put()
 
                     elif pay_rec.paymentType == u'INV' and \
                             (enquiry.getStateName() in ['receiveddeposit', 'confirmed']):
-                        logging.info('Transition receivefinal for %s', enquiry_number)
+                        logging.info('Settlement on %s', enquiry_number)
                         applied_amount = enquiry.totalAmountInZAR - \
                                                 enquiry.amountPaidInZAR
                         if enquiry.getStateName() == 'receiveddeposit':
                             transition_name = 'receivefinal'
                         elif enquiry.getStateName() == 'confirmed': 
                             transition_name = 'receiveall'
+                        txn_subtype = 'Settle'
                         txn_description = 'Payment REF %s: Outstanding Balance\n' % \
                                                             (enquiry_number)
-                        txn_total = -1 * applied_amount
+
+                    txn_total = -1 * applied_amount
+
+                    # check that applying the transaction will not break the bank
+                    # leave a 100c buffer for shortfalls to handle conversion errors
+                    if (available_total - applied_amount) >= -100:
+                        # apply the transaction
+                        enquiry.amountPaidInZAR += applied_amount
+                        enquiry.put()
 
                         # create the transaction record
                         ct = CollectionTransaction(parent=enquiry_collection,
-                                    subType = 'Settle',
+                                    subType = txn_subtype,
                                     description = txn_description,
                                     enquiryReference = enquiry.referenceNumber,
                                     total = txn_total)
@@ -176,32 +175,41 @@ class PaymentNotification(webapp.RequestHandler):
                         ct.category = 'Auto'
                         ct.put()
 
-                    else:
-                        # We will end with a discrepancy. Store it as a 
-                        # transaction to be sorted out manually
-                        continue
+                        # do the workflow transition on the enquiry
+                        try:
+                            enquiry.doTransition(transition_name, txn_category='Auto')
+                        except WorkflowError, msg:
+                            logging.error('Workflow error: %s', msg)
 
-                    available_total -= applied_amount
+                        available_total -= applied_amount
 
-                    # check that applying the amount does not cause
-                    # an error larger than 10 cents
+                    # check that we have not broken the bank
                     if available_total < 0:
                         logging.info('available_total: %s', available_total)
                         # we have no more money to apply to anything
                         break
 
-                    enquiry.amountPaidInZAR += applied_amount
-                    enquiry.put()
-                    try:
-                        enquiry.doTransition(transition_name, txn_category='Auto')
-                    except WorkflowError, msg:
-                        logging.error('Workflow error: %s', msg)
-                        continue
+            # Check if we have any money left over or under, 
+            # and record it as a shorfall or unapplied amoount
+            if available_total != 0:
+                if available_total > 0:
+                    txn_subtype = 'Unapplied'
+                else:
+                    txn_subtype = 'Shortfall'
+                ct = CollectionTransaction(parent=enquiry_collection,
+                            subType = txn_subtype,
+                            description = '%s amount on reference %s' % \
+                                    (txn_subtype, enquiry_collection.referenceNumber),
+                            enquiryReference = enquiry_collection.referenceNumber,
+                            total = -1 * available_total)
+                ct.creator = users.get_current_user()
+                ct.type = 'Payment'
+                ct.category = 'Manual'
+                ct.notes='Please take steps to correct this shortfall or unapplied amount'
+                ct.put()
 
-        # Check if we have any money left over or under, and create a transaction
-        # to reflect that. To be dealt with by a manager.
-        # We may also be dealing with a non enquiry payment, e.g. food parcel
-        if available_total != 0:
+        else:
+            # We are dealing with a non enquiry payment, e.g. food parcel
             logging.info('available_total: %s', available_total)
             ct = CollectionTransaction(parent=enquiry_collection,
                         subType = (available_total > 0) and 'Payment' or 'Refund',
@@ -209,7 +217,7 @@ class PaymentNotification(webapp.RequestHandler):
                         enquiryReference = enquiry_collection.referenceNumber,
                         total = -1 * available_total)
             ct.type = 'Payment'
-            ct.category = 'Auto'
+            ct.category = 'Manual'
             if isinstance(pay_rec.enquiryList, list):
                 ct.notes = "\n".join(pay_rec.enquiryList)     # try this for now 
             else:
