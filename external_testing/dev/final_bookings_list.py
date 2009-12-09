@@ -28,7 +28,7 @@ xml = """
     </creditcardholder>
     <enquiries>
         <enquiry>
-            <enquirynumber>YEK8-DQN-2P1</enquirynumber>
+            <enquirynumber>YEK8-DQN-2PG</enquirynumber>
             <city>CPT</city>
             <accommodation>
                 <type>GH</type>
@@ -51,7 +51,7 @@ xml = """
             <vat>4844.00</vat>
         </enquiry>
         <enquiry>
-            <enquirynumber>YEK8-DQN-2PG</enquirynumber>
+            <enquirynumber>YEK8-DQN-2P1</enquirynumber>
             <city>DUR</city>
             <accommodation>
                 <type>GH</type>
