@@ -247,42 +247,33 @@ class WorkflowAware(db.Model):
         runs any defined state/transition handlers. Extra
         arguments are passed down to all handlers called.
         """
-        logging.info('Getting self.workflow')
         # Get the workflow
         workflow = self.workflow
         flowdict = eval(workflow.flowdict)
 
-        logging.info('Getting the transition %s', transname)
         # Get the transition
         transition = workflow.findTransition(transname)
         if not transition:
             error = "transition '%s' not in '%s'"
             raise WorkflowError, error % (transname, self.workflow.key().name())
 
-        logging.info('Getting the current state')
         # Get the current state
         state = workflow.findState(self.workflowStateName)
 
-        logging.info('Before Iterating to check for valid transition state')
         if transname not in flowdict[self.workflowStateName]:
             error = "transition '%s' is invalid from state '%s'"
             raise WorkflowError, error % (transname, self.workflowStateName)
-        logging.info('After Iterating to check for valid transition state')
 
-        logging.info('Getting the new state')
         new_state = transition.stateTo
 
-        logging.info('Calling onleave handler')
         # call app-specific leave- state  handler if any
         name = 'onleave_%s' % self.workflowStateName
         if hasattr(self, name):
             getattr(self, name)(*args, **kw)
 
-        logging.info('Setting the new state')
         # Set the new state
         self.workflowStateName = new_state.key().name()
 
-        logging.info('Calling ontransition handler')
         # call app-specific transition handler if any
         name = 'ontransition_%s' % transname
         if hasattr(self, name):
@@ -294,13 +285,11 @@ class WorkflowAware(db.Model):
                 error = sys.exc_info()[1]
                 raise WorkflowError, msg % (error)
 
-        logging.info('Calling onenter handler')
         # call app-specific enter-state handler if any
         name = 'onenter_%s' % new_state.key().name()
         if hasattr(self, name):
             getattr(self, name)(*args, **kw)
 
-        logging.info('setting new expiry date')
         #Set expiry date
         exp_date = ExpirationSetting.getExpirationDate(
             self.workflow,
@@ -312,7 +301,6 @@ class WorkflowAware(db.Model):
         else:
             self.expiryDate = None
 
-        logging.info('self.put()')
         self.put()
 
 
@@ -366,7 +354,7 @@ class ExpirationSetting(db.Model):
         #      entityKind, entityState, entityTransition)
 
         if setting and setting.hours >= 0: 
-            logging.info('Expires in %s hours time', setting.hours)
+            #logging.info('Expires in %s hours time', setting.hours)
             return datetime.now() + timedelta(hours=setting.hours)
 
 
