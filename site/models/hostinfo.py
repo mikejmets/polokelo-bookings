@@ -13,6 +13,17 @@ def datetimeIterator(from_date=datetime.now(), to_date=None):
         from_date = from_date + timedelta(days = 1)
     return
 
+def getDateList(from_date, to_date):
+    dates = []
+    if to_date < from_date:
+        return dates
+
+    while from_date <= to_date:
+        dates.append(from_date)
+        from_date = from_date + timedelta(days = 1)
+
+    return dates
+
 
 logger = logging.getLogger('HostInfo')
 
@@ -215,9 +226,14 @@ class Venue(db.Model):
         for room in self.venue_bedrooms:
             for bed in room.bedroom_beds:
                 for berth in bed.bed_berths:
-                    for d in datetimeIterator(
-                                  self.contractStartDate, 
-                                  self.contractEndDate):
+                    all_dates = getDateList(
+                        max(datetime.now().date(), self.contractStartDate), 
+                        self.contractEndDate)
+                    slot_dates = \
+                        [s.startDate for s in Slot.all().ancestor(berth)]
+                    new_dates = [d for d in all_dates if d not in slot_dates]
+
+                    for d in new_dates:
                         t = time(14, 00)
                         slots = Slot.all().ancestor(berth)
                         slots.filter('startDate =', d)
@@ -239,7 +255,7 @@ class Venue(db.Model):
                             room.wheelchairAccess 
                         slot.put()
                         counter += 1
-                    if counter > 50:
+                    if counter > 10:
                         #Jump out so that the request doesn't timeout
                         return counter
         return counter
@@ -251,15 +267,13 @@ class Venue(db.Model):
         for room in self.venue_bedrooms:
             for bed in room.bedroom_beds:
                 for berth in bed.bed_berths:
-                    for d in datetimeIterator(
-                                  self.contractStartDate, 
-                                  self.contractEndDate):
-                        numNights += 1
-                        t = time(14, 00)
-                        slots = Slot.all().ancestor(berth)
-                        slots.filter('startDate =', d)
-                        if slots.get():
-                            numSlots += 1 
+                    all_dates = getDateList(
+                        max(datetime.now().date(), self.contractStartDate), 
+                        self.contractEndDate)
+                    slot_dates = \
+                        [s.startDate for s in Slot.all().ancestor(berth)]
+                    numNights += len(all_dates)
+                    numSlots += len(slot_dates)
         return "Of the total of %s contracted nights, %s slots exist" % \
             (numNights, numSlots)
                         
