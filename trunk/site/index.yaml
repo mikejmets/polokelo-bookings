@@ -144,3 +144,16 @@ indexes:
   properties:
   - name: __key__
     direction: desc
+
+- kind: Venue
+  properties:
+  - name: owner
+  - name: state
+  - name: created
+
+- kind: Venue
+  properties:
+  - name: owner
+  - name: state
+  - name: created
+    direction: desc
