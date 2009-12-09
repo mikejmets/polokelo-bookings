@@ -133,14 +133,11 @@ http://www.polokelo.info/getinvoice.php?ref=%s
         message.to = email.recipients
         message.sender = 'bookings@polokelo-bookings.co.za'
         message.reply_to = 'bookings@polokelo-bookings.co.za'
-        message.bcc = 'mike@polokelo-bookings.co.za'
-        try:
-            message.subject = email.subject
-            message.body = email.body
-            # message.check_initialized()
-            message.send()
-            logger.info('Send notification email to client %s', message.to)
-        except:
-            status = str(sys.exc_info()[1])
+
+        message.subject = email.subject
+        message.body = email.body
+        # message.check_initialized()
+        message.send()
+        logger.info('Send notification email to client %s', message.to)
 
         return status
