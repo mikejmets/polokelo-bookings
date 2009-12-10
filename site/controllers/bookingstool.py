@@ -188,11 +188,15 @@ class AccommodationSearch():
         for slot in slots:
             #logger.info('Found berth %s', slot.berth.key())
             berth = slot.berth
+            berth_key = str(berth.key())
+
             venue = berth.bed.bedroom.venue
+            venue_key = str(venue.key())
+            #venue_key = slot.venue_key
+            #venue = Venue.get(venue_key)
+
             if venue.state == 'Closed':
                 continue
-            venue_key = str(venue.key())
-            berth_key = str(berth.key())
             if not venues_dict.has_key(venue_key):
                 venues_dict[venue_key] = {}
             berths_dict = venues_dict[venue_key]
@@ -200,7 +204,7 @@ class AccommodationSearch():
                 berths_dict[berth_key].append(str(slot.key()))
             else:
                 berths_dict[berth_key] = [str(slot.key())]
-        
+        #logger.info('Found %s venues', venues_dict.keys()) 
         #Check for completeness - each berth has a slot for each night required
         valid_venues = {}
         for venue_key in venues_dict.keys():

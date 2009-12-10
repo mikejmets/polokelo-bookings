@@ -10,6 +10,7 @@ from controllers.home import BASE_PATH, PROJECT_PATH
 from controllers.match import MatchSchedule, CaptureMatch, EditMatch, DeleteMatch
 from models.hostinfo import Owner
 
+from controllers.slotviewer import ViewSlots
 from controllers.codelookup import \
     LookupTablesRoot, CaptureLookupTable, EditLookupTable, DeleteLookupTable, \
     ViewLookupTable, CaptureLookupItem, EditLookupItem, DeleteLookupItem
@@ -69,6 +70,7 @@ application = webapp.WSGIApplication([
           ('/admin/packages/capturepackage', CapturePackage),
           ('/admin/packages/editpackage', EditPackage),
           ('/admin/packages/deletepackage', DeletePackage),
+          ('/admin/slots/viewslots', ViewSlots),
           ], debug=False)
 
 def main():
