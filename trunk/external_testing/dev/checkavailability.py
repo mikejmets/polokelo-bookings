@@ -86,7 +86,7 @@ xml = """
     <guestagentcode>Trafalgar-234234234</guestagentcode>
     <action>check availability</action>
     <enquirynumber>%s</enquirynumber>
-    <city>DUR</city>
+    <city>DBN</city>
     <accommodation>
         <type>GH</type>
         <rooms>
