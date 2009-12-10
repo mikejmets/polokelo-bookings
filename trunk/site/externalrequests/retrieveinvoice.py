@@ -57,9 +57,8 @@ def retrieveInvoice(node):
         qry = Enquiry.all().ancestor(enquiry_collection)
         qry.filter('workflowStateName in', 
                 [ 'allocated', 'awaitingagent', 'awaitingclient', 
-                  'confirmed', 'receiveddeposit', 'receivedfull'])
-        enquiries = qry.fetch(10)
-        for enquiry in enquiries:
+                  'confirmed', 'receiveddeposit', 'receivedfull', 'cancelled'])
+        for enquiry in qry:
             item_node = SubElement(items_node, 'item')
             new_node = SubElement(item_node, 'enquirynumber')
             new_node.text = enquiry.referenceNumber
