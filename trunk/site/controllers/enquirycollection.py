@@ -183,7 +183,7 @@ class ViewTransactionRecord(webapp.RequestHandler):
                 'notes':txn.notes,
                 'cost':(txn.cost and '%0.2f' % (txn.cost / 100.0) or None),
                 'vat':(txn.vat and '%0.2f' % (txn.vat / 100.0) or None),
-                'total':(txn.total and '%0.2f' % (txn.total / 100.0) or None)
+                'total':(txn.total and '%0.2f' % (txn.total / 100.0) or '0.00')
                 }
         
         self.response.out.write(template.render(filepath, 
