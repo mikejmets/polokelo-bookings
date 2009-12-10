@@ -202,29 +202,44 @@ class Enquiry(workflow.WorkflowAware):
 
         # create the confirmation transaction in the collection
         if kw and kw['txn_category'] == 'Auto':
-            qry = CollectionTransaction.all().ancestor(ec)
-            qry.filter('type = ', 'Booking')
-            qry.filter('subType =', 'Confirm')
-            qry.filter('enquiryReference =', self.referenceNumber)
-            txn = qry.get()
-            if not txn:
-                txn = CollectionTransaction(parent=ec,
-                                subType = 'Confirm',
-                                description = kw['txn_description'],
-                                enquiryReference = self.referenceNumber,
-                                total = kw['txn_total'])
-            else:
-                txn.subType = 'Confirm',
-                txn.description = kw['txn_description'],
-                txn.enquiryReference = self.referenceNumber,
-                txn.total = kw['txn_total']
-            txn.type = 'Booking'
-            txn.category = 'Auto'
-            txn.creator = users.get_current_user()
-            txn.notes=''
-            txn.cost = kw['txn_quote']
-            txn.vat = kw['txn_vat']
-            txn.put()
+            category = 'Auto'
+            description = kw['txn_description']
+            total = kw['txn_total']
+            cost = kw['txn_quote']
+            vat = kw['txn_vat']
+        else:
+            category = 'Manual'
+            description = 'Confirmation on %s for enquiry %s: %s' % \
+                            (datetime.now().date(), self.referenceNumber, 
+                                    self.getAccommodationDescription())
+            total = self.totalAmountInZAR
+            cost = self.quoteInZAR
+            vat = self.vatInZAR
+
+        # check for an existing transaction, else create a new one
+        qry = CollectionTransaction.all().ancestor(ec)
+        qry.filter('type = ', 'Booking')
+        qry.filter('subType =', 'Confirm')
+        qry.filter('enquiryReference =', self.referenceNumber)
+        txn = qry.get()
+        if not txn:
+            txn = CollectionTransaction(parent=ec,
+                            subType = 'Confirm',
+                            description = description,
+                            enquiryReference = self.referenceNumber,
+                            total = total)
+        else:
+            txn.subType = 'Confirm',
+            txn.description = description,
+            txn.enquiryReference = self.referenceNumber,
+            txn.total = total
+        txn.type = 'Booking'
+        txn.category = category
+        txn.creator = users.get_current_user()
+        txn.notes=''
+        txn.cost = cost
+        txn.vat = vat
+        txn.put()
 
         element = AccommodationElement.all().ancestor(self)[0]
         et = EmailTool()
@@ -242,18 +257,44 @@ class Enquiry(workflow.WorkflowAware):
 
         # create the confirmation transaction in the collection
         if kw and kw['txn_category'] == 'Auto':
+            category = 'Auto'
+            description = kw['txn_description']
+            total = kw['txn_total']
+            cost = kw['txn_quote']
+            vat = kw['txn_vat']
+        else:
+            category = 'Manual'
+            description = 'Confirmation on %s for enquiry %s: %s' % \
+                            (datetime.now().date(), self.referenceNumber, 
+                                    self.getAccommodationDescription())
+            total = self.totalAmountInZAR
+            cost = self.quoteInZAR
+            vat = self.vatInZAR
+
+        # check for an existing transaction, else create a new one
+        qry = CollectionTransaction.all().ancestor(ec)
+        qry.filter('type = ', 'Booking')
+        qry.filter('subType =', 'Confirm')
+        qry.filter('enquiryReference =', self.referenceNumber)
+        txn = qry.get()
+        if not txn:
             txn = CollectionTransaction(parent=ec,
                             subType = 'Confirm',
-                            description = kw['txn_description'],
+                            description = description,
                             enquiryReference = self.referenceNumber,
-                            total = kw['txn_total'])
-            txn.type = 'Booking'
-            txn.category = 'Auto'
-            txn.creator = users.get_current_user()
-            txn.notes=''
-            txn.cost = kw['txn_quote']
-            txn.vat = kw['txn_vat']
-            txn.put()
+                            total = total)
+        else:
+            txn.subType = 'Confirm',
+            txn.description = description,
+            txn.enquiryReference = self.referenceNumber,
+            txn.total = total
+        txn.type = 'Booking'
+        txn.category = category
+        txn.creator = users.get_current_user()
+        txn.notes=''
+        txn.cost = cost
+        txn.vat = vat
+        txn.put()
 
         element = AccommodationElement.all().ancestor(self)[0]
         et = EmailTool()
