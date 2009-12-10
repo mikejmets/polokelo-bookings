@@ -82,17 +82,17 @@ class CreateSlotsTask(webapp.RequestHandler):
 
 class UpdateDatastore(webapp.RequestHandler):
     def get(self):
-        logger.info("Enter Updating Datastote Task")
 
         slots = Slot.all()
         last_key = self.request.get('last_key', 'None')
         current_key = '0' 
-        logger.info('---last %s', last_key)
 
         if last_key != 'None':
             last_key = db.Key(last_key)
-            slots.filter('__key__ >=', last_key)
+            slots.filter('__key__ >', last_key)
             current_key = last_key 
+            logger.info("Updating Datastote Task from %s", last_key)
+
 
         slots.order('__key__')
         slots = slots.fetch(10)
@@ -100,24 +100,23 @@ class UpdateDatastore(webapp.RequestHandler):
             next_url = '/'
             last_key = '0'
         else:
-            for slot in slots[:-1]:
+            for slot in slots:
                   slot.venue_key = str(slot.berth.bed.bedroom.venue.key())
                   slot.put()
             last_key = str(slots[-1].key())
-            next_url = '/tasks/update_datastore?last_key=%s' % last_key
-        logger.info("Exit adding Venue Key to Slot Task")
+            next_url = '/tasks/update_datastore?last_key=%s' % str(last_key)
 
         auth_url, auth_url_text = get_authentication_urls(self.request.uri)
         filepath = os.path.join(
             PROJECT_PATH, 'templates', 'common', 'update_datastore.html')
-        self.response.out.write(template.render(filepath, 
-                                    {
-                                        'base_path':BASE_PATH,
-                                        'auth_url':auth_url,
-                                        'auth_url_text':auth_url_text,
-                                        'current_key': current_key,
-                                        'next_url': next_url,
-                                        }))
+        context = {
+                  'base_path':BASE_PATH,
+                  'auth_url':auth_url,
+                  'auth_url_text':auth_url_text,
+                  'next_url': next_url,
+                  }
+        self.response.out.write(context) 
+        #self.response.out.write(template.render(filepath, context)) 
 
 
 application = webapp.WSGIApplication([
