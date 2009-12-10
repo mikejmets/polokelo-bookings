@@ -13,6 +13,7 @@ from models.bookinginfo import \
     ContractedBooking, Enquiry, AccommodationElement
 from models.packages import Package
 from controllers import generator
+from controllers.date_utils import getDateList
 
 logger = logging.getLogger('BookingsTool')
 
@@ -190,10 +191,10 @@ class AccommodationSearch():
             berth = slot.berth
             berth_key = str(berth.key())
 
-            venue = berth.bed.bedroom.venue
-            venue_key = str(venue.key())
-            #venue_key = slot.venue_key
-            #venue = Venue.get(venue_key)
+            #venue = berth.bed.bedroom.venue
+            #venue_key = str(venue.key())
+            venue_key = slot.venue_key
+            venue = Venue.get(venue_key)
 
             if venue.state == 'Closed':
                 continue
@@ -255,6 +256,7 @@ class SimpleAccommodationSearch(AccommodationSearch):
     def _findValidBerths(self, element):
         #Infer extra criteria
         end = element.start + timedelta(days = (element.nights-1))
+        dates = getDateList(element.start, end)
         child_friendly_required = element.children > 0
         #logger.info('Search for %s, %s, %s -> %s(%s), %s', 
         #  element.city, element.type, element.start, end, element.nights,
@@ -269,10 +271,9 @@ class SimpleAccommodationSearch(AccommodationSearch):
             slots.filter('wheelchairAccess =', True)
         if child_friendly_required:
             slots.filter('childFriendly =', True)
-        slots.filter('startDate >=', element.start)
-        slots.filter('startDate <=', end)
+        slots.filter('startDate in', dates)
         slots.order('startDate')
-        #logger.info('--------Found %s slots', len([s for s in slots]))
+        logger.info('--------Found %s slots', len([s for s in slots]))
         #Run query and 
         return self._validateBerths(slots, element)
 
