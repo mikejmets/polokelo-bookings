@@ -199,10 +199,21 @@ class ViewTransactionRecord(webapp.RequestHandler):
 class CollectionTransactionForm(djangoforms.ModelForm):
     class Meta:
         model = CollectionTransaction
-        exclude = ['created', 'creator', 'category']
+        exclude = ['created', 'creator', 'category', 'cost', 'vat']
 
     enquiryReference = forms.ChoiceField(choices=[])
-     
+
+
+
+def _getEnquiryTuples(collection):
+    """ Retrieve enquiries in a collection and return 
+        a list suitable for a Django ChoiceField
+    """
+    enquiries = [('', '-- Select --'),
+            (collection.referenceNumber, collection.referenceNumber)]
+    enquiries.extend([(e.referenceNumber, e.referenceNumber) \
+                                for e in Enquiry.all().ancestor(collection)])
+    return enquiries
 
 
 class CaptureTransactionRecord(webapp.RequestHandler):
@@ -211,8 +222,7 @@ class CaptureTransactionRecord(webapp.RequestHandler):
         came_from = self.request.referer
         coll_key = self.request.get('coll_key')
         theparent = EnquiryCollection.get(coll_key)
-        enquiries = [(e.referenceNumber, e.referenceNumber) for e in  
-            Enquiry.all().ancestor(theparent)]
+        enquiries = _getEnquiryTuples(theparent)
         tx_form = CollectionTransactionForm()
         tx_form.fields['enquiryReference'].choices = enquiries
         auth_url, auth_url_text = get_authentication_urls(self.request.uri)
@@ -236,26 +246,26 @@ class CaptureTransactionRecord(webapp.RequestHandler):
         valid = data.is_valid()
         if valid:
             clean_data = data._cleaned_data()
+            total = clean_data.get('total') and \
+                    int(clean_data.get('total')) or 0
             txn = CollectionTransaction(parent=theparent,
                         subType = clean_data.get('subType'),
                         description = clean_data.get('description'),
                         enquiryReference = clean_data.get('enquiryReference'),
-                        total = clean_data.get('total') and \
-                                int(clean_data.get('total')) or 0)
+                        total=total)
             txn.creator = users.get_current_user()
             txn.type = clean_data.get('type')
             txn.category = 'Manual'
             txn.notes = clean_data.get('notes')
-            txn.cost = clean_data.get('cost') and int(clean_data.get('cost')) or None
-            txn.vat = clean_data.get('vat') and int(clean_data.get('vat')) or None
+            txn.cost = int(total / 114.0 * 100.0)
+            txn.vat = total - txn.cost
             txn.put()
             self.redirect(came_from)
         else:
             auth_url, auth_url_text = get_authentication_urls(self.request.uri)
             filepath = os.path.join(PROJECT_PATH, 
                           'templates', 'bookings', 'capturetxnrecord.html')
-            enquiries = [(e.referenceNumber, e.referenceNumber) for e in  
-                Enquiry.all().ancestor(theparent)]
+            enquiries = _getEnquiryTuples(theparent)
             data.fields['enquiryReference'].choices = enquiries
             self.response.out.write(template.render(filepath, 
                                     {
@@ -277,8 +287,7 @@ class EditTransactionRecord(webapp.RequestHandler):
         auth_url, auth_url_text = get_authentication_urls(self.request.uri)
         filepath = os.path.join(PROJECT_PATH, 
                         'templates', 'bookings', 'edittxnrecord.html')
-        enquiries = [(e.referenceNumber, e.referenceNumber) for e in  
-            Enquiry.all().ancestor(txn.parent())]
+        enquiries = _getEnquiryTuples(txn.parent())
         tx_form = CollectionTransactionForm(instance=txn)
         tx_form.fields['enquiryReference'].choices = enquiries
         self.response.out.write(template.render(filepath, 
@@ -300,14 +309,15 @@ class EditTransactionRecord(webapp.RequestHandler):
             entity = data.save(commit=False)
             entity.creator = users.get_current_user()
             entity.category='Manual'
+            entity.cost = int(entity.total / 114.0 * 100.0)
+            entity.vat = entity.total - entity.cost
             entity.put()
             self.redirect(came_from)
         else:
             auth_url, auth_url_text = get_authentication_urls(self.request.uri)
             filepath = os.path.join(PROJECT_PATH, 
                           'templates', 'bookings', 'edittxnrecord.html')
-            enquiries = [(e.referenceNumber, e.referenceNumber) for e in  
-                Enquiry.all().ancestor(txn.parent())]
+            enquiries = _getEnquiryTuples(txn.parent())
             data.fields['enquiryReference'].choices = enquiries
             self.response.out.write(template.render(filepath, 
                                     {
