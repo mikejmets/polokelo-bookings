@@ -38,6 +38,7 @@ handlers:
 
 - url: /tasks/.*
   script: controllers/tasks.py
+  login: admin
 
 - url: /unload
   script: $PYTHON_LIB/google/appengine/ext/remote_api/handler.py

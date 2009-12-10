@@ -4,11 +4,12 @@ from datetime import datetime
 from google.appengine.ext import webapp
 from google.appengine.ext.webapp.util import run_wsgi_app
 from google.appengine.ext.webapp import template
+from google.appengine.ext import db
 
 from controllers.home import BASE_PATH, PROJECT_PATH
 from controllers.utils import get_authentication_urls
 from models.bookinginfo import Enquiry
-from models.hostinfo import Owner, Venue
+from models.hostinfo import Owner, Venue, Slot
 
 logger = logging.getLogger("Tasks")
 
@@ -79,11 +80,53 @@ class CreateSlotsTask(webapp.RequestHandler):
                                         'auth_url_text':auth_url_text
                                         }))
 
+class UpdateDatastore(webapp.RequestHandler):
+    def get(self):
+        logger.info("Enter Updating Datastote Task")
+
+        slots = Slot.all()
+        last_key = self.request.get('last_key', 'None')
+        current_key = '0' 
+        logger.info('---last %s', last_key)
+
+        if last_key != 'None':
+            last_key = db.Key(last_key)
+            slots.filter('__key__ >', last_key)
+            current_key = last_key 
+
+        slots.order('__key__')
+        slots = slots.fetch(3)
+        if len(slots) == 0:
+            next_url = '/'
+            last_key = '0'
+        else:
+          for slot in slots[:-1]:
+                slot.venue_key = str(slot.berth.bed.bedroom.venue.key())
+                slot.put()
+                logger.info("Add Venue Key to Slot %s", slot.key())
+          last_key = str(slots[-1].key())
+          next_url = '/tasks/update_datastore?last_key=%s' % last_key
+        logger.info("Exit adding Venue Key to Slot Task")
+
+        logger.info('-----%s %s %s', current_key, last_key, next_url)
+        auth_url, auth_url_text = get_authentication_urls(self.request.uri)
+        filepath = os.path.join(
+            PROJECT_PATH, 'templates', 'common', 'update_datastore.html')
+        self.response.out.write(template.render(filepath, 
+                                    {
+                                        'base_path':BASE_PATH,
+                                        'auth_url':auth_url,
+                                        'auth_url_text':auth_url_text,
+                                        'current_key': current_key,
+                                        'next_url': next_url,
+                                        }))
+
 
 application = webapp.WSGIApplication([
       ('/tasks/expireenquiries', ExpireEnquiries),
       ('/tasks/emailguests', EmailGuests),
       ('/tasks/createslots', CreateSlotsTask),
+      ('/tasks/update_datastore', UpdateDatastore),
       ], debug=False)
 
 def main():

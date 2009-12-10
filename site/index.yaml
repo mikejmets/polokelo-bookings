@@ -127,6 +127,14 @@ indexes:
   - name: city
   - name: occupied
   - name: venueType
+  - name: startDate
+  - name: ownerReference
+
+- kind: Slot
+  properties:
+  - name: city
+  - name: occupied
+  - name: venueType
   - name: wheelchairAccess
   - name: startDate
 

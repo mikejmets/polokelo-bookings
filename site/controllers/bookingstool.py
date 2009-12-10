@@ -181,26 +181,30 @@ class AccommodationSearch():
             return {}
 
     def _validateBerths(self, slots, element):
-        #Group slots by berth in a dict
-        venues = {}
+        #Group slots by berth by venue in a dict
+        #  {'v1': {'berth1':['slot1', 's2', 's3'],
+        #          'berth2':['slot1', 's2', 's3']}}
+        venues_dict = {}
         for slot in slots:
             #logger.info('Found berth %s', slot.berth.key())
-            if slot.berth.bed.bedroom.venue.state == 'Closed':
+            berth = slot.berth
+            venue = berth.bed.bedroom.venue
+            if venue.state == 'Closed':
                 continue
-            venue_key = str(slot.berth.bed.bedroom.venue.key())
-            berth_key = str(slot.berth.key())
-            if not venues.has_key(venue_key):
-                venues[venue_key] = {}
-            venue = venues[venue_key]
-            if venue.has_key(berth_key):
-                venue[berth_key].append(str(slot.key()))
+            venue_key = str(venue.key())
+            berth_key = str(berth.key())
+            if not venues_dict.has_key(venue_key):
+                venues_dict[venue_key] = {}
+            berths_dict = venues_dict[venue_key]
+            if berths_dict.has_key(berth_key):
+                berths_dict[berth_key].append(str(slot.key()))
             else:
-                venue[berth_key] = [str(slot.key())]
-
-        #Check for completeness
+                berths_dict[berth_key] = [str(slot.key())]
+        
+        #Check for completeness - each berth has a slot for each night required
         valid_venues = {}
-        for venue_key in venues.keys():
-            venue = venues[venue_key]
+        for venue_key in venues_dict.keys():
+            venue = venues_dict[venue_key]
             valid_berths = []
             for berth_key in venue.keys():
                 berth = venue[berth_key]
@@ -264,7 +268,7 @@ class SimpleAccommodationSearch(AccommodationSearch):
         slots.filter('startDate >=', element.start)
         slots.filter('startDate <=', end)
         slots.order('startDate')
-
+        #logger.info('--------Found %s slots', len([s for s in slots]))
         #Run query and 
         return self._validateBerths(slots, element)
 
