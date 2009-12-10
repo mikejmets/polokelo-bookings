@@ -95,7 +95,7 @@ class UpdateDatastore(webapp.RequestHandler):
             logger.info("Updating Datastote Task from %s", last_key)
 
 
-        slots = slots.fetch(10)
+        slots = slots.fetch(5)
         if len(slots) == 0:
             next_url = '/'
             last_key = '0'
