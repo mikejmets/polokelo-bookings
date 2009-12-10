@@ -82,9 +82,8 @@ class Enquiry(workflow.WorkflowAware):
             b.rdelete()
 
     def cancel(self):
-        #for b in self.getContractedBookings():
-        #    b.rdelete()
-        pass
+        for b in self.getContractedBookings():
+            b.rdelete()
     
     def allocate(self):
         pass
@@ -176,8 +175,76 @@ class Enquiry(workflow.WorkflowAware):
     def ontransition_canceldeposit(self, *args, **kw):
         self.cancel()
 
+        # set amount owed to 0
+        self.totalAmountInZAR = 0
+        self.quoteInZAR = 0
+        self.vatInZAR = 0
+        self.put()
+
+        # create the cancel transaction in the collection
+        description = 'Cancellation on %s of enquiry %s: %s' % \
+                        (datetime.now().date(), self.referenceNumber, 
+                                self.getAccommodationDescription())
+
+        # check for an existing transaction, else create a new one
+        qry = CollectionTransaction.all().ancestor(self.parent())
+        qry.filter('type = ', 'Booking')
+        qry.filter('subType =', 'Cancel')
+        qry.filter('enquiryReference =', self.referenceNumber)
+        txn = qry.get()
+        if not txn:
+            txn = CollectionTransaction(parent=self.parent(),
+                            subType = 'Cancel',
+                            description = description,
+                            enquiryReference = self.referenceNumber,
+                            total = 0)
+        else:
+            txn.subType = 'Cancel',
+            txn.description = description,
+            txn.enquiryReference = self.referenceNumber,
+            txn.total = 0
+        txn.type = 'Booking'
+        txn.category = 'Manual'
+        txn.creator = users.get_current_user()
+        txn.notes=''
+        txn.put()
+
     def ontransition_cancelfull(self, *args, **kw):
         self.cancel()
+
+        # set amount owed to 0
+        self.totalAmountInZAR = 0
+        self.quoteInZAR = 0
+        self.vatInZAR = 0
+        self.put()
+
+        # create the cancel transaction in the collection
+        description = 'Cancellation on %s of enquiry %s: %s' % \
+                        (datetime.now().date(), self.referenceNumber, 
+                                self.getAccommodationDescription())
+
+        # check for an existing transaction, else create a new one
+        qry = CollectionTransaction.all().ancestor(self.parent())
+        qry.filter('type = ', 'Booking')
+        qry.filter('subType =', 'Cancel')
+        qry.filter('enquiryReference =', self.referenceNumber)
+        txn = qry.get()
+        if not txn:
+            txn = CollectionTransaction(parent=self.parent(),
+                            subType = 'Cancel',
+                            description = description,
+                            enquiryReference = self.referenceNumber,
+                            total = 0)
+        else:
+            txn.subType = 'Cancel',
+            txn.description = description,
+            txn.enquiryReference = self.referenceNumber,
+            txn.total = 0
+        txn.type = 'Booking'
+        txn.category = 'Manual'
+        txn.creator = users.get_current_user()
+        txn.notes=''
+        txn.put()
 
     def ontransition_allocatetemporary(self, *args, **kw):
         self.allocate()
