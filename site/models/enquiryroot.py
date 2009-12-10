@@ -66,6 +66,8 @@ class EnquiryRoot(db.Model):
             title='Assign to agent')
         wfl.addTransition('allocatebyagent', 'awaitingagent', 'allocated', \
             title='Allocate')
+        wfl.addTransition('allocatefromhold', 'onhold', 'allocated', \
+            title='Do Allocation')
 
         #Agent allocation
         wfl.addTransition('temptoagent', 'temporary', 'awaitingagent', \
