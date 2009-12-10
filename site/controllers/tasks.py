@@ -7,7 +7,7 @@ from google.appengine.ext.webapp import template
 from google.appengine.ext import db
 
 from controllers.home import BASE_PATH, PROJECT_PATH
-from controllers.utils import get_authentication_urls
+from controllers.utils import get_authentication_urls, parse_datetime
 from models.bookinginfo import Enquiry
 from models.hostinfo import Owner, Venue, Slot
 
@@ -83,19 +83,19 @@ class CreateSlotsTask(webapp.RequestHandler):
 class UpdateDatastore(webapp.RequestHandler):
     def get(self):
 
-        slots = Slot.all()
+        slots = Slot.all().order('created')
         last_key = self.request.get('last_key', 'None')
         current_key = '0' 
 
         if last_key != 'None':
-            last_key = db.Key(last_key)
-            slots.filter('__key__ >', last_key)
+            last_key = parse_datetime(
+                last_key, '%Y-%m-%d %H:%M:%S')
+            slots.filter('created >', last_key)
             current_key = last_key 
             logger.info("Updating Datastote Task from %s", last_key)
 
 
-        slots.order('__key__')
-        slots = slots.fetch(3)
+        slots = slots.fetch(10)
         if len(slots) == 0:
             next_url = '/'
             last_key = '0'
@@ -103,7 +103,7 @@ class UpdateDatastore(webapp.RequestHandler):
             for slot in slots:
                   slot.venue_key = str(slot.berth.bed.bedroom.venue.key())
                   slot.put()
-            last_key = str(slots[-1].key())
+            last_key = slots[-1].created
             next_url = '/tasks/update_datastore?last_key=%s' % str(last_key)
 
         auth_url, auth_url_text = get_authentication_urls(self.request.uri)
