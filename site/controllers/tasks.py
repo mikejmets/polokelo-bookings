@@ -100,15 +100,13 @@ class UpdateDatastore(webapp.RequestHandler):
             next_url = '/'
             last_key = '0'
         else:
-          for slot in slots[:-1]:
-                slot.venue_key = str(slot.berth.bed.bedroom.venue.key())
-                slot.put()
-                logger.info("Add Venue Key to Slot %s", slot.key())
-          last_key = str(slots[-1].key())
-          next_url = '/tasks/update_datastore?last_key=%s' % last_key
+            for slot in slots[:-1]:
+                  slot.venue_key = str(slot.berth.bed.bedroom.venue.key())
+                  slot.put()
+            last_key = str(slots[-1].key())
+            next_url = '/tasks/update_datastore?last_key=%s' % last_key
         logger.info("Exit adding Venue Key to Slot Task")
 
-        logger.info('-----%s %s %s', current_key, last_key, next_url)
         auth_url, auth_url_text = get_authentication_urls(self.request.uri)
         filepath = os.path.join(
             PROJECT_PATH, 'templates', 'common', 'update_datastore.html')
