@@ -6,23 +6,13 @@ from google.appengine.ext.db import polymodel
 from google.appengine.api import users
 
 from models.bookinginfo import ContractedBooking
+from controllers.date_utils import getDateList
 
 def datetimeIterator(from_date=datetime.now(), to_date=None):
     while to_date is None or from_date <= to_date:
         yield from_date
         from_date = from_date + timedelta(days = 1)
     return
-
-def getDateList(from_date, to_date):
-    dates = []
-    if to_date < from_date:
-        return dates
-
-    while from_date <= to_date:
-        dates.append(from_date)
-        from_date = from_date + timedelta(days = 1)
-
-    return dates
 
 
 logger = logging.getLogger('HostInfo')
