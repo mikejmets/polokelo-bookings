@@ -86,10 +86,7 @@ class PaymentNotification(webapp.RequestHandler):
                 pay_rec.depositPercentage =  int(self.request.get('m_4'))
                 enq_list = []
                 for num in self.request.get('m_2').split(','):
-                    if num[0] == 'P':
-                        enq_num = num[:3] + '-' + num[3:6] + '-' + num[6:]
-                    else:
-                        enq_num = num[:4] + '-' + num[4:7] + '-' + num[7:]
+                    enq_num = num[:3] + '-' + num[3:6] + '-' + num[6:]
                     enq_list.append(enq_num)
                 pay_rec.enquiryList = enq_list
             else:
