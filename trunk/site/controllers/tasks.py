@@ -91,11 +91,11 @@ class UpdateDatastore(webapp.RequestHandler):
 
         if last_key != 'None':
             last_key = db.Key(last_key)
-            slots.filter('__key__ >', last_key)
+            slots.filter('__key__ >=', last_key)
             current_key = last_key 
 
         slots.order('__key__')
-        slots = slots.fetch(3)
+        slots = slots.fetch(10)
         if len(slots) == 0:
             next_url = '/'
             last_key = '0'
