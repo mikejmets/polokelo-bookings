@@ -95,7 +95,7 @@ class UpdateDatastore(webapp.RequestHandler):
 
 
         slots.order('__key__')
-        slots = slots.fetch(10)
+        slots = slots.fetch(3)
         if len(slots) == 0:
             next_url = '/'
             last_key = '0'

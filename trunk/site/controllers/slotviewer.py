@@ -16,14 +16,14 @@ logger = logging.getLogger('SlotViewer')
 
 class ViewSlots(webapp.RequestHandler):
     def get(self):
-        logger.info('inside get')
         auth_url, auth_url_text = get_authentication_urls(self.request.uri)
 
         query = Slot.all().order('__key__')
+        size = int(self.request.get('size', '30'))
         start = self.request.get('start', 'None')
         if start != 'None':
           query.filter('__key__ >=', db.Key(start))
-        slots = query.fetch(20+1)
+        slots = query.fetch(size+1)
         if slots:
             new_start = str(slots[-1].key())
 
@@ -32,6 +32,7 @@ class ViewSlots(webapp.RequestHandler):
         context = {'base_path':BASE_PATH,
                   'auth_url':auth_url,
                   'auth_url_text':auth_url_text,
+                  'size':size,
                   'start':new_start,
                   'slots':slots,
                   }
