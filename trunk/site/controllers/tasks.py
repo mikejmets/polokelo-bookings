@@ -56,7 +56,8 @@ class CreateSlotsTask(webapp.RequestHandler):
         logger.info("Create Slots Task")
         owners = Owner.all()
         owners.order('created')
-        for owner in owners.fetch(5):
+        for owner in owners.fetch(1):
+            logger.info("Create Slots for owner %s", owner.surname)
             venues = Venue.all()
             venues.filter('owner =', owner)
             venues.filter('state =', 'Open')
