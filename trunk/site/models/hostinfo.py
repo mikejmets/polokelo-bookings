@@ -253,6 +253,7 @@ class Venue(db.Model):
                         slot.wheelchairAccess = \
                             self.wheelchairAccess or \
                             room.wheelchairAccess 
+                        slot.venue_key = str(self.key())
                         slot.put()
                         counter += 1
                     if counter > 10:
@@ -471,6 +472,7 @@ class Slot(db.Model):
     bedType = db.StringProperty()
     childFriendly = db.BooleanProperty()
     wheelchairAccess = db.BooleanProperty()
+    venue_key = db.StringProperty()
 
     def listing_name(self):
         return 'Room:%s Venue:%s' % \
