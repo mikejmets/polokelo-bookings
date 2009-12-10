@@ -92,26 +92,26 @@ def _generateNumber(seed, number_type):
 def generateEnquiryCollectionNumber():
     """ generate a new enquiry number
     """
-    number = _generateNumber('HT4W79ZD', 'enquirycollectionnumber')
-    return 'YC' + number[:2] + '-' + number[2:5] + '-' + number[5:]
+    number = _generateNumber('T4W79ZD', 'enquirycollectionnumber')
+    return 'YC' + number[:1] + '-' + number[1:4] + '-' + number[4:]
 
 
 def generateEnquiryNumber():
     """ generate a new enquiry number
     """
-    number = _generateNumber('K8DQN2PG', 'enquirynumber')
-    return 'YE' + number[:2] + '-' + number[2:5] + '-' + number[5:]
+    number = _generateNumber('8DQN2PG', 'enquirynumber')
+    return 'YE' + number[:1] + '-' + number[1:4] + '-' + number[4:]
 
 
 def generateBookingNumber():
     """ generate a new booking number
     """
-    number = _generateNumber('S5HKZ3CE', 'bookingnumber')
-    return 'YB' + number[:2] + '-' + number[2:5] + '-' + number[5:]
+    number = _generateNumber('5HKZ3CE', 'bookingnumber')
+    return 'YB' + number[:1] + '-' + number[1:4] + '-' + number[4:]
 
 
 def generateClientNumber():
     """ generate a new client number
     """
-    number = _generateNumber('A9TLW6FV', 'clientnumber')
+    number = _generateNumber('9TLW6FV', 'clientnumber')
     return 'YG' + number
