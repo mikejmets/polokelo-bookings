@@ -112,6 +112,15 @@ indexes:
   - name: childFriendly
   - name: city
   - name: occupied
+  - name: startDate
+  - name: venueType
+  - name: venue_key
+
+- kind: Slot
+  properties:
+  - name: childFriendly
+  - name: city
+  - name: occupied
   - name: venueType
   - name: startDate
 
