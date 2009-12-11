@@ -7,7 +7,8 @@ from google.appengine.ext.webapp import template
 from google.appengine.ext import db
 
 from controllers.home import BASE_PATH, PROJECT_PATH
-from controllers.utils import get_authentication_urls, parse_datetime
+from controllers.utils import get_authentication_urls
+from controllers.date_utils import parse_datetime
 from models.bookinginfo import Enquiry
 from models.hostinfo import Owner, Venue, Slot
 
