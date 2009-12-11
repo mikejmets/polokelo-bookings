@@ -243,6 +243,7 @@ class SimpleAccommodationSearch(AccommodationSearch):
         if len(venue_keys) > 0:
             for venue_key in venue_keys:
                 berths = venues[venue_key]
+                #logger.info('----------%s', berths)
                 if len(berths) >= people:
                     valid_venues[venue_key] = berths
         if valid_venues:
@@ -272,10 +273,10 @@ class SimpleAccommodationSearch(AccommodationSearch):
         if child_friendly_required:
             slots.filter('childFriendly =', True)
         slots.filter('startDate in', dates)
-        slots.order('startDate')
-        logger.info('--------Found %s slots', len([s for s in slots]))
+        slots.order('venue_key')
+        #logger.info('--------Found %s slots', len([s for s in slots]))
         #Run query and 
-        return self._validateBerths(slots, element)
+        return self._validateBerths(slots.fetch(500), element)
 
 
 
