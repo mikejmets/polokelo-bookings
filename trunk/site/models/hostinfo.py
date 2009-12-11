@@ -136,10 +136,11 @@ class Venue(db.Model):
             double_indicator = 0
             if berth.bed.bedType == 'Double':
                 double_indicator = 9
-        return "%s %s %s %s %s" % (
+        return "%s %s %s %s %s %s" % (
             allocations, 
-            double_indicator, 
             self.owner.referenceNumber,
+            self.name,
+            double_indicator, 
             berth.bed.bedroom.name,
             berth.bed.name)
 
@@ -148,7 +149,7 @@ class Venue(db.Model):
 
     def recalcNumOfBookings(self):
         self.numberOfBookings = len(self.getContractedBookings())
-        logger.info('Recalc venue %s to %d', self.name, self.numberOfBookings)
+        #logger.info('Recalc venue %s to %d', self.name, self.numberOfBookings)
         self.put()
 
     def getContractedBookings(self):
@@ -207,6 +208,11 @@ class Venue(db.Model):
         #if len(self.venue_photos.fetch(1)) == 0:
         #    return False, "No Photos"
 
+        #Recalc numberOfBookings
+        if self.numberOfBookings > 0:
+            self.recalcNumOfBookings()
+
+ 
         #Otherwise
         return True, ""
 
