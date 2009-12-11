@@ -102,7 +102,8 @@ class UpdateDatastore(webapp.RequestHandler):
             last_key = '0'
         else:
             for slot in slots:
-                  slot.venue_key = str(slot.berth.bed.bedroom.venue.key())
+                  slot.venue_capacity = \
+                      slot.berth.bed.bedroom.venue.getCapacity()
                   slot.put()
             last_key = slots[-1].created
             next_url = '/tasks/update_datastore?last_key=%s' % str(last_key)
