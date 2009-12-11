@@ -81,6 +81,31 @@ class CreateSlotsTask(webapp.RequestHandler):
                                         'auth_url_text':auth_url_text
                                         }))
 
+class CreateSlotsScript(webapp.RequestHandler):
+    def get(self):
+        venues = Venue.all().order('created')
+        last_key = self.request.get('last_key', 'None')
+
+        if last_key != 'None':
+            last_key = parse_datetime(
+                last_key, '%Y-%m-%d %H:%M:%S')
+            venues.filter('created >', last_key)
+            logger.info("Updating Datastore Script from %s", last_key)
+
+        venues = venues.fetch(2)
+        if len(venues) == 0:
+            next_url = '/'
+            last_key = '0'
+        else:
+            venues[0].createSlots()
+            last_key = venues[1].created
+            next_url = '/tasks/createslotsscript?last_key=%s' % str(last_key)
+
+        context = {
+                  'next_url': next_url,
+                  }
+        self.response.out.write(context) 
+
 class UpdateDatastore(webapp.RequestHandler):
     def get(self):
 
@@ -108,9 +133,6 @@ class UpdateDatastore(webapp.RequestHandler):
             last_key = slots[-1].created
             next_url = '/tasks/update_datastore?last_key=%s' % str(last_key)
 
-        auth_url, auth_url_text = get_authentication_urls(self.request.uri)
-        filepath = os.path.join(
-            PROJECT_PATH, 'templates', 'common', 'update_datastore.html')
         context = {
                   'base_path':BASE_PATH,
                   'auth_url':auth_url,
@@ -118,13 +140,13 @@ class UpdateDatastore(webapp.RequestHandler):
                   'next_url': next_url,
                   }
         self.response.out.write(context) 
-        #self.response.out.write(template.render(filepath, context)) 
 
 
 application = webapp.WSGIApplication([
       ('/tasks/expireenquiries', ExpireEnquiries),
       ('/tasks/emailguests', EmailGuests),
       ('/tasks/createslots', CreateSlotsTask),
+      ('/tasks/createslotsscript', CreateSlotsScript),
       ('/tasks/update_datastore', UpdateDatastore),
       ], debug=False)
 
