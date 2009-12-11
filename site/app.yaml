@@ -43,6 +43,9 @@ handlers:
   script: $PYTHON_LIB/google/appengine/ext/remote_api/handler.py
   login: required
 
+- url: /stats.* 
+  script: appstats/ui.py 
+
 - url: /
   script: controllers/home.py
   login: required
