@@ -3,13 +3,15 @@ import urllib2
 
 
 def main(): 
-  key = 'None'
+  key = None
   url = 'http://www.polokelo-bookings.co.za/tasks/update_datastore'
   url = 'http://localhost:8080/tasks/update_datastore'
   cnt = 0
   while True:
-      data = urllib.urlencode({'last_key':key})
-      next_url = url + '?' + data
+      next_url = url
+      if key:
+          data = urllib.urlencode({'last_key':key})
+          next_url = url + '?' + data
       try:
           response = urllib2.urlopen(next_url)
           results = eval(response.read())
