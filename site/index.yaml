@@ -109,51 +109,14 @@ indexes:
 
 - kind: Slot
   properties:
-  - name: childFriendly
   - name: city
   - name: occupied
   - name: startDate
   - name: venueType
+  - name: venue_capacity
   - name: venue_key
-
-- kind: Slot
-  properties:
   - name: childFriendly
-  - name: city
-  - name: occupied
-  - name: venueType
-  - name: startDate
-
-- kind: Slot
-  properties:
-  - name: city
-  - name: occupied
-  - name: startDate
-  - name: venueType
-  - name: venue_key
-
-- kind: Slot
-  properties:
-  - name: city
-  - name: occupied
-  - name: venueType
-  - name: startDate
-
-- kind: Slot
-  properties:
-  - name: city
-  - name: occupied
-  - name: venueType
-  - name: startDate
-  - name: ownerReference
-
-- kind: Slot
-  properties:
-  - name: city
-  - name: occupied
-  - name: venueType
   - name: wheelchairAccess
-  - name: startDate
 
 - kind: Transition
   properties:

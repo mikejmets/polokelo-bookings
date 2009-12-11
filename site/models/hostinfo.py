@@ -250,6 +250,7 @@ class Venue(db.Model):
                             self.wheelchairAccess or \
                             room.wheelchairAccess 
                         slot.venue_key = str(self.key())
+                        slot.venue_capacity = self.getCapacity()
                         slot.put()
                         counter += 1
                     if counter > 10:
@@ -282,6 +283,12 @@ class Venue(db.Model):
                     for slot in berth.berth_slots:
                         slot.rdelete()
 
+
+    def getCapacity(self):
+        cap = 0
+        for b in self.venue_bedrooms:
+            cap += b.capacity
+        return cap
 
     def rdelete(self):
         for r in self.venue_inspections:
@@ -469,6 +476,7 @@ class Slot(db.Model):
     childFriendly = db.BooleanProperty()
     wheelchairAccess = db.BooleanProperty()
     venue_key = db.StringProperty()
+    venue_capacity = db.IntegerProperty(default=0)
 
     def listing_name(self):
         return 'Room:%s Venue:%s' % \

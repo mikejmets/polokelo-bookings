@@ -1,6 +1,7 @@
 import os
 import sys
 import logging
+import random
 import urllib
 from datetime import datetime, timedelta
 
@@ -273,10 +274,19 @@ class SimpleAccommodationSearch(AccommodationSearch):
         if child_friendly_required:
             slots.filter('childFriendly =', True)
         slots.filter('startDate in', dates)
+        slots.filter('venue_capacity >=', element.adults + element.children)
+        slots.order('venue_capacity')
         slots.order('venue_key')
-        #logger.info('--------Found %s slots', len([s for s in slots]))
+        num_results = len([s for s in slots])
+        limit = min(800, num_results)
+        offset = 0
+        if num_results > limit:
+            offset = random.randrange(0, num_results - limit)
+        logger.info('---Found %s Use %s %s', num_results, offset, limit)
         #Run query and 
-        return self._validateBerths(slots.fetch(500), element)
+        return self._validateBerths(
+                      slots.fetch(offset=offset, limit=limit), 
+                      element)
 
 
 
