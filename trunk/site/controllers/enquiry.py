@@ -236,7 +236,8 @@ class BookingsToolFindAccommodation(webapp.RequestHandler):
             #Clean up
             accom_element.availableBerths = None
             accom_element.put()
-            if enquiry.workflowStateName not in ['onhold', 'awaitingagent']:
+            if enquiry.workflowStateName not in \
+                    ['onhold', 'awaitingagent', 'expired']:
                 enquiry.doTransition('putonhold')
             params['error'] = "No results found" 
             params = urllib.urlencode(params)
@@ -245,7 +246,8 @@ class BookingsToolFindAccommodation(webapp.RequestHandler):
             #Clean up
             accom_element.availableBerths = None
             accom_element.put()
-            if enquiry.workflowStateName not in ['onhold', 'awaitingagent']:
+            if enquiry.workflowStateName not in \
+                    ['onhold', 'awaitingagent', 'expired']:
                 enquiry.doTransition('putonhold')
             params['error'] = "No package found" 
             params = urllib.urlencode(params)

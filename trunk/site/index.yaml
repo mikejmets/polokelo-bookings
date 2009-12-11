@@ -109,6 +109,36 @@ indexes:
 
 - kind: Slot
   properties:
+  - name: childFriendly
+  - name: city
+  - name: occupied
+  - name: startDate
+  - name: venueType
+  - name: venue_capacity
+  - name: venue_key
+
+- kind: Slot
+  properties:
+  - name: childFriendly
+  - name: city
+  - name: occupied
+  - name: startDate
+  - name: venueType
+  - name: wheelchairAccess
+  - name: venue_capacity
+  - name: venue_key
+
+- kind: Slot
+  properties:
+  - name: city
+  - name: occupied
+  - name: startDate
+  - name: venueType
+  - name: venue_capacity
+  - name: venue_key
+
+- kind: Slot
+  properties:
   - name: city
   - name: occupied
   - name: startDate
@@ -117,6 +147,43 @@ indexes:
   - name: venue_key
   - name: childFriendly
   - name: wheelchairAccess
+
+- kind: Slot
+  properties:
+  - name: city
+  - name: occupied
+  - name: startDate
+  - name: venueType
+  - name: venue_capacity
+    direction: desc
+  - name: venue_key
+
+- kind: Slot
+  properties:
+  - name: city
+  - name: occupied
+  - name: startDate
+  - name: venueType
+  - name: venue_key
+
+- kind: Slot
+  properties:
+  - name: city
+  - name: occupied
+  - name: startDate
+  - name: venueType
+  - name: wheelchairAccess
+  - name: venue_capacity
+  - name: venue_key
+
+- kind: Slot
+  properties:
+  - name: city
+  - name: occupied
+  - name: startDate
+  - name: venueType
+  - name: wheelchairAccess
+  - name: venue_key
 
 - kind: Transition
   properties:
