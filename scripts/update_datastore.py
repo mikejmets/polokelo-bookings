@@ -5,7 +5,7 @@ import urllib2
 def main(): 
   key = None
   url = 'http://www.polokelo-bookings.co.za/tasks/update_datastore'
-  url = 'http://localhost:8080/tasks/update_datastore'
+  #url = 'http://localhost:8080/tasks/update_datastore'
   cnt = 0
   while True:
       next_url = url
