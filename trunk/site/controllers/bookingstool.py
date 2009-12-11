@@ -59,11 +59,13 @@ class BookingsTool():
         venues = self.findVenues(element) 
         if venues:
             element.availableBerths = str(venues)
+            #Create lsit of available berths from venues dict
             berths = []
             for venue_key in venues:
                 for key, slots in venues[venue_key]:
                     berth = Berth.get(key)
                     berths.append(berth)
+
             #Simply pull from the top of the list
             quote_amount = package.calculateQuote(element)
             people = element.adults + \
@@ -207,7 +209,7 @@ class AccommodationSearch():
                 berths_dict[berth_key].append(str(slot.key()))
             else:
                 berths_dict[berth_key] = [str(slot.key())]
-        #logger.info('Found %s venues', venues_dict.keys()) 
+        logger.info('Found %s venues', len(venues_dict.keys()))
         #Check for completeness - each berth has a slot for each night required
         valid_venues = {}
         for venue_key in venues_dict.keys():
@@ -225,6 +227,7 @@ class AccommodationSearch():
                 
         #for key, slots in valid_berths:
         # logger.info('valid pairing %s: %s', key, slots)
+        logger.info('Found %s valid venues', len(valid_venues.keys()))
         return valid_venues
 
 class SimpleAccommodationSearch(AccommodationSearch):
@@ -235,8 +238,8 @@ class SimpleAccommodationSearch(AccommodationSearch):
 
         try:
             venues = self._findValidBerths(element)
-        except DeadlineExceededError:
-            logger.info('FindValues timedout') 
+        except Exception, e:
+            logger.info('FindValues timedout: %s', e) 
             venues = {}
             
 
@@ -250,7 +253,9 @@ class SimpleAccommodationSearch(AccommodationSearch):
         if len(venue_keys) > 0:
             for venue_key in venue_keys:
                 berths = venues[venue_key]
-                #logger.info('----------%s', berths)
+                venue = Venue.get(venue_key)
+                logger.info('------%s--%s---%s', 
+                    venue.owner.referenceNumber, venue.name, len(berths))
                 if len(berths) >= people:
                     valid_venues[venue_key] = berths
         if valid_venues:
@@ -280,11 +285,11 @@ class SimpleAccommodationSearch(AccommodationSearch):
         if child_friendly_required:
             slots.filter('childFriendly =', True)
         slots.filter('startDate in', dates)
-        #slots.filter('venue_capacity >=', element.adults + element.children)
-        #slots.order('-venue_capacity')
+        slots.filter('venue_capacity >=', element.adults + element.children)
+        slots.order('venue_capacity')
         slots.order('venue_key')
         num_results = len([s for s in slots])
-        limit = min(800, num_results)
+        limit = min(700, num_results)
         offset = 0
         if num_results > limit:
             offset = random.randrange(0, num_results - limit)
