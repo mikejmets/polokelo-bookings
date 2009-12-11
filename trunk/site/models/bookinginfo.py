@@ -54,10 +54,10 @@ class Enquiry(workflow.WorkflowAware):
     expiryDate = db.DateTimeProperty(verbose_name="Expiry Date/Time (YYYY-MM-DD hh:mm:ss)")
     guestEmail = db.StringProperty(verbose_name='Guest Email')
     agentCode = db.StringProperty(verbose_name='Travel Agent Code')
-    quoteInZAR = db.IntegerProperty(verbose_name='Quote', default=0L)
-    vatInZAR = db.IntegerProperty(verbose_name='VAT', default=0L)
-    totalAmountInZAR = db.IntegerProperty(verbose_name="Total Due", default=0L)
-    amountPaidInZAR = db.IntegerProperty(verbose_name="Amount Paid", default=0L)
+    quoteInZAR = db.IntegerProperty(verbose_name='Quote in cents', default=0L)
+    vatInZAR = db.IntegerProperty(verbose_name='VAT in cents', default=0L)
+    totalAmountInZAR = db.IntegerProperty(verbose_name="Total Due in cents", default=0L)
+    amountPaidInZAR = db.IntegerProperty(verbose_name="Amount Paid in cents", default=0L)
     xmlSource = db.TextProperty(verbose_name='Source Detail')
 
     def getAccommodationDescription(self):
