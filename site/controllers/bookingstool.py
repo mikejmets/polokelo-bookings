@@ -6,6 +6,7 @@ import urllib
 from datetime import datetime, timedelta
 
 from google.appengine.ext.db import run_in_transaction
+from google.appengine.runtime import DeadlineExceededError
 
 from workflow.workflow import WorkflowError
 from booking_errors import BookingConflictError
@@ -232,7 +233,12 @@ class SimpleAccommodationSearch(AccommodationSearch):
         logger.info('SimpleAccommodationSearch for %s, %s, %s(%s)', 
             element.city, element.type, element.start, element.nights)
 
-        venues = self._findValidBerths(element)
+        try:
+            venues = self._findValidBerths(element)
+        except DeadlineExceededError:
+            logger.info('FindValues timedout') 
+            venues = {}
+            
 
         #for key, slots in berths:
         #  logger.info('valid pairing %s: %s', key, slots)
@@ -274,8 +280,8 @@ class SimpleAccommodationSearch(AccommodationSearch):
         if child_friendly_required:
             slots.filter('childFriendly =', True)
         slots.filter('startDate in', dates)
-        slots.filter('venue_capacity >=', element.adults + element.children)
-        slots.order('venue_capacity')
+        #slots.filter('venue_capacity >=', element.adults + element.children)
+        #slots.order('-venue_capacity')
         slots.order('venue_key')
         num_results = len([s for s in slots])
         limit = min(800, num_results)
