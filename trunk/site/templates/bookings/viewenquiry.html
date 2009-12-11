@@ -17,10 +17,10 @@
   </tr>
   <tr>
     <td>Agent Code: <strong>{{ enquiry.agentCode }}</strong> </td>
-    <td>Quote: <strong>R{{ enquiry.quoteInZAR|make_list|slice:":-2"|join:""|default:"0" }}</strong> </td>
-    <td>VAT: <strong>R{{ enquiry.vatInZAR|make_list|slice:":-2"|join:""|default:"0" }}</strong> </td>
-    <td>Total: <strong>R{{ enquiry.totalAmountInZAR|make_list|slice:":-2"|join:""|default:"0" }}</strong> </td>
-    <td>Paid: <strong>R{{ enquiry.amountPaidInZAR|make_list|slice:":-2"|join:""|default:"0" }}</strong> </td>
+    <td>Quote: <strong>R{{ enquiry.quoteInZAR|make_list|slice:":-2"|join:""|default:"0" }}.{{ enquiry.quoteInZAR|make_list|slice:"-2:"|join:""|default:"0" }}</strong> </td>
+    <td>VAT: <strong>R{{ enquiry.vatInZAR|make_list|slice:":-2"|join:""|default:"0" }}.{{ enquiry.vatInZAR|make_list|slice:"-2:"|join:""|default:"0" }}</strong> </td>
+    <td>Total: <strong>R{{ enquiry.totalAmountInZAR|make_list|slice:":-2"|join:""|default:"0" }}.{{ enquiry.totalAmountInZAR|make_list|slice:"-2:"|join:""|default:"0" }}</strong> </td>
+    <td>Paid: <strong>R{{ enquiry.amountPaidInZAR|make_list|slice:":-2"|join:""|default:"0" }}.{{ enquiry.amountPaidInZAR|make_list|slice:"-2:"|join:""|default:"0" }}</strong> </td>
     {% ifnotequal enquiry.workflowStateName 'expired' %}
     <td><a href="/bookings/enquiry/editenquiry?enquirykey={{ enquiry.key }}"> <img src="/images/edit.png"/></a></td>
     {% endifnotequal %}
