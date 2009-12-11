@@ -77,6 +77,15 @@ class CaptureGuestElement(webapp.RequestHandler):
             guest.contactNumber = clean_data.get('contactNumber')
             guest.identifyingNumber = clean_data.get('identifyingNumber')
             guest.put()
+
+            # update guest email address on enquiries, if necessary
+            enquiries = Enquiry.all().ancestor(theparent)
+            for enquiry in enquiries:
+                if enquiry.guestEmail is None:
+                    enquiry.guestEmail = clean_data.get('email')
+                    enquiry.put()
+
+            # get out of here
             self.redirect(came_from)
         else:
             auth_url, auth_url_text = get_authentication_urls(self.request.uri)
