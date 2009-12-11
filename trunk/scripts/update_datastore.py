@@ -12,18 +12,16 @@ def main():
       next_url = url + '?' + data
       try:
           response = urllib2.urlopen(next_url)
-          results = response.read()
-          #print '--------%s' % results
-          results = eval(results)
+          results = eval(response.read())
           next_url = results['next_url']
           if next_url == '/':
               break
           key = next_url.split('=')[1]
+          cnt += 1
+          print '-- %s: %s' % (cnt, key)
       except:
           print 'Reset key -------- %s: %s' % (cnt, key)
       
-      print '-- %s: %s' % (cnt, key)
-      cnt += 1
   print 'Done'
 
 if __name__ == "__main__":
