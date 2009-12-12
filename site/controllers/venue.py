@@ -121,7 +121,10 @@ class ViewVenue(webapp.RequestHandler):
             is_valid, err = venue.validate()
             params = {}
             if is_valid:
-                params['error'] = venue.validateSlots()
+                numNights, numSlots = venue.validateSlots()
+                params['error'] = \
+                  "Of the total of %s contracted nights, %s slots exist" % (
+                      numNights, numSlots)
             else:
                 params['error'] = err
             params['came_from'] = self.request.referer
