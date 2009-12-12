@@ -222,38 +222,9 @@ class Venue(db.Model):
         for room in self.venue_bedrooms:
             for bed in room.bedroom_beds:
                 for berth in bed.bed_berths:
-                    all_dates = getDateList(
-                        max(datetime.now().date(), self.contractStartDate), 
-                        self.contractEndDate)
-                    slot_dates = \
-                        [s.startDate for s in Slot.all().ancestor(berth)]
-                    new_dates = [d for d in all_dates if d not in slot_dates]
-
-                    for d in new_dates:
-                        t = time(14, 00)
-                        slots = Slot.all().ancestor(berth)
-                        slots.filter('startDate =', d)
-                        if slots.get():
-                            continue
-                        slot = Slot(parent=berth)
-                        slot.creator = users.get_current_user()
-                        slot.ownerReference = self.owner.referenceNumber
-                        slot.berth = berth
-                        slot.startDate = d #datetime.combine(d, t)
-                        slot.city = self.get_city()
-                        slot.venueType = self.venueType
-                        slot.bedType = bed.bedType
-                        slot.childFriendly = \
-                            self.childFriendly or \
-                            room.childFriendly 
-                        slot.wheelchairAccess = \
-                            self.wheelchairAccess or \
-                            room.wheelchairAccess 
-                        slot.venue_key = str(self.key())
-                        slot.venue_capacity = self.getCapacity()
-                        slot.put()
-                        counter += 1
-                    if counter > 10:
+                    slots = berth.createSlots(self, room, bed)
+                    counter += slots
+                    if counter >= 10:
                         #Jump out so that the request doesn't timeout
                         return counter
         return counter
@@ -423,7 +394,7 @@ class Bed(db.Model):
     bedroom = db.ReferenceProperty(Bedroom, collection_name='bedroom_beds')
     created = db.DateTimeProperty(auto_now_add=True)
     creator = db.UserProperty()
-    name = db.StringProperty(required=True)
+    name = db.StringProperty()
     bedType = db.StringProperty(required=True)
     capacity = db.IntegerProperty(required=True, default=1)
 
@@ -432,6 +403,9 @@ class Bed(db.Model):
         fields = [str(f) for f in fields]
         return '%s' % ', '.join(fields)
 
+    def isValid(self):
+        return self.capacity == len([b for b in self.bed_berths])
+        
     def rdelete(self):
         for r in self.bed_berths:
             r.rdelete()
@@ -460,7 +434,59 @@ class Berth(db.Model):
                slot.contracted_booking:
                 bookings.add(str(slot.contracted_booking.key()))
         return bookings
-        
+
+    def createSlots(self, venue=None, room=None, bed=None):
+        cnt = 0
+        if bed is None:
+            bed = self.bed
+        if room is None:
+            room = bed.bedroom
+        if venue is None:
+            venue = room.venue
+        if venue.state == 'Closed':
+            return cnt
+
+        #slots = Slot.all().ancestor(self)
+        #slots.order('-startDate')
+        #last_slot = slots.get()
+        #if last_slot:
+        #    start_date = last_slot.startDate
+        #else:
+        start_date = max(datetime.now().date(), venue.contractStartDate) 
+
+        all_dates = getDateList(start_date, venue.contractEndDate)
+        slot_dates = \
+            [s.startDate for s in Slot.all().ancestor(self)]
+        new_dates = [d for d in all_dates if d not in slot_dates]
+
+        #logger.info('-----------Slot date %s', new_dates)
+        for d in new_dates:
+            t = time(14, 00)
+            slots = Slot.all().ancestor(self)
+            slots.filter('startDate =', d)
+            if slots.get():
+                continue
+            #logger.info('-----------Create slot for %s', d)
+            slot = Slot(parent=self)
+            slot.creator = users.get_current_user()
+            slot.ownerReference = venue.owner.referenceNumber
+            slot.berth = self
+            slot.startDate = d #datetime.combine(d, t)
+            slot.city = venue.get_city()
+            slot.venueType = venue.venueType
+            slot.bedType = bed.bedType
+            slot.childFriendly = \
+                venue.childFriendly or \
+                room.childFriendly 
+            slot.wheelchairAccess = \
+                venue.wheelchairAccess or \
+                room.wheelchairAccess 
+            slot.venue_key = str(venue.key())
+            slot.venue_capacity = venue.getCapacity()
+            slot.put()
+            cnt += 1
+        return cnt
+
 class Slot(db.Model):
     created = db.DateTimeProperty(auto_now_add=True)
     creator = db.UserProperty()
