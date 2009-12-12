@@ -109,6 +109,11 @@ indexes:
 
 - kind: Slot
   properties:
+  - name: berth
+  - name: startDate
+
+- kind: Slot
+  properties:
   - name: childFriendly
   - name: city
   - name: occupied
