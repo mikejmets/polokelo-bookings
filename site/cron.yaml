@@ -7,6 +7,6 @@ cron:
   url: /tasks/emailguests
   schedule: every 1 hours
 
-- description: Create Slots
-  url: /tasks/createslots
-  schedule: every 10 minutes
+#- description: Create Slots
+#  url: /tasks/createslots
+#  schedule: every 10 minutes
