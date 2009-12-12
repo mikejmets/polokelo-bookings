@@ -1,4 +1,5 @@
 import re
+import logging
 from datetime import datetime,timedelta
 from google.appengine.api import users
 from models.hostinfo import Owner, Venue, Bedroom, Bed, Berth, Bathroom, \
@@ -35,6 +36,18 @@ def listVenuesValidity():
                  is_valid)
 
     return 'Valid/Total = %s/%s\n' % (valids, total) + results
+
+def checkBerths():
+    results = ""
+    beds = Bed.all()
+    beds.order('name')
+    for bed in [b for b in beds]:
+        if not bed.isValid:
+            results += 'Owner %s: Venue %s: IsValid\n' % (
+                bed.bedroom.venue.owner.referenceNumber,
+                bed.bedroom.venue.name)
+
+    return results
     
 def countAllEntities():
     results = ""
@@ -61,7 +74,7 @@ def countHostInfoEntities():
     adict['PhoneNumber'] = len([k for k in PhoneNumber.all(keys_only=True)])
     adict['Inspection'] = len([k for k in Inspection.all(keys_only=True)])
     adict['Complaint'] = len([k for k in Complaint.all(keys_only=True)])
-    adict['Slot'] = len([k for k in Slot.all(keys_only=True)])
+    #adict['Slot'] = len([k for k in Slot.all(keys_only=True)])
     results = "Host Info\n"
     keys = adict.keys()
     keys.sort()

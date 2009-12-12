@@ -185,6 +185,12 @@ indexes:
   - name: wheelchairAccess
   - name: venue_key
 
+- kind: Slot
+  ancestor: yes
+  properties:
+  - name: startDate
+    direction: desc
+
 - kind: Transition
   properties:
   - name: __key__
