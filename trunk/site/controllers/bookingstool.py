@@ -190,6 +190,7 @@ class AccommodationSearch():
         #  {'v1': {'berth1':['slot1', 's2', 's3'],
         #          'berth2':['slot1', 's2', 's3']}}
         venues_dict = {}
+        num_closed = 0
         for slot in slots:
             berth = slot.berth
             berth_key = str(berth.key())
@@ -198,6 +199,7 @@ class AccommodationSearch():
             venue = Venue.get(venue_key)
 
             if venue.state == 'Closed':
+                num_closed += 1
                 continue
             if not venues_dict.has_key(venue_key):
                 venues_dict[venue_key] = {}
@@ -206,7 +208,8 @@ class AccommodationSearch():
                 berths_dict[berth_key].append(str(slot.key()))
             else:
                 berths_dict[berth_key] = [str(slot.key())]
-        logger.info('Found %s venues', len(venues_dict.keys()))
+        logger.info('Found %s venues (%s closed)', 
+            len(venues_dict.keys()), num_closed)
 
         #Check for completeness
         # Ensure each berth has a slot for each night required
@@ -225,9 +228,9 @@ class AccommodationSearch():
                 valid_venues[venue_key] = valid_berths
                 
             #Log results
-            for key, slots in valid_berths:
-              logger.info('Found valid pairing %s %s: %s', 
-                  Venue.get(venue_key).owner.referenceNumber, key, len(slots))
+            #for key, slots in valid_berths:
+            #  logger.info('Found valid pairing %s %s: %s', 
+            #      Venue.get(venue_key).owner.referenceNumber, key, len(slots))
 
         logger.info('Found %s valid venues', len(valid_venues.keys()))
         return valid_venues
@@ -256,9 +259,9 @@ class SimpleAccommodationSearch(AccommodationSearch):
             for venue_key in venue_keys:
                 berths = venues[venue_key]
                 #Log details
-                #venue = Venue.get(venue_key)
-                #logger.info('------%s--%s--berths: %s', 
-                #    venue.owner.referenceNumber, venue.name, len(berths))
+                venue = Venue.get(venue_key)
+                logger.info('------%s--%s--berths: %s', 
+                    venue.owner.referenceNumber, venue.name, len(berths))
                 if len(berths) >= people:
                     valid_venues[venue_key] = berths
         if valid_venues:
