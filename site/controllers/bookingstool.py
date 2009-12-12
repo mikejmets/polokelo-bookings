@@ -186,17 +186,14 @@ class AccommodationSearch():
             return {}
 
     def _validateBerths(self, slots, element):
-        #Group slots by berth by venue in a dict
+        #Group slots by berth by venue into the venues_dict
         #  {'v1': {'berth1':['slot1', 's2', 's3'],
         #          'berth2':['slot1', 's2', 's3']}}
         venues_dict = {}
         for slot in slots:
-            #logger.info('Found berth %s', slot.berth.key())
             berth = slot.berth
             berth_key = str(berth.key())
 
-            #venue = berth.bed.bedroom.venue
-            #venue_key = str(venue.key())
             venue_key = slot.venue_key
             venue = Venue.get(venue_key)
 
@@ -210,23 +207,28 @@ class AccommodationSearch():
             else:
                 berths_dict[berth_key] = [str(slot.key())]
         logger.info('Found %s venues', len(venues_dict.keys()))
-        #Check for completeness - each berth has a slot for each night required
+
+        #Check for completeness
+        # Ensure each berth has a slot for each night required
         valid_venues = {}
         for venue_key in venues_dict.keys():
             venue = venues_dict[venue_key]
             valid_berths = []
             for berth_key in venue.keys():
-                berth = venue[berth_key]
+                slots = venue[berth_key]
                 #Check completeness
-                if len(berth) != element.nights:
+                if len(slots) != element.nights:
                     #logger.info('INVALID: Pairing for %s is incomplete', key)
                     break #it remains false
-                valid_berths.append((berth_key, berth))
+                valid_berths.append((berth_key, slots))
             if len(valid_berths) > 0:
                 valid_venues[venue_key] = valid_berths
                 
-        #for key, slots in valid_berths:
-        # logger.info('valid pairing %s: %s', key, slots)
+            #Log results
+            for key, slots in valid_berths:
+              logger.info('Found valid pairing %s %s: %s', 
+                  Venue.get(venue_key).owner.referenceNumber, key, len(slots))
+
         logger.info('Found %s valid venues', len(valid_venues.keys()))
         return valid_venues
 
@@ -236,11 +238,11 @@ class SimpleAccommodationSearch(AccommodationSearch):
         logger.info('SimpleAccommodationSearch for %s, %s, %s(%s)', 
             element.city, element.type, element.start, element.nights)
 
-        try:
-            venues = self._findValidBerths(element)
-        except Exception, e:
-            logger.info('FindValues timedout: %s', e) 
-            venues = {}
+        #try:
+        venues = self._findValidBerths(element)
+        #except Exception, e:
+        #    logger.info('FindValues timedout: %s', e) 
+        #    venues = {}
             
 
         #for key, slots in berths:
@@ -253,9 +255,10 @@ class SimpleAccommodationSearch(AccommodationSearch):
         if len(venue_keys) > 0:
             for venue_key in venue_keys:
                 berths = venues[venue_key]
-                venue = Venue.get(venue_key)
-                logger.info('------%s--%s---%s', 
-                    venue.owner.referenceNumber, venue.name, len(berths))
+                #Log details
+                #venue = Venue.get(venue_key)
+                #logger.info('------%s--%s--berths: %s', 
+                #    venue.owner.referenceNumber, venue.name, len(berths))
                 if len(berths) >= people:
                     valid_venues[venue_key] = berths
         if valid_venues:
