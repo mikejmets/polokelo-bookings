@@ -474,7 +474,7 @@ class Berth(db.Model):
             slots.filter('startDate =', d)
             if slots.get():
                 continue
-            #logger.info('-----------Create slot for %s', d)
+            logger.info('-----------Create slot for %s', d)
             slot = Slot(parent=self)
             slot.creator = users.get_current_user()
             slot.ownerReference = venue.owner.referenceNumber
@@ -493,6 +493,9 @@ class Berth(db.Model):
             slot.venue_capacity = venue.getCapacity()
             slot.put()
             cnt += 1
+            if cnt > 20:
+                #jump out early
+                return cnt
         return cnt
 
 class Slot(db.Model):
