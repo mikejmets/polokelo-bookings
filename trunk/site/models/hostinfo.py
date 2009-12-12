@@ -236,15 +236,11 @@ class Venue(db.Model):
         for room in self.venue_bedrooms:
             for bed in room.bedroom_beds:
                 for berth in bed.bed_berths:
-                    all_dates = getDateList(
-                        max(datetime.now().date(), self.contractStartDate), 
-                        self.contractEndDate)
-                    slot_dates = \
-                        [s.startDate for s in Slot.all().ancestor(berth)]
-                    numNights += len(all_dates)
-                    numSlots += len(slot_dates)
-        return "Of the total of %s contracted nights, %s slots exist" % \
-            (numNights, numSlots)
+                    td = self.contractEndDate - self.contractStartDate
+                    numNights += td.days
+                    numSlots += len(
+                        [s for s in Slot.all(keys_only=True).ancestor(berth)])
+        return numNights, numSlots
                         
     def deleteAllSlots(self):
         #Beware: this may leave bookings hanging
