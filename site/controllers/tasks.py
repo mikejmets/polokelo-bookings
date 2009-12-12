@@ -89,20 +89,29 @@ class CreateBerthSlots(webapp.RequestHandler):
         if last_key != 'None':
             last_key = parse_datetime(
                 last_key, '%Y-%m-%d %H:%M:%S')
-            berths.filter('created >', last_key)
+            berths.filter('created >=', last_key)
             logger.info("Create Slots for berth from %s", last_key)
 
-        berths = berths.fetch(2)
+        report = ""
+        berths = berths.fetch(5)
         if len(berths) == 0:
             next_url = '/'
             last_key = '0'
+            report += "The End\n"
         else:
-            berths[0].createSlots()
-            last_key = berths[0].created
+            cnt = 0
+            for i in range(0, 4):
+                cnt += berths[i].createSlots()
+                report += "created slots date %s (indx = %s cnt = %s)\n" % (
+                    berths[i].created, i, cnt)
+                if cnt > 20:
+                    break
+            last_key = berths[i].created
             next_url = '/tasks/createberthslots?last_key=%s' % str(last_key)
 
         context = {
                   'next_url': next_url,
+                  'report': report,
                   }
         self.response.out.write(context) 
 
