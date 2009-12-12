@@ -46,13 +46,13 @@ class ViewBedroom(webapp.RequestHandler):
                 {
                     'base_path':BASE_PATH,
                     'form':BedroomForm(),
+                    'venuekey':bedroom.venue.key(),
                     'bedroom':bedroom,
                     'bedroom_values':bedroom_values,
                     'beds':beds,
                     'auth_url':auth_url,
                     'auth_url_text':auth_url_text,
                     'is_admin_user':users.is_current_user_admin(),
-                    'venuekey':self.request.get('venuekey')
                     }))
 
 class CaptureBedroom(webapp.RequestHandler):
