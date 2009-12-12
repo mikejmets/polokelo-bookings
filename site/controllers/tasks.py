@@ -143,6 +143,7 @@ class BedValidation(webapp.RequestHandler):
                         bed.name)
 
                 if not bed.isValid():
+                    # Report, delete and recreate
                     report += 'Invalid: Owner %s Venue %s Room %s Bed %s' % (
                         venue.owner.referenceNumber,
                         venue.name,
