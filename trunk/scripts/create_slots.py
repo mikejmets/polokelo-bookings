@@ -4,8 +4,8 @@ import urllib2
 
 def main(): 
   key = None
-  url = 'http://www.polokelo-bookings.co.za/tasks/update_datastore'
-  url = 'http://localhost:8080/tasks/update_datastore'
+  url = 'http://www.polokelo-bookings.co.za/tasks/createberthslots'
+  url = 'http://localhost:8080/tasks/createberthslots'
   cnt = 0
   while True:
       next_url = url
