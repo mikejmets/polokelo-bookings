@@ -131,7 +131,7 @@ class BedValidation(webapp.RequestHandler):
                     report += '---room problem--%s: %s' % (
                         bed.key(),
                         e)
-                    bed.rdelete()
+                    # Cannot be sure - bed.rdelete()
                     continue
                 if len(bed.name) == 0:
                     bed.name = '1'
