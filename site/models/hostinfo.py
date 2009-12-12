@@ -417,6 +417,14 @@ class Bed(db.Model):
             bookings.update(berth.getContractedBookings())
         return bookings
 
+    def createBerths(self):
+        for i in range(self.capacity):
+            berth = Berth(parent=self)
+            berth.creator = users.get_current_user()
+            berth.bed = self
+            berth.put()
+            #logger.info('Created berth %s', i)
+
 class Berth(db.Model):
     bed = db.ReferenceProperty(Bed, collection_name='bed_berths')
     created = db.DateTimeProperty(auto_now_add=True)

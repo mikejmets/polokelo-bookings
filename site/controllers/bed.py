@@ -53,11 +53,7 @@ class CaptureBed(webapp.RequestHandler):
             bed._parent = container
             bed.put()
             #auto create a berth per capacity
-            for i in range(bed.capacity):
-                berth = Berth(parent=bed)
-                berth.creator = users.get_current_user()
-                berth.bed = bed
-                berth.put()
+            bed.createBerths()
             self.redirect(came_from)
         else:
             auth_url, auth_url_text = get_authentication_urls(self.request.uri)
