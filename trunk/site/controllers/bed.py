@@ -22,6 +22,37 @@ class BedForm(djangoforms.ModelForm):
 
     bedType = forms.ChoiceField(choices=getChoicesTuple(('BEDTP')))
 
+class ViewBed(webapp.RequestHandler):
+
+    def get(self):
+        came_from = self.request.referer
+        auth_url, auth_url_text = get_authentication_urls(self.request.uri)
+        bedkey = self.request.get('bedkey')
+        bed = Bed.get(bedkey)
+        form = BedForm(instance=bed)
+        bed_values = []
+        for field in form.fields.keyOrder:
+            for value in bed.properties().values():
+                if value.name == field:
+                    name = value.name
+                    if value.verbose_name:
+                        name = value.verbose_name
+                    val = value.get_value_for_form(bed)
+                    bed_values.append((name, val))
+        filepath = os.path.join(PROJECT_PATH, 
+                      'templates', 'services', 'viewbed.html')
+        self.response.out.write(template.render(filepath, 
+                                    {
+                                        'base_path':BASE_PATH,
+                                        'form':BedForm(),
+                                        'bed_values':bed_values,
+                                        'bedroomkey':bed.bedroom.key(),
+                                        'berths':bed.bed_berths,
+                                        'came_from':came_from,
+                                        'auth_url':auth_url,
+                                        'auth_url_text':auth_url_text
+                                        }))
+
 class CaptureBed(webapp.RequestHandler):
 
     def get(self):

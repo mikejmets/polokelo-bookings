@@ -1,0 +1,40 @@
+{% extends base_path %}
+
+{% block breadcrumbs %}
+<a href="/services/owner/venue/viewbed?bedkey={{ bedkey }}">go back</a>
+{% endblock %}
+
+{% block pagecontent %}
+    <h1>berth</h1>
+
+    <table>
+        {% for value in berth_values %}
+        <tr>
+          <td><strong>{{ value.0 }}:</strong></td>
+          <td> {{ value.1 }} </td>
+        </tr>
+        {% endfor %}
+    </table>
+
+    <hr />
+      <p><strong>Slots</strong> </p>
+
+    <table class="listing">
+        <thead>
+          <td>Bed</td>
+          <td>Date</td>
+          <td>Key</td>
+        </thead>
+        {% for slot in slots %}
+        <tr>
+            <td>{{ slot.berth.bed.name }} </td>
+            <td>{{ slot.startDate }} </td>
+            <td>
+                <a title="View this slot"
+                  href="/services/owner/venue/viewslot?slotkey={{ slot.key }}">
+                  {{ slot.key }}</a></td>
+        </tr>
+        {% endfor %}
+    </table>
+
+{% endblock pagecontent %}
