@@ -33,14 +33,14 @@ class ViewBerth(webapp.RequestHandler):
         filepath = os.path.join(PROJECT_PATH, 
                       'templates', 'services', 'viewberth.html')
         self.response.out.write(template.render(filepath, 
-                                    {
-                                        'base_path':BASE_PATH,
-                                        'form':BerthForm(),
-                                        'berth_values':berth_values,
-                                        'bedkey':bed.key(),
-                                        'slots':berth.berth_slots,
-                                        'came_from':came_from,
-                                        'auth_url':auth_url,
-                                        'auth_url_text':auth_url_text
-                                        }))
+                {
+                    'base_path':BASE_PATH,
+                    'form':BerthForm(),
+                    'berth_values':berth_values,
+                    'bedkey':bed.key(),
+                    'slots':berth.berth_slots.order('startDate'),
+                    'came_from':came_from,
+                    'auth_url':auth_url,
+                    'auth_url_text':auth_url_text
+                    }))
 
