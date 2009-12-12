@@ -10,7 +10,7 @@ from controllers.home import BASE_PATH, PROJECT_PATH
 from controllers.utils import get_authentication_urls
 from controllers.date_utils import parse_datetime
 from models.bookinginfo import Enquiry
-from models.hostinfo import Owner, Venue, Slot
+from models.hostinfo import Owner, Venue, Slot, Bed, Berth
 
 logger = logging.getLogger("Tasks")
 
@@ -81,28 +81,78 @@ class CreateSlotsTask(webapp.RequestHandler):
                                         'auth_url_text':auth_url_text
                                         }))
 
-class CreateSlotsScript(webapp.RequestHandler):
+class CreateBerthSlots(webapp.RequestHandler):
     def get(self):
-        venues = Venue.all().order('created')
+        berths = Berth.all().order('created')
         last_key = self.request.get('last_key', 'None')
 
         if last_key != 'None':
             last_key = parse_datetime(
                 last_key, '%Y-%m-%d %H:%M:%S')
-            venues.filter('created >', last_key)
-            logger.info("Updating Datastore Script from %s", last_key)
+            berths.filter('created >', last_key)
+            logger.info("Create Slots for berth from %s", last_key)
 
-        venues = venues.fetch(2)
-        if len(venues) == 0:
+        berths = berths.fetch(2)
+        if len(berths) == 0:
             next_url = '/'
             last_key = '0'
         else:
-            venues[0].createSlots()
-            last_key = venues[1].created
-            next_url = '/tasks/createslotsscript?last_key=%s' % str(last_key)
+            berths[0].createSlots()
+            last_key = berths[0].created
+            next_url = '/tasks/createberthslots?last_key=%s' % str(last_key)
 
         context = {
                   'next_url': next_url,
+                  }
+        self.response.out.write(context) 
+
+class BedValidation(webapp.RequestHandler):
+    def get(self):
+        beds = Bed.all().order('created')
+        last_key = self.request.get('last_key', 'None')
+
+        if last_key != 'None':
+            last_key = parse_datetime(
+                last_key, '%Y-%m-%d %H:%M:%S')
+            beds.filter('created >', last_key)
+            logger.info("Create Slots for berth from %s", last_key)
+
+        report = ""
+        beds = beds.fetch(limit=10)
+        if len(beds) == 0:
+            next_url = '/'
+            last_key = '0'
+        else:
+            for bed in beds:
+                try:
+                    room = bed.bedroom
+                    venue = room.venue
+                except Exception, e:
+                    report += '---room problem--%s: %s' % (
+                        bed.key(),
+                        e)
+                    bed.rdelete()
+                    continue
+                if len(bed.name) == 0:
+                    bed.name = '1'
+                    report += 'Set Name: Owner %s Venue %s Room %s Bed %s' % (
+                        venue.owner.referenceNumber,
+                        venue.name,
+                        room.name,
+                        bed.name)
+
+                if not bed.isValid():
+                    report += 'Invalid: Owner %s Venue %s Room %s Bed %s' % (
+                        venue.owner.referenceNumber,
+                        venue.name,
+                        room.name,
+                        bed.name)
+            last_key = beds[-1].created
+            next_url = '/tasks/bedvalidation?last_key=%s' % str(last_key)
+
+        context = {
+                  'next_url': next_url,
+                  'report': report,
                   }
         self.response.out.write(context) 
 
@@ -146,8 +196,9 @@ application = webapp.WSGIApplication([
       ('/tasks/expireenquiries', ExpireEnquiries),
       ('/tasks/emailguests', EmailGuests),
       ('/tasks/createslots', CreateSlotsTask),
-      ('/tasks/createslotsscript', CreateSlotsScript),
+      ('/tasks/createberthslots', CreateBerthSlots),
       ('/tasks/update_datastore', UpdateDatastore),
+      ('/tasks/bedvalidation', BedValidation),
       ], debug=False)
 
 def main():
