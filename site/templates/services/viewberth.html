@@ -21,18 +21,30 @@
 
     <table class="listing">
         <thead>
-          <td>Bed</td>
           <td>Date</td>
-          <td>Key</td>
+          <td>Occupied</td>
+          <td>Owner</td>
+          <td>City</td>
+          <td>VenueType</td>
+          <td>BedType</td>
+          <td>Child</td>
+          <td>Access</td>
+          <td>Capacity</td>
         </thead>
         {% for slot in slots %}
         <tr>
-            <td>{{ slot.berth.bed.name }} </td>
-            <td>{{ slot.startDate }} </td>
             <td>
                 <a title="View this slot"
                   href="/services/owner/venue/viewslot?slotkey={{ slot.key }}">
-                  {{ slot.key }}</a></td>
+                  {{ slot.startDate }}</a></td>
+            <td>{{ slot.occupied }} </td>
+            <td>{{ slot.ownerReference }} </td>
+            <td>{{ slot.city }} </td>
+            <td>{{ slot.venueType }} </td>
+            <td>{{ slot.bedType }} </td>
+            <td>{{ slot.childFriendly }} </td>
+            <td>{{ slot.wheelchairAccess }} </td>
+            <td>{{ slot.venue_capacity }} </td>
         </tr>
         {% endfor %}
     </table>
