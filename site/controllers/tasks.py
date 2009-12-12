@@ -131,9 +131,10 @@ class BedValidation(webapp.RequestHandler):
                     report += '---room problem--%s: %s' % (
                         bed.key(),
                         e)
-                    # Cannot be sure - bed.rdelete()
+                    if str(e).startswith('ReferenceProperty fail'):
+                        bed.rdelete()
                     continue
-                if len(bed.name) == 0:
+                if bed.name is None or len(bed.name) == 0:
                     bed.name = '1'
                     report += 'Set Name: Owner %s Venue %s Room %s Bed %s' % (
                         venue.owner.referenceNumber,
@@ -147,6 +148,10 @@ class BedValidation(webapp.RequestHandler):
                         venue.name,
                         room.name,
                         bed.name)
+                    for berth in bed.bed_berths:
+                        berth.rdelete()
+                    bed.createBerths()
+
             last_key = beds[-1].created
             next_url = '/tasks/bedvalidation?last_key=%s' % str(last_key)
 
