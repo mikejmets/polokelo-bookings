@@ -23,12 +23,13 @@ def listVenuesValidity():
     total = 0
     valids = 0
     for owner in [o for o in Owner.all()]:
-        venues = [v for v in Venue.all().ancestor(owner)]
         total += 1
-        for venue in venues:
+        for venue in owner.owner_venues:
             is_valid = venue.isValid()
             if is_valid:
-                valids += 1
+                numNights, numSlots = venue.validateSlots()
+                if numNights <= numSlots:
+                    valids += 1
             results += 'Owner %s %s: Venue %s: IsValid %s\n' % \
                 (owner.surname,
                  owner.firstNames,
@@ -36,6 +37,22 @@ def listVenuesValidity():
                  is_valid)
 
     return 'Valid/Total = %s/%s\n' % (valids, total) + results
+
+def listOpenVenues():
+    results = ""
+    total = 0
+    opens = 0
+    for venue in [v for v in Venue.all()]:
+        total += 1
+        if venue.state == 'Open':
+            opens += 1
+        else:
+            results += 'Owner %s: Venue %s: Status %s\n' % \
+                (venue.owner.referenceNumber,
+                 venue.name,
+                 venue.state)
+
+    return 'Open/Total = %s/%s\n' % (opens, total) + results
 
 def checkBerths():
     results = ""

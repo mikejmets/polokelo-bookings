@@ -8,7 +8,8 @@ from google.appengine.ext import db
 
 from controllers.home import BASE_PATH, PROJECT_PATH
 from controllers.utils import get_authentication_urls, \
-    listVenuesValidity, countAllEntities, checkBerths
+    listVenuesValidity, countAllEntities, checkBerths, \
+    listOpenVenues
 
 logger = logging.getLogger('ViewStatistics')
 
@@ -21,8 +22,9 @@ class ViewStatistics(webapp.RequestHandler):
         filepath = os.path.join(PROJECT_PATH, 
                       'templates', 'admin', 'viewstatistics.html')
         results = ''
+        results = 'Open Venues\n' + listOpenVenues()
         #results = 'Venue Completeness\n' + listVenuesValidity()
-        results = 'Entity Count\n' + countAllEntities()
+        #results = 'Entity Count\n' + countAllEntities()
         #results = 'Check Berths\n' + checkBerths()
         self.response.out.write(template.render(filepath, 
                   {
