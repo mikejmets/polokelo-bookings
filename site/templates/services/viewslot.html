@@ -1,0 +1,19 @@
+{% extends base_path %}
+
+{% block breadcrumbs %}
+<a href="/services/owner/venue/viewberth?berthkey={{ berthkey }}">go back</a>
+{% endblock %}
+
+{% block pagecontent %}
+    <h1>Slot</h1>
+
+    <table>
+        {% for value in slot_values %}
+        <tr>
+          <td><strong>{{ value.0 }}:</strong></td>
+          <td> {{ value.1 }} </td>
+        </tr>
+        {% endfor %}
+    </table>
+
+{% endblock pagecontent %}

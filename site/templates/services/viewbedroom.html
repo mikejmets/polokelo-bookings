@@ -34,7 +34,14 @@
         </thead>
         {% for bed in beds %}
         <tr>
-            <td>{{ bed.name }}</td>
+            {% if is_admin_user %}
+              <td><a title="View this bed"
+                    href="/services/owner/venue/viewbed?bedkey={{ bed.key }}">
+                    {{ bed.name }}</a>
+            </td>
+            {% else %}
+              <td>{{ bed.name }}</td>
+            {% endif %}
             <td>{{ bed.bedType }}</td>
             <td>{{ bed.capacity }}</td>
             {% if bedroom.venue.canModify %}

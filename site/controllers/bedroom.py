@@ -43,16 +43,17 @@ class ViewBedroom(webapp.RequestHandler):
                     bedroom_values.append((name, val))
         beds = bedroom.bedroom_beds
         self.response.out.write(template.render(filepath, 
-                                    {
-                                        'base_path':BASE_PATH,
-                                        'form':BedroomForm(),
-                                        'bedroom':bedroom,
-                                        'bedroom_values':bedroom_values,
-                                        'beds':beds,
-                                        'auth_url':auth_url,
-                                        'auth_url_text':auth_url_text,
-                                        'venuekey':self.request.get('venuekey')
-                                        }))
+                {
+                    'base_path':BASE_PATH,
+                    'form':BedroomForm(),
+                    'bedroom':bedroom,
+                    'bedroom_values':bedroom_values,
+                    'beds':beds,
+                    'auth_url':auth_url,
+                    'auth_url_text':auth_url_text,
+                    'is_admin_user':users.is_current_user_admin(),
+                    'venuekey':self.request.get('venuekey')
+                    }))
 
 class CaptureBedroom(webapp.RequestHandler):
 
