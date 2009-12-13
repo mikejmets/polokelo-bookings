@@ -26,13 +26,13 @@ class HomePage(webapp.RequestHandler):
         auth_url, auth_url_text = get_authentication_urls(self.request.uri)
         filepath = os.path.join(PROJECT_PATH, 'templates', 'index.html')
         self.response.out.write(template.render(filepath, 
-                {
-                    'base_path':BASE_PATH,
-                    'user':users.get_current_user(),
-                    'app_version': os.environ['CURRENT_VERSION_ID'],
-                    'auth_url':auth_url,
-                    'auth_url_text':auth_url_text
-                    }))
+            {
+                'base_path':BASE_PATH,
+                'user':users.get_current_user(),
+                'app_version': os.environ['CURRENT_VERSION_ID'].split('.')[0],
+                'auth_url':auth_url,
+                'auth_url_text':auth_url_text
+                }))
 
 class CommonError(webapp.RequestHandler):
     def get(self):
