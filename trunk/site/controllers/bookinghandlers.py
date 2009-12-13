@@ -2,6 +2,7 @@ import os
 import urllib
 import logging
 from datetime import datetime
+from google.appengine.api import users
 from google.appengine.ext import webapp
 from google.appengine.ext.webapp.util import run_wsgi_app
 from google.appengine.ext.webapp import template
@@ -42,6 +43,7 @@ class ManageBookings(webapp.RequestHandler):
         extras = {'base_path':BASE_PATH,
                   'contractedbookings':contractedbookings,
                   'collections':collections,
+                  'user':users.get_current_user(),
                   'auth_url':auth_url,
                   'auth_url_text':auth_url_text
                   }
@@ -59,6 +61,7 @@ class BookingError(webapp.RequestHandler):
         extras= { 'base_path':BASE_PATH,
                   'error':error,
                   'enquirykey':enquirykey,
+                  'user':users.get_current_user(),
                   'auth_url':auth_url,
                   'auth_url_text':auth_url_text
                   }

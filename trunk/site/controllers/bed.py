@@ -43,16 +43,17 @@ class ViewBed(webapp.RequestHandler):
         filepath = os.path.join(PROJECT_PATH, 
                       'templates', 'services', 'viewbed.html')
         self.response.out.write(template.render(filepath, 
-                                    {
-                                        'base_path':BASE_PATH,
-                                        'form':BedForm(),
-                                        'bed_values':bed_values,
-                                        'bedroomkey':bed.bedroom.key(),
-                                        'berths':bed.bed_berths,
-                                        'came_from':came_from,
-                                        'auth_url':auth_url,
-                                        'auth_url_text':auth_url_text
-                                        }))
+              {
+                  'base_path':BASE_PATH,
+                  'form':BedForm(),
+                  'bed_values':bed_values,
+                  'bedroomkey':bed.bedroom.key(),
+                  'berths':bed.bed_berths,
+                  'came_from':came_from,
+                  'user':users.get_current_user(),
+                  'auth_url':auth_url,
+                  'auth_url_text':auth_url_text
+                  }))
 
 class CaptureBed(webapp.RequestHandler):
 
@@ -63,14 +64,15 @@ class CaptureBed(webapp.RequestHandler):
         filepath = os.path.join(PROJECT_PATH, 
                                     'templates', 'services', 'capturebed.html')
         self.response.out.write(template.render(filepath, 
-                                    {
-                                        'base_path':BASE_PATH,
-                                        'form':BedForm(),
-                                        'containerkey':containerkey,
-                                        'came_from':came_from,
-                                        'auth_url':auth_url,
-                                        'auth_url_text':auth_url_text
-                                        }))
+                  {
+                    'base_path':BASE_PATH,
+                    'form':BedForm(),
+                    'containerkey':containerkey,
+                    'came_from':came_from,
+                    'user':users.get_current_user(),
+                    'auth_url':auth_url,
+                    'auth_url_text':auth_url_text
+                    }))
 
     def post(self):
         came_from = self.request.get('came_from')
@@ -112,15 +114,16 @@ class EditBed(webapp.RequestHandler):
         filepath = os.path.join(PROJECT_PATH, 
                                     'templates', 'services', 'editbed.html')
         self.response.out.write(template.render(filepath, 
-                                    {
-                                        'base_path':BASE_PATH,
-                                        'form':BedForm(instance=bed),
-                                        'bedkey':bedkey,
-                                        'containerkey': container.key,
-                                        'came_from':came_from,
-                                        'auth_url':auth_url,
-                                        'auth_url_text':auth_url_text
-                                        }))
+                {
+                    'base_path':BASE_PATH,
+                    'form':BedForm(instance=bed),
+                    'bedkey':bedkey,
+                    'containerkey': container.key,
+                    'came_from':came_from,
+                    'user':users.get_current_user(),
+                    'auth_url':auth_url,
+                    'auth_url_text':auth_url_text
+                    }))
 
     def post(self):
         came_from = self.request.get('came_from')

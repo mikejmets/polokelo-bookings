@@ -143,12 +143,14 @@
                  href="/services/owner/editvenue?venuekey={{ venue.key }}&ownerkey={{ owner.key }}">
                 <img src="/images/edit.png"/></a></td>
             </a></td>
-            <td class="action">
-              <a title="Delete this venue"
-                 href="/services/owner/deletevenue?venuekey={{ venue.key }}&ownerkey={{ owner.key }}"
-                     onclick="return confirm('Are you sure?');">
-                <img src="/images/delete.png"/></a></td>
-            </a></td>
+            {% if is_admin_user %}
+              <td class="action">
+                <a title="Delete this venue"
+                   href="/services/owner/deletevenue?venuekey={{ venue.key }}&ownerkey={{ owner.key }}"
+                       onclick="return confirm('Are you sure?');">
+                  <img src="/images/delete.png"/></a></td>
+              </a></td>
+            {% endif %}
           {% else %}
             <td>&nbsp</td>
             <td>&nbsp</td>

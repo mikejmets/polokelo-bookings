@@ -35,15 +35,16 @@ class CapturePhoneNumber(webapp.RequestHandler):
         filepath = os.path.join(PROJECT_PATH, 
                                     'templates', 'common', 'capturephonenumber.html')
         self.response.out.write(template.render(filepath, 
-                                    {
-                                        'base_path':BASE_PATH,
-                                        'form':PhoneNumberForm(),
-                                        'auth_url':auth_url,
-                                        'auth_url_text':auth_url_text,
-                                        'came_from':came_from,
-                                        'post_url':self.request.uri,
-                                        'containerkey':containerkey
-                                        }))
+                {
+                    'base_path':BASE_PATH,
+                    'form':PhoneNumberForm(),
+                    'user':users.get_current_user(),
+                    'auth_url':auth_url,
+                    'auth_url_text':auth_url_text,
+                    'came_from':came_from,
+                    'post_url':self.request.uri,
+                    'containerkey':containerkey
+                    }))
 
     def post(self):
         came_from = self.request.get('came_from')
@@ -84,15 +85,16 @@ class EditPhoneNumber(webapp.RequestHandler):
         filepath = os.path.join(PROJECT_PATH, 
                                     'templates', 'common', 'editphonenumber.html')
         self.response.out.write(template.render(filepath, 
-                                    {
-                                        'base_path':BASE_PATH,
-                                        'phonekey':phonekey,
-                                        'form':PhoneNumberForm(instance=phonenumber),
-                                        'came_from':came_from,
-                                        'post_url':self.request.uri,
-                                        'auth_url':auth_url,
-                                        'auth_url_text':auth_url_text
-                                        }))
+                {
+                    'base_path':BASE_PATH,
+                    'phonekey':phonekey,
+                    'form':PhoneNumberForm(instance=phonenumber),
+                    'came_from':came_from,
+                    'post_url':self.request.uri,
+                    'user':users.get_current_user(),
+                    'auth_url':auth_url,
+                    'auth_url_text':auth_url_text
+                    }))
 
     def post(self):
         came_from = self.request.get('came_from')

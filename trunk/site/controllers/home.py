@@ -25,11 +25,12 @@ class HomePage(webapp.RequestHandler):
         auth_url, auth_url_text = get_authentication_urls(self.request.uri)
         filepath = os.path.join(PROJECT_PATH, 'templates', 'index.html')
         self.response.out.write(template.render(filepath, 
-                                    {
-                                        'base_path':BASE_PATH,
-                                        'auth_url':auth_url,
-                                        'auth_url_text':auth_url_text
-                                        }))
+                {
+                    'base_path':BASE_PATH,
+                    'user':users.get_current_user(),
+                    'auth_url':auth_url,
+                    'auth_url_text':auth_url_text
+                    }))
 
 class CommonError(webapp.RequestHandler):
     def get(self):
@@ -39,13 +40,14 @@ class CommonError(webapp.RequestHandler):
         error = self.request.get('error')
         came_from = self.request.get('came_from')
         self.response.out.write(template.render(filepath, 
-                                    {
-                                        'base_path':BASE_PATH,
-                                        'error':error,
-                                        'came_from':came_from,
-                                        'auth_url':auth_url,
-                                        'auth_url_text':auth_url_text
-                                        }))
+                {
+                    'base_path':BASE_PATH,
+                    'error':error,
+                    'came_from':came_from,
+                    'user':users.get_current_user(),
+                    'auth_url':auth_url,
+                    'auth_url_text':auth_url_text
+                    }))
 
     def post(self):
         came_from = self.request.get('came_from')

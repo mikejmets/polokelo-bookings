@@ -39,15 +39,16 @@ class CaptureAddress(webapp.RequestHandler):
         filepath = os.path.join(PROJECT_PATH, 
                                     'templates', 'common', 'captureaddress.html')
         self.response.out.write(template.render(filepath, 
-                                    {
-                                        'base_path':BASE_PATH,
-                                        'form':AddressForm(),
-                                        'containerkey':containerkey,
-                                        'came_from':came_from,
-                                        'post_url':self.request.uri,
-                                        'auth_url':auth_url,
-                                        'auth_url_text':auth_url_text
-                                        }))
+                {
+                    'base_path':BASE_PATH,
+                    'form':AddressForm(),
+                    'containerkey':containerkey,
+                    'came_from':came_from,
+                    'post_url':self.request.uri,
+                    'user':users.get_current_user(),
+                    'auth_url':auth_url,
+                    'auth_url_text':auth_url_text
+                    }))
 
     def post(self):
         came_from = self.request.get('came_from')
@@ -88,16 +89,17 @@ class EditAddress(webapp.RequestHandler):
         filepath = os.path.join(PROJECT_PATH, 
                                     'templates', 'common', 'editaddress.html')
         self.response.out.write(template.render(filepath, 
-                                    {
-                                        'base_path':BASE_PATH,
-                                        'form':AddressForm(instance=address),
-                                        'addresskey':addresskey,
-                                        'containerkey': container.key,
-                                        'came_from':came_from,
-                                        'post_url':self.request.uri,
-                                        'auth_url':auth_url,
-                                        'auth_url_text':auth_url_text
-                                        }))
+                {
+                    'base_path':BASE_PATH,
+                    'form':AddressForm(instance=address),
+                    'addresskey':addresskey,
+                    'containerkey': container.key,
+                    'came_from':came_from,
+                    'post_url':self.request.uri,
+                    'user':users.get_current_user(),
+                    'auth_url':auth_url,
+                    'auth_url_text':auth_url_text
+                    }))
 
     def post(self):
         came_from = self.request.get('came_from')
