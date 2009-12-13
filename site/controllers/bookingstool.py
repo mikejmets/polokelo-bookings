@@ -277,6 +277,7 @@ class SimpleAccommodationSearch(AccommodationSearch):
         end = element.start + timedelta(days = (element.nights-1))
         dates = getDateList(element.start, end)
         child_friendly_required = element.children > 0
+        people =  element.adults + element.children
         #logger.info('Search for %s, %s, %s -> %s(%s), %s', 
         #  element.city, element.type, element.start, end, element.nights,
         #  child_friendly_required)
@@ -291,12 +292,15 @@ class SimpleAccommodationSearch(AccommodationSearch):
         if child_friendly_required:
             slots.filter('childFriendly =', True)
         slots.filter('startDate in', dates)
-        slots.filter('venue_capacity >=', element.adults + element.children)
+        slots.filter('venue_capacity >=', people)
         slots.order('venue_capacity')
         slots.order('venue_key')
-        num_results = len([s for s in slots])
+        #num_results = len([s for s in slots])
+        num_results = slots.count()
+        logger.info('Num Results %s', num_results)
         #Make 600 a function of number of days and people
-        limit = min(1000, num_results)
+        seed = min(100*people, 800)
+        limit = min(seed, num_results)
         offset = 0
         if num_results > limit:
             offset = random.randrange(0, num_results - limit)
