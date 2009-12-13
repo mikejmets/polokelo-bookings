@@ -299,16 +299,14 @@ class SimpleAccommodationSearch(AccommodationSearch):
         slots.order('venue_key')
 
         #Second decide how many?
-        limit = 700
         offset = 0
+        #Make allocation a function of number of days and people
+        volume_factor = int((people + element.nights) / 2)
+        limit = min(80*volume_factor, 700)
         if False:
-            num_results = len([s for s in slots])
+            #num_results = len([s for s in slots])
             num_results = slots.count()
-            #Make allocation a function of number of days and people
-            volume_factor = int((people + element.nights) / 2)
-            seed = min(80*volume_factor, 800)
-            limit = min(seed, num_results)
-            offset = 0
+            limit = min(limit, num_results)
             if num_results > limit:
                 offset = random.randrange(0, num_results - limit)
             logger.info('---Found %s results', num_results)
