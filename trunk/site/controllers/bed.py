@@ -39,6 +39,7 @@ class ViewBed(webapp.RequestHandler):
                         name = value.verbose_name
                     val = value.get_value_for_form(bed)
                     bed_values.append((name, val))
+        bed_values.append(('created', bed.created))
         filepath = os.path.join(PROJECT_PATH, 
                       'templates', 'services', 'viewbed.html')
         self.response.out.write(template.render(filepath, 
