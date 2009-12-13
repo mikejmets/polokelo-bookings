@@ -295,7 +295,8 @@ class SimpleAccommodationSearch(AccommodationSearch):
         slots.order('venue_capacity')
         slots.order('venue_key')
         num_results = len([s for s in slots])
-        limit = min(700, num_results)
+        #Make 600 a function of number of days and people
+        limit = min(1000, num_results)
         offset = 0
         if num_results > limit:
             offset = random.randrange(0, num_results - limit)

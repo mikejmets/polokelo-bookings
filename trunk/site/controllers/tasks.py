@@ -100,7 +100,7 @@ class CreateBerthSlots(webapp.RequestHandler):
             report += "The End\n"
         else:
             cnt = 0
-            for i in range(0, 4):
+            for i in range(0, min(len(berths), 4):
                 cnt += berths[i].createSlots()
                 report += "created slots date %s (indx = %s cnt = %s)\n" % (
                     berths[i].created, i, cnt)
@@ -206,6 +206,35 @@ class UpdateDatastore(webapp.RequestHandler):
                   }
         self.response.out.write(context) 
 
+class VenueValidation(webapp.RequestHandler):
+    def get(self):
+        owners = Owner.all()
+        owners.order('referenceNumber')
+        last = self.request.get('last', 'None')
+
+        if last != 'None':
+            logger.info('-----last %s', last)
+            owners.filter('referenceNumber >', last)
+
+        owner = owners.get()
+        if owner:
+            last = owner.referenceNumber
+            report = ""
+            for venue in owner.owner_venues:
+                report += "%s %s Status %s Is Valid %s\n" % (
+                    owner.referenceNumber, venue.name, 
+                    venue.state, venue.isValid())
+            context = {
+                      'last': last,
+                      'report':report,
+                      }
+        else:
+            context = {
+                      'last': '0',
+                      'report':'The End',
+                      }
+
+        self.response.out.write(context) 
 
 application = webapp.WSGIApplication([
       ('/tasks/expireenquiries', ExpireEnquiries),
@@ -214,6 +243,7 @@ application = webapp.WSGIApplication([
       ('/tasks/createberthslots', CreateBerthSlots),
       ('/tasks/update_datastore', UpdateDatastore),
       ('/tasks/bedvalidation', BedValidation),
+      ('/tasks/venuevalidation', VenueValidation),
       ], debug=False)
 
 def main():
