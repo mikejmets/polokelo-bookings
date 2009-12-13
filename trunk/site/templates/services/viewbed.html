@@ -22,6 +22,7 @@
     <table class="listing">
         <thead>
           <td>Name</td>
+          <td>Slots</td>
         </thead>
         {% for berth in berths %}
         <tr>
@@ -29,6 +30,7 @@
                 <a title="View this berth"
                   href="/services/owner/venue/viewberth?berthkey={{ berth.key }}">
                   {{ berth.key }}</a></td>
+              <td>{{ berth.berth_slots.count }}</td>
         </tr>
         {% endfor %}
     </table>
