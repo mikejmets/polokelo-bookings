@@ -1,5 +1,5 @@
 application: polokelo-bookings
-version: 0-15-alpha
+version: 0-1-beta
 runtime: python
 api_version: 1
 
