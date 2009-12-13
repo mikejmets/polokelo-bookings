@@ -115,6 +115,44 @@ class CreateBerthSlots(webapp.RequestHandler):
                   }
         self.response.out.write(context) 
 
+class DeleteBerthSlots(webapp.RequestHandler):
+    def get(self):
+        # Delete first and then recreate all slots
+        report = 'Ooops'
+        berths = Berth.all().order('created')
+        last_key = self.request.get('last_key', 'None')
+        action = self.request.get('action', 'create')
+
+        report = ""
+        if last_key != 'None':
+            last_key = parse_datetime(
+                last_key, '%Y-%m-%d %H:%M:%S')
+            berths.filter('created >=', last_key)
+        limit = 2
+        berths = berths.fetch(limit=limit)
+        if len(berths) == 1:
+            action = 'stop'
+            last_key = 'None'
+            report += "The End\n"
+        else:
+            cnt = 0
+            for berth in berths:
+                for slot in Slot.all().ancestor(berth):
+                   slot.delete()
+                cnt += 1
+                report += "delete berth slots date %s (cnt = %s)\n" % (
+                   berth.created, cnt)
+                if cnt > 1:
+                    break
+            last_key = berth.created
+
+        context = {
+                  'action': action,
+                  'last_key': str(last_key),
+                  'report': report,
+                  }
+        self.response.out.write(context) 
+
 class BedValidation(webapp.RequestHandler):
     def get(self):
         beds = Bed.all().order('created')
