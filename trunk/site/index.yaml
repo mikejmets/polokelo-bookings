@@ -66,6 +66,11 @@ indexes:
     direction: desc
 
 - kind: Enquiry
+  properties:
+  - name: workflowStateName
+  - name: expiryDate
+
+- kind: Enquiry
   ancestor: yes
   properties:
   - name: created

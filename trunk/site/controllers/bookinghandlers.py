@@ -21,7 +21,8 @@ from controllers.enquirycollection import ViewEnquiryCollection, \
     CaptureEnquiryCollection, EditEnquiryCollection, DeleteEnquiryCollection, \
     ViewVCSRecord, ViewTransactionRecord, \
     CaptureTransactionRecord, EditTransactionRecord, DeleteTransactionRecord
-from models.bookinginfo import EnquiryCollection, ContractedBooking
+from models.bookinginfo import \
+    Enquiry, EnquiryCollection, ContractedBooking
 from controllers.bookingsemail import \
     CaptureBookingsEmail, EditBookingsEmail, DeleteBookingsEmail
 from controllers.guestelements import \
@@ -35,6 +36,9 @@ logger = logging.getLogger('BookingHandlers')
 class ManageBookings(webapp.RequestHandler):
     def get(self):
         auth_url, auth_url_text = get_authentication_urls(self.request.uri)
+        enquiries = Enquiry.all()
+        enquiries.filter('workflowStateName =', 'awaitingagent')
+        enquiries.order('expiryDate')
         contractedbookings = ContractedBooking.all().order('bookingNumber')
         collections = EnquiryCollection.all().order('referenceNumber')
 
@@ -42,6 +46,7 @@ class ManageBookings(webapp.RequestHandler):
             PROJECT_PATH, 'templates', 'bookings', 'managebookinginfo.html')
         extras = {'base_path':BASE_PATH,
                   'contractedbookings':contractedbookings,
+                  'enquiries':enquiries,
                   'collections':collections,
                   'user':users.get_current_user(),
                   'auth_url':auth_url,
