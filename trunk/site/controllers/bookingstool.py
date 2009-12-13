@@ -238,8 +238,10 @@ class AccommodationSearch():
 class SimpleAccommodationSearch(AccommodationSearch):
 
     def findVenues(self, element):
-        logger.info('SimpleAccommodationSearch for %s, %s, %s(%s)', 
-            element.city, element.type, element.start, element.nights)
+        logger.info('Search for %s, %s, %s(%s) for %s people', 
+            element.city, element.type, 
+            element.start, element.nights,
+            element.adults + element.children)
 
         #try:
         venues = self._findValidBerths(element)
@@ -259,9 +261,9 @@ class SimpleAccommodationSearch(AccommodationSearch):
             for venue_key in venue_keys:
                 berths = venues[venue_key]
                 #Log details
-                venue = Venue.get(venue_key)
-                logger.info('------%s--%s--berths: %s', 
-                    venue.owner.referenceNumber, venue.name, len(berths))
+                #venue = Venue.get(venue_key)
+                #logger.info('------%s--%s--berths: %s', 
+                #    venue.owner.referenceNumber, venue.name, len(berths))
                 if len(berths) >= people:
                     valid_venues[venue_key] = berths
         if valid_venues:
@@ -297,7 +299,6 @@ class SimpleAccommodationSearch(AccommodationSearch):
         slots.order('venue_key')
         #num_results = len([s for s in slots])
         num_results = slots.count()
-        logger.info('Num Results %s', num_results)
         #Make 600 a function of number of days and people
         seed = min(100*people, 800)
         limit = min(seed, num_results)
