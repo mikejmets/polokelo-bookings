@@ -100,7 +100,7 @@ class CreateBerthSlots(webapp.RequestHandler):
             report += "The End\n"
         else:
             cnt = 0
-            for i in range(0, min(len(berths), 4):
+            for i in range(0, min(len(berths), 4)):
                 cnt += berths[i].createSlots()
                 report += "created slots date %s (indx = %s cnt = %s)\n" % (
                     berths[i].created, i, cnt)
