@@ -6,7 +6,6 @@ import urllib
 from datetime import datetime, timedelta
 
 from google.appengine.ext.db import run_in_transaction
-from google.appengine.runtime import DeadlineExceededError
 
 from workflow.workflow import WorkflowError
 from booking_errors import BookingConflictError
@@ -285,6 +284,7 @@ class SimpleAccommodationSearch(AccommodationSearch):
         #  child_friendly_required)
 
         #Contract query
+        #First define what we want
         slots = Slot.all()
         slots.filter('occupied =', False)
         slots.filter('city =', element.city)
@@ -297,15 +297,22 @@ class SimpleAccommodationSearch(AccommodationSearch):
         slots.filter('venue_capacity >=', people)
         slots.order('venue_capacity')
         slots.order('venue_key')
-        #num_results = len([s for s in slots])
-        num_results = slots.count()
-        #Make 600 a function of number of days and people
-        seed = min(100*people, 800)
-        limit = min(seed, num_results)
+
+        #Second decide how many?
+        limit = 700
         offset = 0
-        if num_results > limit:
-            offset = random.randrange(0, num_results - limit)
-        logger.info('---Found %s Use %s %s', num_results, offset, limit)
+        if False:
+            num_results = len([s for s in slots])
+            num_results = slots.count()
+            #Make allocation a function of number of days and people
+            volume_factor = int((people + element.nights) / 2)
+            seed = min(80*volume_factor, 800)
+            limit = min(seed, num_results)
+            offset = 0
+            if num_results > limit:
+                offset = random.randrange(0, num_results - limit)
+            logger.info('---Found %s results', num_results)
+        logger.info('---Fetch %s starting from %s', limit, offset)
         #Run query and 
         return self._validateBerths(
                       slots.fetch(offset=offset, limit=limit), 
