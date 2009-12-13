@@ -65,21 +65,22 @@ class ViewEnquiry(webapp.RequestHandler):
                 show_results = False
         show_bookings = len(enquiry.getContractedBookings()) > 0
         self.response.out.write(template.render(filepath, 
-                    {
-                        'base_path':BASE_PATH,
-                        'enquiry': enquiry,
-                        'element': element,
-                        'show_search':show_search,
-                        'show_transitions':show_transitions,
-                        'show_results':show_results,
-                        'show_bookings':show_bookings,
-                        'transitions':transitions,
-                        'cities':cities,
-                        'accomtypes':accommodationTypes,
-                        'berths':berths,
-                        'auth_url':auth_url,
-                        'auth_url_text':auth_url_text,
-                        }))
+              {
+                  'base_path':BASE_PATH,
+                  'enquiry': enquiry,
+                  'element': element,
+                  'show_search':show_search,
+                  'show_transitions':show_transitions,
+                  'show_results':show_results,
+                  'show_bookings':show_bookings,
+                  'transitions':transitions,
+                  'cities':cities,
+                  'accomtypes':accommodationTypes,
+                  'berths':berths,
+                  'user':users.get_current_user(),
+                  'auth_url':auth_url,
+                  'auth_url_text':auth_url_text,
+                  }))
 
 
 class AdvanceEnquiry(webapp.RequestHandler):
@@ -90,12 +91,13 @@ class AdvanceEnquiry(webapp.RequestHandler):
                       'templates', 'bookings', 'viewenquiry.html')
         enquirykey = self.request.get('enquirykey')
         self.response.out.write(template.render(filepath, 
-                    {
-                        'base_path':BASE_PATH,
-                        'enquirykey': enquirykey,
-                        'auth_url':auth_url,
-                        'auth_url_text':auth_url_text
-                        }))
+                {
+                  'base_path':BASE_PATH,
+                  'enquirykey': enquirykey,
+                  'user':users.get_current_user(),
+                  'auth_url':auth_url,
+                  'auth_url_text':auth_url_text
+                  }))
 
 
     def post(self):
@@ -147,15 +149,16 @@ class EditEnquiry(webapp.RequestHandler):
         filepath = os.path.join(PROJECT_PATH, 
                         'templates', 'bookings', 'editenquiry.html')
         self.response.out.write(template.render(filepath, 
-                    {
-                        'base_path':BASE_PATH,
-                        'form':EnquiryForm(instance=enquiry),
-                        'enquirykey':enquirykey,
-                        'came_from':came_from,
-                        'enquirykey':enquirykey,
-                        'auth_url':auth_url,
-                        'auth_url_text':auth_url_text
-                        }))
+              {
+                  'base_path':BASE_PATH,
+                  'form':EnquiryForm(instance=enquiry),
+                  'enquirykey':enquirykey,
+                  'came_from':came_from,
+                  'enquirykey':enquirykey,
+                  'user':users.get_current_user(),
+                  'auth_url':auth_url,
+                  'auth_url_text':auth_url_text
+                  }))
 
     def post(self):
         enquirykey = self.request.get('enquirykey')
@@ -176,12 +179,13 @@ class EditEnquiry(webapp.RequestHandler):
             filepath = os.path.join(PROJECT_PATH, 
                           'templates', 'bookings', 'editenquiry.html')
             self.response.out.write(template.render(filepath, 
-                          {
-                              'base_path':BASE_PATH,
-                              'form':data,
-                              'came_from':came_from,
-                              'enquirykey':enquirykey
-                              }))
+                      {
+                        'base_path':BASE_PATH,
+                        'form':data,
+                        'user':users.get_current_user(),
+                        'came_from':came_from,
+                        'enquirykey':enquirykey
+                        }))
 
 
 class DeleteEnquiry(webapp.RequestHandler):

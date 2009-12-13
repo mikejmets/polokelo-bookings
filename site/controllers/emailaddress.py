@@ -35,15 +35,16 @@ class CaptureEmailAddress(webapp.RequestHandler):
         filepath = os.path.join(PROJECT_PATH, 
                                     'templates', 'common', 'captureemail.html')
         self.response.out.write(template.render(filepath, 
-                                    {
-                                        'base_path':BASE_PATH,
-                                        'form':EmailForm(),
-                                        'auth_url':auth_url,
-                                        'auth_url_text':auth_url_text,
-                                        'came_from':came_from,
-                                        'post_url':self.request.uri,
-                                        'containerkey':containerkey
-                                        }))
+                {
+                    'base_path':BASE_PATH,
+                    'form':EmailForm(),
+                    'user':users.get_current_user(),
+                    'auth_url':auth_url,
+                    'auth_url_text':auth_url_text,
+                    'came_from':came_from,
+                    'post_url':self.request.uri,
+                    'containerkey':containerkey
+                    }))
 
     def post(self):
         came_from = self.request.get('came_from')
@@ -84,15 +85,16 @@ class EditEmailAddress(webapp.RequestHandler):
         filepath = os.path.join(PROJECT_PATH, 
                                     'templates', 'common', 'editemail.html')
         self.response.out.write(template.render(filepath, 
-                                    {
-                                        'base_path':BASE_PATH,
-                                        'emailkey':emailkey,
-                                        'form':EmailForm(instance=emailaddress),
-                                        'came_from':came_from,
-                                        'post_url':self.request.uri,
-                                        'auth_url':auth_url,
-                                        'auth_url_text':auth_url_text
-                                        }))
+                {
+                    'base_path':BASE_PATH,
+                    'emailkey':emailkey,
+                    'form':EmailForm(instance=emailaddress),
+                    'came_from':came_from,
+                    'post_url':self.request.uri,
+                    'user':users.get_current_user(),
+                    'auth_url':auth_url,
+                    'auth_url_text':auth_url_text
+                    }))
 
     def post(self):
         came_from = self.request.get('came_from')

@@ -52,6 +52,7 @@ class ViewBedroom(webapp.RequestHandler):
                     'beds':beds,
                     'auth_url':auth_url,
                     'auth_url_text':auth_url_text,
+                    'user':users.get_current_user(),
                     'is_admin_user':users.is_current_user_admin(),
                     }))
 
@@ -64,14 +65,15 @@ class CaptureBedroom(webapp.RequestHandler):
         filepath = os.path.join(PROJECT_PATH, 
                                     'templates', 'services', 'capturebedroom.html')
         self.response.out.write(template.render(filepath, 
-                                    {
-                                        'base_path':BASE_PATH,
-                                        'form':BedroomForm(),
-                                        'containerkey':containerkey,
-                                        'came_from':came_from,
-                                        'auth_url':auth_url,
-                                        'auth_url_text':auth_url_text
-                                        }))
+                {
+                    'base_path':BASE_PATH,
+                    'form':BedroomForm(),
+                    'containerkey':containerkey,
+                    'came_from':came_from,
+                    'user':users.get_current_user(),
+                    'auth_url':auth_url,
+                    'auth_url_text':auth_url_text
+                    }))
 
     def post(self):
         came_from = self.request.get('came_from')
@@ -111,16 +113,17 @@ class EditBedroom(webapp.RequestHandler):
         filepath = os.path.join(PROJECT_PATH, 
                                     'templates', 'services', 'editbedroom.html')
         self.response.out.write(template.render(filepath, 
-                                    {
-                                        'base_path':BASE_PATH,
-                                        'form':BedroomForm(instance=bedroom),
-                                        'bedroomkey':bedroomkey,
-                                        'containerkey': container.key,
-                                        'came_from':came_from,
-                                        'auth_url':auth_url,
-                                        'auth_url_text':auth_url_text,
-                                        'venuekey':self.request.get('venuekey')
-                                        }))
+                {
+                    'base_path':BASE_PATH,
+                    'form':BedroomForm(instance=bedroom),
+                    'bedroomkey':bedroomkey,
+                    'containerkey': container.key,
+                    'came_from':came_from,
+                    'user':users.get_current_user(),
+                    'auth_url':auth_url,
+                    'auth_url_text':auth_url_text,
+                    'venuekey':self.request.get('venuekey')
+                    }))
 
     def post(self):
         came_from = self.request.get('came_from')

@@ -53,17 +53,19 @@ class ViewOwner(webapp.RequestHandler):
         phonenumbers = owner.entity_phonenumbers
         emails = owner.entity_emails
         self.response.out.write(template.render(filepath, 
-                                    {
-                                        'base_path':BASE_PATH,
-                                        'owner':owner,
-                                        'owner_values':owner_values,
-                                        'venues':venues,
-                                        'addresses':addresses,
-                                        'phonenumbers':phonenumbers,
-                                        'emails':emails,
-                                        'auth_url':auth_url,
-                                        'auth_url_text':auth_url_text
-                                        }))
+                {
+                    'base_path':BASE_PATH,
+                    'owner':owner,
+                    'owner_values':owner_values,
+                    'venues':venues,
+                    'addresses':addresses,
+                    'phonenumbers':phonenumbers,
+                    'emails':emails,
+                    'user':users.get_current_user(),
+                    'is_admin_user':users.is_current_user_admin(),
+                    'auth_url':auth_url,
+                    'auth_url_text':auth_url_text
+                    }))
 
 
 class CaptureOwner(webapp.RequestHandler):
@@ -73,12 +75,13 @@ class CaptureOwner(webapp.RequestHandler):
         filepath = os.path.join(PROJECT_PATH, 
                                     'templates', 'services', 'captureowner.html')
         self.response.out.write(template.render(filepath, 
-                                    {
-                                        'base_path':BASE_PATH,
-                                        'form':OwnerForm(),
-                                        'auth_url':auth_url,
-                                        'auth_url_text':auth_url_text
-                                        }))
+                {
+                    'base_path':BASE_PATH,
+                    'form':OwnerForm(),
+                    'user':users.get_current_user(),
+                    'auth_url':auth_url,
+                    'auth_url_text':auth_url_text
+                    }))
 
     def post(self):
         data = OwnerForm(data=self.request.POST)
@@ -104,13 +107,14 @@ class EditOwner(webapp.RequestHandler):
         filepath = os.path.join(PROJECT_PATH, 
                                     'templates', 'services', 'editowner.html')
         self.response.out.write(template.render(filepath, 
-                                    {
-                                        'base_path':BASE_PATH,
-                                        'form':OwnerForm(instance=owner),
-                                        'ownerkey':ownerkey,
-                                        'auth_url':auth_url,
-                                        'auth_url_text':auth_url_text
-                                        }))
+                {
+                    'base_path':BASE_PATH,
+                    'form':OwnerForm(instance=owner),
+                    'ownerkey':ownerkey,
+                    'user':users.get_current_user(),
+                    'auth_url':auth_url,
+                    'auth_url_text':auth_url_text
+                    }))
 
     def post(self):
         ownerkey = self.request.get('ownerkey')

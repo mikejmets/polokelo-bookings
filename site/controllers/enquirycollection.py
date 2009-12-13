@@ -51,17 +51,18 @@ class ViewEnquiryCollection(webapp.RequestHandler):
                 'total':'%0.2f' % (txn.total / 100.0),
                 'can_edit':txn.category != 'Auto'})
         self.response.out.write(template.render(filepath, 
-                    {
-                        'base_path':BASE_PATH,
-                        'enquirycollectionkey': enquirycollectionkey,
-                        'enquirycollection': enquirycollection,
-                        'enquiries':enquiries,
-                        'vcsrecords':vcsrecords,
-                        'transactions':transactions,
-                        'cardholder':card_holder,
-                        'auth_url':auth_url,
-                        'auth_url_text':auth_url_text
-                        }))
+              {
+                  'base_path':BASE_PATH,
+                  'enquirycollectionkey': enquirycollectionkey,
+                  'enquirycollection': enquirycollection,
+                  'enquiries':enquiries,
+                  'vcsrecords':vcsrecords,
+                  'transactions':transactions,
+                  'cardholder':card_holder,
+                  'user':users.get_current_user(),
+                  'auth_url':auth_url,
+                  'auth_url_text':auth_url_text
+                  }))
 
     def post(self):
         transition = self.request.get('transition')
@@ -95,15 +96,16 @@ class EditEnquiryCollection(webapp.RequestHandler):
         filepath = os.path.join(PROJECT_PATH, 
                         'templates', 'bookings', 'editenquirycollection.html')
         self.response.out.write(template.render(filepath, 
-                    {
-                        'base_path':BASE_PATH,
-                        'form':EnquiryCollectionForm(instance=enquirycollection),
-                        'enquirycollectionkey':enquirycollectionkey,
-                        'came_from':came_from,
-                        'enquirycollectionkey':enquirycollectionkey,
-                        'auth_url':auth_url,
-                        'auth_url_text':auth_url_text
-                        }))
+              {
+                  'base_path':BASE_PATH,
+                  'form':EnquiryCollectionForm(instance=enquirycollection),
+                  'enquirycollectionkey':enquirycollectionkey,
+                  'came_from':came_from,
+                  'enquirycollectionkey':enquirycollectionkey,
+                  'user':users.get_current_user(),
+                  'auth_url':auth_url,
+                  'auth_url_text':auth_url_text
+                  }))
 
     def post(self):
         enquirycollectionkey = self.request.get('enquirycollectionkey')
