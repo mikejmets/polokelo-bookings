@@ -121,30 +121,29 @@ class DeleteBerthSlots(webapp.RequestHandler):
         report = 'Ooops'
         berths = Berth.all().order('created')
         last_key = self.request.get('last_key', 'None')
-        action = self.request.get('action', 'create')
+        action = self.request.get('action', 'delete')
+        limit = int(self.request.get('limit', '2'))
 
         report = ""
         if last_key != 'None':
             last_key = parse_datetime(
                 last_key, '%Y-%m-%d %H:%M:%S')
             berths.filter('created >=', last_key)
-        limit = 2
         berths = berths.fetch(limit=limit)
+        cnt = 0
+        for berth in berths:
+            cnt += 1
+            if cnt == limit:
+                break
+            for slot in Slot.all().ancestor(berth):
+               slot.delete()
+            report += "delete berth slots date %s (cnt = %s)\n" % (
+               berth.created, cnt)
+        last_key = berth.created
         if len(berths) == 1:
             action = 'stop'
             last_key = 'None'
             report += "The End\n"
-        else:
-            cnt = 0
-            for berth in berths:
-                for slot in Slot.all().ancestor(berth):
-                   slot.delete()
-                cnt += 1
-                report += "delete berth slots date %s (cnt = %s)\n" % (
-                   berth.created, cnt)
-                if cnt > 1:
-                    break
-            last_key = berth.created
 
         context = {
                   'action': action,
@@ -279,6 +278,7 @@ application = webapp.WSGIApplication([
       ('/tasks/emailguests', EmailGuests),
       ('/tasks/createslots', CreateSlotsTask),
       ('/tasks/createberthslots', CreateBerthSlots),
+      ('/tasks/deleteberthslots', DeleteBerthSlots),
       ('/tasks/update_datastore', UpdateDatastore),
       ('/tasks/bedvalidation', BedValidation),
       ('/tasks/venuevalidation', VenueValidation),
