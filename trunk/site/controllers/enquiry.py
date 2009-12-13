@@ -7,6 +7,7 @@ from google.appengine.ext import webapp
 from google.appengine.ext.webapp import template
 from google.appengine.ext.db import djangoforms
 from google.appengine.ext import db
+from google.appengine.runtime import DeadlineExceededError
 
 from controllers.bookingstool import BookingsTool
 from controllers.home import BASE_PATH, PROJECT_PATH
@@ -220,14 +221,40 @@ class BookingsToolFindAccommodation(webapp.RequestHandler):
         accom_element.singlerooms = int(self.request.get('singlerooms', '0'))
         accom_element.put()
 
-        tool = BookingsTool()
-        venues = tool.findVenues(accom_element)
-
         # Check if we have a package for the accommodation type in the city.
         query = Package.all()
         query.filter('city =', accom_element.city)
         query.filter('accommodationType =', accom_element.type)
         package = query.get()
+
+        if not package:
+            #Clean up
+            accom_element.availableBerths = None
+            accom_element.put()
+            if enquiry.workflowStateName not in \
+                    ['onhold', 'awaitingagent', 'expired']:
+                enquiry.doTransition('putonhold')
+            params['error'] = "No package found" 
+            params = urllib.urlencode(params)
+            self.redirect('/bookings/bookingerror?%s' % params)
+            return
+
+        tool = BookingsTool()
+        error = None
+        try:
+            venues = tool.findVenues(accom_element)
+        except DeadlineExceededError:
+            self.response.clear()
+            self.response.set_status(500)
+            logger.info("Except DeadlineExceeded Error")
+            error = "We had a problem processing your request, pleae try again"
+            venues = None
+        except Exception, e:
+            self.response.clear()
+            self.response.set_status(500)
+            logger.info("Except %s", e)
+            error = "We had a problem processing your request, pleae try again"
+            venues = None
 
         params = {}
         params['enquirykey'] = enquirykey
@@ -243,17 +270,9 @@ class BookingsToolFindAccommodation(webapp.RequestHandler):
             if enquiry.workflowStateName not in \
                     ['onhold', 'awaitingagent', 'expired']:
                 enquiry.doTransition('putonhold')
-            params['error'] = "No results found" 
-            params = urllib.urlencode(params)
-            self.redirect('/bookings/bookingerror?%s' % params)
-        elif not package:
-            #Clean up
-            accom_element.availableBerths = None
-            accom_element.put()
-            if enquiry.workflowStateName not in \
-                    ['onhold', 'awaitingagent', 'expired']:
-                enquiry.doTransition('putonhold')
-            params['error'] = "No package found" 
+            if not error:
+                error = "No results found" 
+            params['error'] = error
             params = urllib.urlencode(params)
             self.redirect('/bookings/bookingerror?%s' % params)
 
