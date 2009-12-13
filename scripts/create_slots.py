@@ -16,10 +16,13 @@ def main():
           response = urllib2.urlopen(next_url)
           results = eval(response.read())
           next_url = results['next_url']
+          report = results['report']
           if next_url == '/':
               break
           key = next_url.split('=')[1]
           cnt += 1
+          if len(report) > 0:
+              print '---- Report:\n%s' % (report)
           print '-- %s: %s' % (cnt, key)
       except:
           print 'Reset key -------- %s: %s' % (cnt, key)
