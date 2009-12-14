@@ -6,6 +6,7 @@ from google.appengine.ext import webapp
 from google.appengine.ext.webapp import template
 from google.appengine.runtime import DeadlineExceededError
 from google.appengine.ext.db import djangoforms
+from google.appengine.api.labs.taskqueue import Task
 from django import newforms as forms
 
 from controllers.home import BASE_PATH, PROJECT_PATH
@@ -136,6 +137,11 @@ class ViewVenue(webapp.RequestHandler):
             if state == 'Closed':
                 venue.state = 'Open'
                 venue.put()
+                task = Task(
+                    method='GET',
+                    url='/tasks/createslots',
+                    params={'venuekey': venue.key()})
+                task.add('slot-creation')
             elif state == 'Open':
                 venue.state = 'Closed'
                 venue.put()
