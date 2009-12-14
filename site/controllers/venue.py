@@ -14,8 +14,7 @@ from controllers.home import BASE_PATH, PROJECT_PATH
 from models.bookinginfo import ContractedBooking
 from models.hostinfo import Owner, Venue
 from models.codelookup import getChoicesTuple
-from controllers.utils import \
-    get_authentication_urls, setCookie, getCookieValue
+from controllers.utils import get_authentication_urls
 
 logger = logging.getLogger('VenueHandler')
 
@@ -41,7 +40,6 @@ class ViewVenue(webapp.RequestHandler):
                 'limited_view=%s expires=%s' \
                     % (limited_view, expiration))
         else:
-                self.request.cookies.get('limited_view'))
             limited_view = self.request.cookies.get('limited_view') == 'True'
         
         venuekey = self.request.get('venuekey')
