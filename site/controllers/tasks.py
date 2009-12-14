@@ -51,24 +51,23 @@ class EmailGuests(webapp.RequestHandler):
                                         }))
 class CreateSlotsTask(webapp.RequestHandler):
     def get(self):
-        logger.info("Create Slots Task")
         venuekey = self.request.get('venuekey')
-        logger.info('Crate slots got key %s', venuekey)
+        logger.info('CreateSlotsTask got key %s', venuekey)
         if venuekey:
             venue = Venue.get(venuekey)
             if venue:
-                logger.info('Create slot for venue %s', venue.name)
+                logger.info('CreateSlotsTask for venue %s', venue.name)
                 try:
                     venue.createSlots(limit=0)
                 except DeadlineExceededError:
                     self.response.clear()
                     self.response.set_status(500)
-                    logger.info("Except DeadlineExceeded for venue %s",
+                    logger.error("Except DeadlineExceeded for venue %s",
                         "%s %s" % (venue.owner.referenceNumber, venue.name))
                 except Exception, e:
                     self.response.clear()
                     self.response.set_status(500)
-                    logger.info("Except %s Error for venue %s",
+                    logger.error("Except %s Error for venue %s",
                         e,
                         "%s %s" % (venue.owner.referenceNumber, venue.name))
 
