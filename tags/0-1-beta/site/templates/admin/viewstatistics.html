@@ -1,0 +1,14 @@
+{% extends base_path %}
+
+{% block breadcrumbs %}
+<a href="/admin/home">go back</a>
+{% endblock %}
+
+{% block pagecontent %}
+    <h1>Statistics</h1>
+
+    <textarea rows="10" cols="80">
+      {{ results }}
+    </textarea>
+
+{% endblock pagecontent %}

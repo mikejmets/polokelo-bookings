@@ -1,0 +1,117 @@
+{% extends base_path %}
+
+{% block breadcrumbs %}
+<a href="{{ came_from }}">go back</a>
+{% endblock %}
+
+{% block pagecontent %}
+<h1>View VCS Record</h1>
+
+<table class="listing" cellspacing="0" width="70%">
+    <tr>
+        <th>Date Received</th>
+        <td>{{ vcsrec.created }}</td>
+    </tr>
+    <tr>
+        <th>VCS TX Date</th>
+        <td>{{ vcsrec.timeStamp}}</td>
+    </tr>
+    <tr>
+        <th>Terminal ID</th>
+        <td>{{ vcsrec.terminalId }}</td>
+    </tr>
+    <tr>
+        <th>TX Ref. Num</th>
+        <td>{{ vcsrec.txRefNum }}</td>
+    </tr>
+    <tr>
+        <th>TX Type</th>
+        <td>{{ vcsrec.txType }}</td>
+    </tr>
+    <tr>
+        <th>Dupl. Indicator</th>
+        <td>{{ vcsrec.duplicateTransaction }}</td>
+    </tr>
+    <tr>
+        <th>Authorised</th>
+        <td>{{ vcsrec.authorised }}</td>
+    </tr>
+    <tr>
+        <th>Auth. Number/Reason</th>
+        <td>{{ vcsrec.authNumberOrReason }}</td>
+    </tr>
+    <tr>
+        <th>Auth. Response Code</th>
+        <td>{{ vcsrec.authResponseCode }}</td>
+    </tr>
+    <tr>
+        <th>Description of Goods</th>
+        <td>{{ vcsrec.goodsDescription }}</td>
+    </tr>
+    <tr>
+        <th>Auth. Amount</th>
+        <td>
+            {{ vcsrec.authAmount|make_list|slice:":-2"|join:""|default:"0" }}.{{ vcsrec.authAmount|make_list|slice:"-2:"|join:""|default:"0" }}
+        </td>
+    </tr>
+    <tr>
+        <th>Budget Period</th>
+        <td>{{ vcsrec.budgetPeriod }}</td>
+    </tr>
+    <tr>
+        <th>Card Holder</th>
+        <td>{{ vcsrec.cardHolderName }}</td>
+    </tr>
+    <tr>
+        <th>Holder Email</th>
+        <td>{{ vcsrec.cardHolderEmail }}</td>
+    </tr>
+    <tr>
+        <th>Holder IP</th>
+        <td>{{ vcsrec.cardHolderIP }}</td>
+    </tr>
+    <tr>
+        <th>Card Number</th>
+        <td>{{ vcsrec.maskedCardNumber }}</td>
+    </tr>
+    <tr>
+        <th>Card Type</th>
+        <td>{{ vcsrec.cardType }}</td>
+    </tr>
+    <tr>
+        <th>Card Expiry</th>
+        <td>{{ vcsrec.cardExpiry }}</td>
+    </tr>
+    <tr>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+    </tr>
+    <tr>
+        <th>Enq. Batch Ref.</th>
+        <td>
+            {{ vcsrec.enquiryCollection }}
+        </td>
+    </tr>
+    <tr>
+        <th>Enquiries</th>
+        <td>
+            {% for enquiry in vcsrec.enquiryList %}
+            {{ enquiry }}&nbsp;
+            {% endfor %}
+        </td>
+    </tr>
+    <tr>
+        <th>Payment Type</th>
+        <td>{{ vcsrec.paymentType }}</td>
+    </tr>
+    <tr>
+        <th>Deposit Perc.</th>
+        <td>{{ vcsrec.depositPercentage }}</td>
+    </tr>
+    <tr>
+        <th>Processing State</th>
+        <td>{{ vcsrec.processingState }}</td>
+    </tr>
+</table>
+
+{% endblock pagecontent %}

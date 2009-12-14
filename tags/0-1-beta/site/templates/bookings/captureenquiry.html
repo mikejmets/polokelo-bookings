@@ -1,0 +1,16 @@
+{% extends base_path %}
+
+{% block breadcrumbs %}
+<a href="/bookings/bookinginfo">go back</a>
+{% endblock %}
+
+{% block pagecontent %}
+    <h1>Capture New Enquiry</h1>
+    <form name="booking" method="post" action="/bookings/enquiry/captureenquiry">
+      <input type="hidden" name="enquirycollectionkey" value="{{ enquirycollectionkey }}" />
+        <table>
+            {{ form }}
+        </table>
+        <input type="submit" value="Add Enquiry" />
+    </form>
+{% endblock pagecontent %}

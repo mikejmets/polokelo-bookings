@@ -1,0 +1,38 @@
+{% extends base_path %}
+
+{% block breadcrumbs %}
+<a href="{{ came_from }}">go back</a>
+{% endblock %}
+
+{% block pagecontent %}
+<h1>View Credit Card Holder</h1>
+
+<table class="listing" cellspacing="0" width="70%">
+    <tr>
+        <th>Date Created</th>
+        <td>{{ guestelement.created.date }}</td>
+    </tr>
+    <tr>
+        <th>Identifying Number</th>
+        <td> {{ guestelement.identifyingNumber }}</td>
+    </tr>
+    <tr>
+        <th>Surname</th>
+        <td>{{ guestelement.surname }}</td>
+    </tr>
+    <tr>
+        <th>First Names</th>
+        <td>{{ guestelement.firstNames }}</td>
+    </tr>
+    <tr>
+        <th>Email Address</th>
+        <td>{{ guestelement.email }}</td>
+    </tr>
+    <tr>
+        <th>Contact Number</th>
+        <td>{{ guestelement.contactNumber }}</td>
+    </tr>
+</table>
+
+{% endblock pagecontent %}
+
