@@ -222,7 +222,7 @@ class Venue(db.Model):
         for room in self.venue_bedrooms:
             for bed in room.bedroom_beds:
                 for berth in bed.bed_berths:
-                    slots = berth.createSlots(self, room, bed)
+                    slots = berth.createSlots(self, room, bed, limit)
                     counter += slots
                     if limit and counter >= limit:
                         #Jump out so that the request doesn't timeout
@@ -439,7 +439,7 @@ class Berth(db.Model):
                 bookings.add(str(slot.contracted_booking.key()))
         return bookings
 
-    def createSlots(self, venue=None, room=None, bed=None):
+    def createSlots(self, venue=None, room=None, bed=None, limit=10):
         cnt = 0
         if bed is None:
             bed = self.bed
@@ -489,7 +489,7 @@ class Berth(db.Model):
             slot.venue_capacity = venue.getCapacity()
             slot.put()
             cnt += 1
-            if cnt > 20:
+            if limit and cnt > limit:
                 #jump out early
                 return cnt
         return cnt
