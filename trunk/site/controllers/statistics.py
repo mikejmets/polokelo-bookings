@@ -22,9 +22,9 @@ class ViewStatistics(webapp.RequestHandler):
         filepath = os.path.join(PROJECT_PATH, 
                       'templates', 'admin', 'viewstatistics.html')
         results = ''
-        results = 'Open Venues\n' + listOpenVenues()
+        #results = 'Open Venues\n' + listOpenVenues()
         #results = 'Venue Completeness\n' + listVenuesValidity()
-        #results = 'Entity Count\n' + countAllEntities()
+        results = 'Entity Count\n' + countAllEntities()
         #results = 'Check Berths\n' + checkBerths()
         self.response.out.write(template.render(filepath, 
                   {
