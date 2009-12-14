@@ -5,7 +5,14 @@
 {% endblock %}
 
 {% block pagecontent %}
-<h1>Venue</h1>
+<input type='hidden' name='limited_view' value="{{ limited_view }}"/>
+<h1>Venue &nbsp;&nbsp; 
+      {% if limited_view %}
+      <a href="/services/owner/viewvenue?venuekey={{ venue.key }}&limited_view=False"/>(More ...)</a>
+      {% else %}
+      <a href="/services/owner/viewvenue?venuekey={{ venue.key }}&limited_view=True"/>(Less ...)</a>
+      {% endif %}
+</h1>
 
 <table width="100%">
   <tr>
@@ -214,6 +221,7 @@
           {% endfor %}
       </table>
 
+      {% if not limited_view %}
       <hr />
       <p><strong>Bathrooms</strong>
       {% if venue.canModify %}
@@ -248,7 +256,9 @@
           </tr>
           {% endfor %}
       </table>
+      {% endif %}
 
+      {% if not limited_view %}
       <h3>Other Information</h3>
       <p><strong>Photographs</strong>
       <a title="Add a Photograph"
@@ -279,7 +289,9 @@
             {% endfor %}
         </tr>
     </table>
+    {% endif %}
 
+    {% if not limited_view %}
     <hr />
       <p><strong>Inspection Records</strong>
       <a title="Add an Inspection Record"
@@ -311,6 +323,9 @@
           {% endfor %}
       </table>
 
+    {% endif %}
+
+    {% if not limited_view %}
       <hr />
       <p><strong>Complaint Records</strong>
       <a title="Add a Inspection Record"
@@ -344,6 +359,9 @@
           {% endfor %}
       </table>
 
+    {% endif %}
+
+    {% if not limited_view %}
     <hr />
     <p><strong>Contracted Bookings</strong>
       <!-- <a title="Add a new booking"
@@ -375,4 +393,6 @@
         </tr>
         {% endfor %}
     </table>
+    {% endif %}
+
 {% endblock pagecontent %}

@@ -1,6 +1,7 @@
 import os
 import logging
 import urllib
+from datetime import datetime, timedelta
 from google.appengine.api import users
 from google.appengine.ext import webapp
 from google.appengine.ext.webapp import template
@@ -13,7 +14,8 @@ from controllers.home import BASE_PATH, PROJECT_PATH
 from models.bookinginfo import ContractedBooking
 from models.hostinfo import Owner, Venue
 from models.codelookup import getChoicesTuple
-from controllers.utils import get_authentication_urls
+from controllers.utils import \
+    get_authentication_urls, setCookie, getCookieValue
 
 logger = logging.getLogger('VenueHandler')
 
@@ -31,6 +33,19 @@ class ViewVenue(webapp.RequestHandler):
         auth_url, auth_url_text = get_authentication_urls(self.request.uri)
         filepath = os.path.join(PROJECT_PATH, 
                                     'templates', 'services', 'viewvenue.html')
+        if self.request.get('limited_view'):
+            limited_view = self.request.get('limited_view', 'True') == 'True'
+            expiration = datetime.now() + timedelta(days=30)
+            self.response.headers.add_header(
+                'Set-Cookie',
+                'limited_view=%s expires=%s' \
+                    % (limited_view, expiration))
+            logger.info('----set cookie-%s', limited_view)
+        else:
+            logger.info('----found cookie-%s',
+                self.request.cookies.get('limited_view'))
+            limited_view = self.request.cookies.get('limited_view') == 'True'
+        
         venuekey = self.request.get('venuekey')
         venue = Venue.get(venuekey)
         form = VenueForm(instance=venue)
@@ -43,39 +58,43 @@ class ViewVenue(webapp.RequestHandler):
                         name = value.verbose_name
                     val = value.get_value_for_form(venue)
                     venue_values.append((name, val))
-        addresses = venue.entity_addresses
-        photographs = venue.venue_photos
-        inspections = venue.venue_inspections
-        complaints = venue.venue_complaints
+        context = {}
+        if not limited_view:
+            addresses = venue.entity_addresses
+            photographs = venue.venue_photos
+            inspections = venue.venue_inspections
+            complaints = venue.venue_complaints
+            bathrooms = venue.venue_bathrooms
+            contractedbookings = \
+              [ContractedBooking.get(k) for k in venue.getContractedBookings()]
+            context = {
+                'addresses':addresses,
+                'photographs':photographs,
+                'inspections':inspections,
+                'complaints':complaints,
+                'bathrooms':bathrooms,
+                'contractedbookings':contractedbookings,
+                }
+
         phonenumbers = venue.entity_phonenumbers
         bedrooms = venue.venue_bedrooms.order('name')
         emails = venue.entity_emails
-        bathrooms = venue.venue_bathrooms
         ownerkey = venue.owner.key()
-        contractedbookings = \
-            [ContractedBooking.get(k) for k in venue.getContractedBookings()]
-        self.response.out.write(template.render(filepath, 
-                  {
-                      'base_path':BASE_PATH,
-                      'ownerkey':ownerkey,
-                      'owner_name':venue.owner.listing_name(),
-                      'venue':venue,
-                      'venue_values':venue_values,
-                      'addresses':addresses,
-                      'photographs':photographs,
-                      'inspections':inspections,
-                      'complaints':complaints,
-                      'phonenumbers':phonenumbers,
-                      'bedrooms':bedrooms,
-                      'emails':emails,
-                      'bathrooms':bathrooms,
-                      'contractedbookings':contractedbookings,
-                      'user':users.get_current_user(),
-                      'is_admin_user':users.is_current_user_admin(),
-                      'auth_url':auth_url,
-                      'auth_url_text':auth_url_text
-                      }))
+        context['limited_view'] = limited_view
+        context['base_path'] = BASE_PATH
+        context['ownerkey'] = ownerkey
+        context['owner_name'] = venue.owner.listing_name()
+        context['venue'] = venue
+        context['venue_values'] = venue_values
+        context['phonenumbers'] = phonenumbers
+        context['bedrooms'] = bedrooms
+        context['emails'] = emails
+        context['user'] = users.get_current_user()
+        context['is_admin_user'] = users.is_current_user_admin()
+        context['auth_url'] = auth_url
+        context['auth_url_text'] = auth_url_text
 
+        self.response.out.write(template.render(filepath, context))
 
     def post(self):
         venuekey = self.request.get('venuekey')
