@@ -40,9 +40,7 @@ class ViewVenue(webapp.RequestHandler):
                 'Set-Cookie',
                 'limited_view=%s expires=%s' \
                     % (limited_view, expiration))
-            logger.info('----set cookie-%s', limited_view)
         else:
-            logger.info('----found cookie-%s',
                 self.request.cookies.get('limited_view'))
             limited_view = self.request.cookies.get('limited_view') == 'True'
         
