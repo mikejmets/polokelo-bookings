@@ -1,7 +1,7 @@
 #!/bin/bash
 HOST=$1
 EMAIL=$2
-APP_ID=$3
+APP_ID=polokelo-bookings
 echo "------------- Restore owners"
 bulkloader.py --restore --app_id=$APP_ID --email=$EMAIL --kind=Owner --url=$HOST/unload --filename=loader/data/owners .
 echo "------------- Restore venues"
@@ -24,8 +24,8 @@ echo "------------- Restore beds"
 bulkloader.py --restore --app_id=$APP_ID --email=$EMAIL --kind=Bed --url=$HOST/unload --filename=loader/data/beds .
 echo "------------- Restore berths"
 bulkloader.py --restore --app_id=$APP_ID --email=$EMAIL --kind=Berth --url=$HOST/unload --filename=loader/data/berths .
-echo "------------- Restore slots"
-bulkloader.py --restore --app_id=$APP_ID --email=$EMAIL --kind=Slot --url=$HOST/unload --filename=loader/data/slots .
+#echo "------------- Restore slots"
+#bulkloader.py --restore --app_id=$APP_ID --email=$EMAIL --kind=Slot --url=$HOST/unload --filename=loader/data/slots .
 echo "------------- Restore photos"
 bulkloader.py --restore --app_id=$APP_ID --email=$EMAIL --kind=Photograph --url=$HOST/unload --filename=loader/data/photos .
 rm -rf bulkloader-*

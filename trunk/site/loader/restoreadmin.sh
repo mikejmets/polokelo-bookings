@@ -1,7 +1,7 @@
 #!/bin/bash
 HOST=$1
 EMAIL=$2
-APP_ID=$3
+APP_ID=polokelo-bookings
 echo ---------- Restore Loopkup tables
 bulkloader.py --restore --app_id=$APP_ID --email=$EMAIL --kind=CodeLookup --url=$HOST/unload --filename=loader/data/lookups .
 echo ---------- Restore Packages

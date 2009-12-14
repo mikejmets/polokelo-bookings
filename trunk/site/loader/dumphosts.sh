@@ -34,9 +34,9 @@ bulkloader.py --dump --app_id=polokelo-bookings --email=$EMAIL --kind=Bed --url=
 echo "-------------- Dump berths"
 rm -rf loader/data/berths
 bulkloader.py --dump --app_id=polokelo-bookings --email=$EMAIL --kind=Berth --url=$HOST/unload --filename=loader/data/berths .
-echo "-------------- Dump slots"
-rm -rf loader/data/slots
-bulkloader.py --dump --app_id=polokelo-bookings --email=$EMAIL --kind=Slot --url=$HOST/unload --filename=loader/data/slots .
+#echo "-------------- Dump slots"
+#rm -rf loader/data/slots
+#bulkloader.py --dump --app_id=polokelo-bookings --email=$EMAIL --kind=Slot --url=$HOST/unload --filename=loader/data/slots .
 echo "-------------- Dump photos"
 rm -rf loader/data/photos
 bulkloader.py --dump --app_id=polokelo-bookings --email=$EMAIL --kind=Photograph --url=$HOST/unload --filename=loader/data/photos .
