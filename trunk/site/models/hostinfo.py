@@ -216,7 +216,7 @@ class Venue(db.Model):
         #Otherwise
         return True, ""
 
-    def createSlots(self):
+    def createSlots(self, limit=10):
         #logging.info('Create slots for venue %s', self.name)
         counter = 0
         for room in self.venue_bedrooms:
@@ -224,7 +224,7 @@ class Venue(db.Model):
                 for berth in bed.bed_berths:
                     slots = berth.createSlots(self, room, bed)
                     counter += slots
-                    if counter >= 10:
+                    if limit and counter >= limit:
                         #Jump out so that the request doesn't timeout
                         return counter
         return counter
