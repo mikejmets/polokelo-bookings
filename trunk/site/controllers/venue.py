@@ -56,7 +56,6 @@ class ViewVenue(webapp.RequestHandler):
                     venue_values.append((name, val))
         context = {}
         if not limited_view:
-            addresses = venue.entity_addresses
             photographs = venue.venue_photos
             inspections = venue.venue_inspections
             complaints = venue.venue_complaints
@@ -64,7 +63,6 @@ class ViewVenue(webapp.RequestHandler):
             contractedbookings = \
               [ContractedBooking.get(k) for k in venue.getContractedBookings()]
             context = {
-                'addresses':addresses,
                 'photographs':photographs,
                 'inspections':inspections,
                 'complaints':complaints,
@@ -72,10 +70,12 @@ class ViewVenue(webapp.RequestHandler):
                 'contractedbookings':contractedbookings,
                 }
 
+        addresses = venue.entity_addresses
         phonenumbers = venue.entity_phonenumbers
         bedrooms = venue.venue_bedrooms.order('name')
         emails = venue.entity_emails
         ownerkey = venue.owner.key()
+        context['addresses'] = addresses
         context['limited_view'] = limited_view
         context['base_path'] = BASE_PATH
         context['ownerkey'] = ownerkey
@@ -97,7 +97,8 @@ class ViewVenue(webapp.RequestHandler):
         venue = Venue.get(venuekey)
         state = self.request.get('state')
         workflow = self.request.get('workflow')
-        validate = self.request.get('validate')
+        validate_venue = self.request.get('validate_venue')
+        validate_slots = self.request.get('validate_slots')
         clear_slots = self.request.get('clear')
         create_slots = self.request.get('create')
         if clear_slots:
@@ -133,14 +134,26 @@ class ViewVenue(webapp.RequestHandler):
             url = '/home/showerror?%s' % params
             self.redirect(url)
             return
-        if validate:
+        if validate_slots:
             is_valid, err = venue.validate()
             params = {}
-            if is_valid:
-                numNights, numSlots = venue.validateSlots()
+            numNights, numSlots = venue.validateSlots()
+            if numNights == numSlots:
+                params['error'] = 'Slots are valid'
+            else:
                 params['error'] = \
                   "Of the total of %s contracted nights, %s slots exist" % (
                       numNights, numSlots)
+            params['came_from'] = self.request.referer
+            params = urllib.urlencode(params)
+            url = '/home/showerror?%s' % params
+            self.redirect(url)
+            return
+        if validate_venue:
+            is_valid, err = venue.validate()
+            params = {}
+            if is_valid:
+                params['error'] = 'Venue is valid'
             else:
                 params['error'] = err
             params['came_from'] = self.request.referer
