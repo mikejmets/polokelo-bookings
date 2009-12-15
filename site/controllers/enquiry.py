@@ -69,6 +69,7 @@ class ViewEnquiry(webapp.RequestHandler):
               {
                   'base_path':BASE_PATH,
                   'enquiry': enquiry,
+                  'outstanding':'%0.2f' % ((enquiry.totalAmountInZAR - enquiry.amountPaidInZAR) / 100.0),
                   'element': element,
                   'show_search':show_search,
                   'show_transitions':show_transitions,
