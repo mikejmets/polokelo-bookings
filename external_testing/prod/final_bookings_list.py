@@ -1,19 +1,19 @@
 import urllib2
 from xml.etree.ElementTree import XML, SubElement, tostring
 
-url = 'http://0-14-alpha.latest.bookings-dev.appspot.com/externalbookings'
+url = 'http://www.polokelo-bookings.co.za/externalbookings'
 
 
 xml = """
 <enquirylist>
-    <enquirybatchnumber>YCHT-4W7-9Z2</enquirybatchnumber>
+    <enquirybatchnumber>YCT-4W7-9Z0</enquirybatchnumber>
     <guestagentcode>Trafalgar-234234324</guestagentcode>
     <action>confirm enquiries</action>
     <creditcardholder>
         <name>John</name>
         <surname>O'Groats</surname>
         <passportnumber>777777777777</passportnumber>
-        <email>john@ogroats.co.uk</email>
+        <email>jurgen@upfrontsystems.co.za</email>
         <telephone>+4493213123123</telephone>
         <address>
             <streetpobox>34 Shady Lane</streetpobox>
@@ -28,7 +28,7 @@ xml = """
     </creditcardholder>
     <enquiries>
         <enquiry>
-            <enquirynumber>YEK8-DQN-2R9</enquirynumber>
+            <enquirynumber>YE8-DQN-2PB</enquirynumber>
             <city>CPT</city>
             <accommodation>
                 <type>GH</type>
@@ -51,7 +51,7 @@ xml = """
             <vat>4844.00</vat>
         </enquiry>
         <enquiry>
-            <enquirynumber>YEK8-DQN-2RZ</enquirynumber>
+            <enquirynumber>YE8-DQN-2P4</enquirynumber>
             <city>DBN</city>
             <accommodation>
                 <type>GH</type>
@@ -74,7 +74,7 @@ xml = """
             <vat>0.00</vat>
         </enquiry>
         <enquiry>
-            <enquirynumber>YEK8-DQN-2R3</enquirynumber>
+            <enquirynumber>YE8-DQN-2PC</enquirynumber>
             <city>CPT</city>
             <accommodation>
                 <type>GH</type>
