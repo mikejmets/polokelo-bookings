@@ -39,20 +39,20 @@ xml = """
     <guestagentcode>Trafalgar-234234234</guestagentcode>
     <action>check availability</action>
     <enquirynumber>%s</enquirynumber>
-    <city>CPT</city>
+    <city>PCS</city>
     <accommodation>
-        <type>GH</type>
+        <type>HOM</type>
         <rooms>
-            <single>2</single>
+            <single>0</single>
             <twin>0</twin>
             <double>1</double>
             <family>0</family>
         </rooms>
     </accommodation>
-    <startdate>2010-07-10</startdate>
+    <startdate>2010-06-03</startdate>
     <duration>5</duration>
     <adults>2</adults>
-    <children>2</children>
+    <children>1</children>
     <disability>
         <wheelchairaccess>no</wheelchairaccess>
         <otherspecialneeds>no</otherspecialneeds>
