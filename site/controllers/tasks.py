@@ -5,6 +5,7 @@ from google.appengine.ext import webapp
 from google.appengine.ext.webapp.util import run_wsgi_app
 from google.appengine.ext.webapp import template
 from google.appengine.ext import db
+from google.appengine.api.labs.taskqueue import Task
 
 from controllers.home import BASE_PATH, PROJECT_PATH
 from controllers.utils import get_authentication_urls
@@ -56,9 +57,18 @@ class CreateSlotsTask(webapp.RequestHandler):
         if venuekey:
             venue = Venue.get(venuekey)
             if venue:
-                logger.info('CreateSlotsTask for venue %s', venue.name)
                 try:
-                    venue.createSlots(limit=0)
+                    limit = 20
+                    num_slots = venue.createSlots(limit=limit)
+                    if num_slots >= limit:
+                        #Create task to continue
+                        task = Task(
+                            method='GET',
+                            url='/tasks/createslots',
+                            params={'venuekey': venue.key()})
+                        task.add('slot-creation')
+                        logger.info('CreateSlotsTask again, venue %s = %s', 
+                            venue.name, num_slots)
                 except DeadlineExceededError:
                     self.response.clear()
                     self.response.set_status(500)
