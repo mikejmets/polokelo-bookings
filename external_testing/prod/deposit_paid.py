@@ -1,7 +1,7 @@
 import urllib, urllib2
 from xml.etree.ElementTree import XML, SubElement, tostring
 
-url = 'http://0-14-alpha.latest.bookings-dev.appspot.com/paymentnotify'
+url = 'https://polokelo-bookings.appspot.com/paymentnotify'
 
 pay_req = {}
 pay_req["timestamp"] = '2009-12-03 10:00'
