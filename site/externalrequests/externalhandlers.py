@@ -103,7 +103,14 @@ class ExternalBookings(webapp.RequestHandler):
         bt = BookingsTool()
 
         # do the availability check
-        available, amount = bt.checkAvailability(enquiry)
+        try:
+            available, amount = bt.checkAvailability(enquiry)
+        except:
+            error = sys.exc_info()[1]
+            logging.error('Unhandled error: %s', error)
+            available = False
+            amount = 0L
+
         if not available:
             enquiry.doTransition('putonhold')
         enquiry.quoteInZAR = amount
@@ -139,7 +146,7 @@ class ExternalBookings(webapp.RequestHandler):
         # locate the primary guest node (credit card holder)
         guest_node = node.find('creditcardholder')
 
-        # Create guest node and element doesn't exist
+        # Create guest element if element doesn't exist
         if guest_node:
             guest_element = GuestElement.get_or_insert( \
                                 key_name=guest_node.findtext('passportnumber'),
