@@ -61,12 +61,14 @@
         <strong>Validation</strong>
         <p>
             <input type="submit" name="validate" value="Validate Venue" />
-            {% if is_admin_user %}
-              {% if not venue.hasBookings  %}
-                  <input type="submit" name="clear" value="Clear Slots" />
+            {% ifequal venue.state 'Closed' %}
+              {% if is_admin_user %}
+                {% if not venue.hasBookings  %}
+                    <input type="submit" name="clear" value="Clear Slots" />
+                {% endif %}
+                <input type="submit" name="create" value="Create Slots" />
               {% endif %}
-              <input type="submit" name="create" value="Create Slots" />
-            {% endif %}
+            {% endifequal %}
         </p>
       </form>
     </td>
