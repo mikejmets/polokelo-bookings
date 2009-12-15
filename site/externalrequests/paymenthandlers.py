@@ -156,10 +156,6 @@ class PaymentNotification(webapp.RequestHandler):
                     # check that applying the transaction will not break the bank
                     # leave a 100c buffer for shortfalls to handle conversion errors
                     if (available_total - applied_amount) >= -100:
-                        # apply the transaction
-                        enquiry.amountPaidInZAR += applied_amount
-                        enquiry.put()
-
                         # create the transaction record
                         ct = CollectionTransaction(parent=enquiry_collection,
                                     subType = txn_subtype,
@@ -174,7 +170,9 @@ class PaymentNotification(webapp.RequestHandler):
 
                         # do the workflow transition on the enquiry
                         try:
-                            enquiry.doTransition(transition_name, txn_category='Auto')
+                            enquiry.doTransition(transition_name, \
+                                    txn_category='Auto',
+                                    txn_amount=applied_amount)
                         except WorkflowError, msg:
                             logging.error('Workflow error: %s', msg)
 

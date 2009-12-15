@@ -120,36 +120,55 @@ class Enquiry(workflow.WorkflowAware):
             1. check for a deposit transaction record
             2. notify the client
         """
+        txn_amount = 0
         # check for a transaction record
         if kw and kw['txn_category'] != 'Auto':
             qry = CollectionTransaction.all().ancestor(self.parent())
             qry.filter('enquiryReference =', self.referenceNumber)
             qry.filter('type =', 'Payment')
             qry.filter('subType =', 'Deposit')
-            if qry.get() is None:
-                raise NoDepositException, \
+            txn = qry.get()
+            if txn is None:
+                raise NoSettlementException, \
                         'No deposit transaction exists for %s' % self.referenceNumber
+            else:
+                txn_amount = txn.total
+        else:
+            txn_amount = int(kw['txn_amount'])
+
+        # apply the money
+        self.amountPaidInZAR += txn_amount
+        self.put()
 
         # notify the client
-        """ Transition to paid in full
-            1. check that a guest element exists
-            2. create a transaction record
-            3. notify the client
-        """
         element = AccommodationElement.all().ancestor(self).get()
         et = EmailTool()
         et.notifyClient('receivedeposit', element)
 
     def ontransition_receiveall(self, *args, **kw):
+        """ Transition to paid in full
+            1. check that a full payment exists
+            3. notify the client
+        """
+        txn_amount = 0
         # check for a settlement transaction
         if kw and kw['txn_category'] != 'Auto':
             qry = CollectionTransaction.all().ancestor(self.parent())
             qry.filter('enquiryReference =', self.referenceNumber)
             qry.filter('type =', 'Payment')
             qry.filter('subType =', 'Settle')
-            if qry.get() is None:
+            txn = qry.get()
+            if txn is None:
                 raise NoSettlementException, \
                         'No settlement transaction exists for %s' % self.referenceNumber
+            else:
+                txn_amount = txn.total
+        else:
+            txn_amount = int(kw['txn_amount'])
+
+        # apply the money
+        self.amountPaidInZAR += txn_amount
+        self.put()
 
         # notify the client
         element = AccommodationElement.all().ancestor(self).get()
@@ -157,15 +176,25 @@ class Enquiry(workflow.WorkflowAware):
         et.notifyClient('receiveall', element)
 
     def ontransition_receivefinal(self, *args, **kw):
+        txn_amount = 0
         # check for a settlement transaction
         if kw and kw['txn_category'] != 'Auto':
             qry = CollectionTransaction.all().ancestor(self.parent())
             qry.filter('enquiryReference =', self.referenceNumber)
             qry.filter('type =', 'Payment')
             qry.filter('subType =', 'Settle')
-            if not qry.get():
+            txn = qry.get()
+            if txn is None:
                 raise NoSettlementException, \
                         'No settlement transaction exists for %s' % self.referenceNumber
+            else:
+                txn_amount = txn.total
+        else:
+            txn_amount = int(kw['txn_amount'])
+
+        # apply the money
+        self.amountPaidInZAR += txn_amount
+        self.put()
 
         # notify the client
         element = AccommodationElement.all().ancestor(self).get()
