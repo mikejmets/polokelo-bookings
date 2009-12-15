@@ -234,6 +234,7 @@ class UpdateDatastore(webapp.RequestHandler):
             last_key = slots[-1].created
             next_url = '/tasks/update_datastore?last_key=%s' % str(last_key)
 
+        auth_url, auth_url_text = get_authentication_urls(self.request.uri)
         context = {
                   'base_path':BASE_PATH,
                   'auth_url':auth_url,
