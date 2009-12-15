@@ -152,6 +152,8 @@ class ViewVenue(webapp.RequestHandler):
             if state == 'Closed':
                 venue.state = 'Open'
                 venue.put()
+                logger.info('Opened venue %s', 
+                    "%s %s" % (venue.owner.referenceNumber, venue.name))
                 task = Task(
                     method='GET',
                     url='/tasks/createslots',
