@@ -32,9 +32,11 @@ handlers:
 
 - url: /externalbookings
   script: externalrequests/externalhandlers.py
+  secure: always
 
 - url: /paymentnotify
   script: externalrequests/paymenthandlers.py
+  secure: always
 
 - url: /tasks/.*
   script: controllers/tasks.py
