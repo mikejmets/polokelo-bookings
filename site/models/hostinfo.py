@@ -237,7 +237,7 @@ class Venue(db.Model):
             for bed in room.bedroom_beds:
                 for berth in bed.bed_berths:
                     td = self.contractEndDate - self.contractStartDate
-                    numNights += td.days
+                    numNights += td.days + 1
                     numSlots += len(
                         [s for s in Slot.all(keys_only=True).ancestor(berth)])
         return numNights, numSlots

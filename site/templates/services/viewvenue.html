@@ -60,9 +60,11 @@
         <hr />
         <strong>Validation</strong>
         <p>
-            <input type="submit" name="validate" value="Validate Venue" />
+            <input type="submit" name="validate_venue" value="Validate Venue" />
             {% ifequal venue.state 'Closed' %}
               {% if is_admin_user %}
+                <input type="submit" name="validate_slots" 
+                    value="Validate Slots" />
                 {% if not venue.hasBookings  %}
                     <input type="submit" name="clear" value="Clear Slots" />
                 {% endif %}
