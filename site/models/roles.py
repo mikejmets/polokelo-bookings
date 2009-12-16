@@ -16,7 +16,7 @@ class UserRole(db.Model):
     """
     created = db.DateTimeProperty(auto_now_add=True)
     creator = db.UserProperty()
-    user = db.UserProperty(verbose_name="User")
+    user = db.UserProperty(verbose_name="Domain Email")
     role = db.StringProperty(verbose_name='Role')
 
     @classmethod
