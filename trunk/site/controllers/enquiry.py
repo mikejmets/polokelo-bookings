@@ -235,7 +235,12 @@ class BookingsToolFindAccommodation(webapp.RequestHandler):
             if enquiry.workflowStateName not in \
                     ['onhold', 'awaitingagent', 'expired']:
                 enquiry.doTransition('putonhold')
-            params['error'] = "No package found" 
+
+            params = {}
+            params['enquirykey'] = enquirykey
+            params['error'] = "No package found for %s in %s" % (
+                accom_element.type,
+                accom_element.city)
             params = urllib.urlencode(params)
             self.redirect('/bookings/bookingerror?%s' % params)
             return
