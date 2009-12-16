@@ -163,6 +163,17 @@ class ViewVenue(webapp.RequestHandler):
             return
         if workflow:
             if state == 'Closed':
+                #Validate first
+                is_valid, err = venue.validate()
+                if not is_valid:
+                    params = {}
+                    params['came_from'] = self.request.referer
+                    params['error'] = err
+                    params = urllib.urlencode(params)
+                    url = '/home/showerror?%s' % params
+                    self.redirect(url)
+                    return
+
                 venue.state = 'Open'
                 venue.put()
                 logger.info('Opened venue %s', 
