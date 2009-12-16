@@ -132,11 +132,33 @@
     <table class="listing" cellspacing="0">
         <thead>
           <td>Name</td>
-          <td colspan="2">&nbsp</td>
+          <td>Status</td>
+          {% if is_admin_user %}
+              <td colspan="3">&nbsp</td>
+          {% else %}
+              <td colspan="3">&nbsp</td>
+          {% endif %}
         </thead>
         {% for venue in venues %}
         <tr>
           <td><a href="/services/owner/viewvenue?venuekey={{ venue.key }}&ownerkey={{ owner.key }}">{{ venue.listing_name }}</a></td>
+          <td> {{ venue.state }} </td>
+          {% if is_admin_user %}
+            <td>
+            <form name="openclose" method="post" 
+                      action="/services/owner/viewowner">
+            <input type="hidden" name="ownerkey" value="{{ owner.key }}" />
+            <input type="hidden" name="venuekey" value="{{ venue.key }}" />
+            {% ifequal venue.state 'Closed' %}
+              <input type="submit" 
+                name="action" value="Open" />
+            {% else %}
+              <input type="submit" 
+                name="action" value="Close" />
+            {% endifequal %}
+            </form>
+            </td>
+          {% endif %}
           {% if venue.canModify %}
             <td class="action">
               <a title="Edit this venue"
@@ -158,5 +180,4 @@
         </tr>
         {% endfor %}
     </table>
-
 {% endblock pagecontent %}
