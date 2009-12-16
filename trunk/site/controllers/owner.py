@@ -1,5 +1,6 @@
 import os
 import logging
+import urllib
 from google.appengine.api import users
 from google.appengine.ext import webapp
 from google.appengine.ext.webapp import template
@@ -66,6 +67,34 @@ class ViewOwner(webapp.RequestHandler):
                     'auth_url':auth_url,
                     'auth_url_text':auth_url_text
                     }))
+
+    def post(self):
+        ownerkey = self.request.get('ownerkey')
+        owner = Owner.get(ownerkey)
+        venuekey = self.request.get('venuekey', None)
+        params = {}
+        if venuekey:
+            venue = Venue.get(venuekey)
+            action = self.request.get('action', None)
+            if action == 'Open':
+                is_valid, err = venue.validate()
+                if not is_valid:
+                    params['error'] = err
+                    params['came_from'] = \
+                        '/services/owner/viewowner?ownerkey=%s' % ownerkey
+                    params = urllib.urlencode(params)
+                    url = '/home/showerror?%s' % params
+                    self.redirect(url)
+                    return
+                venue.state = 'Open'
+                venue.put()
+            elif action == 'Close':
+                venue.state = 'Closed'
+                venue.put()
+            else:
+                logging.error('Open Venue on Owner receive incorrect action %s',
+                    action)
+        self.redirect('/services/owner/viewowner?ownerkey=%s' % ownerkey)
 
 
 class CaptureOwner(webapp.RequestHandler):
