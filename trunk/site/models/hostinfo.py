@@ -470,7 +470,7 @@ class Berth(db.Model):
             slots.filter('startDate =', d)
             if slots.get():
                 continue
-            logger.info('-----------Create slot for %s', d)
+            logger.debug('-----------Create slot for %s', d)
             slot = Slot(parent=self)
             slot.creator = users.get_current_user()
             slot.ownerReference = venue.owner.referenceNumber
