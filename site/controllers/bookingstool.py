@@ -186,8 +186,8 @@ class AccommodationSearch():
 
     def _validateBerths(self, slots, element):
         #Group slots by berth by venue into the venues_dict
-        #  {'v1': {'berth1':['slot1', 's2', 's3'],
-        #          'berth2':['slot1', 's2', 's3']}}
+        #  {'venue1': {'berth1':['slot1', 'slot2', 'slot3'],
+        #              'berth2':['slot4', 'slot5', 'slot6']}}
         venues_dict = {}
         num_closed = 0
         for slot in slots:
@@ -265,6 +265,9 @@ class SimpleAccommodationSearch(AccommodationSearch):
                 #    venue.owner.referenceNumber, venue.name, len(berths))
                 if len(berths) >= people:
                     valid_venues[venue_key] = berths
+                else:
+                    #these berths could be allocated manually
+                    pass
         if valid_venues:
             logger.info('Found %s venues for %s people', 
                 len(valid_venues.keys()), people)
