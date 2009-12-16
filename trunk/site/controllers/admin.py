@@ -15,11 +15,14 @@ from controllers.slotviewer import ViewSlots
 from controllers.codelookup import \
     LookupTablesRoot, CaptureLookupTable, EditLookupTable, DeleteLookupTable, \
     ViewLookupTable, CaptureLookupItem, EditLookupItem, DeleteLookupItem
+from controllers.roles import \
+    ViewUserRoles, CaptureUserRole, EditUserRole, DeleteUserRole
 from controllers.packages import \
     PackageRoot, CapturePackage, EditPackage, DeletePackage
 from controllers.statistics import ViewStatistics
 from controllers.utils import get_authentication_urls
 from models.schedule import Match
+from models.roles import UserRole
 
 
 class AdminHomePage(webapp.RequestHandler):
@@ -27,12 +30,14 @@ class AdminHomePage(webapp.RequestHandler):
         auth_url, auth_url_text = get_authentication_urls(self.request.uri)
         filepath = os.path.join(PROJECT_PATH, 'templates', 'admin', 'adminhome.html')
         self.response.out.write(template.render(filepath, 
-                {
-                    'base_path':BASE_PATH,
-                    'user':users.get_current_user(),
-                    'auth_url':auth_url,
-                    'auth_url_text':auth_url_text
-                    }))
+          {
+              'base_path':BASE_PATH,
+              'user':users.get_current_user(),
+              'is_administrator': \
+                  UserRole.hasRole(users.get_current_user(), 'Administrator'),
+              'auth_url':auth_url,
+              'auth_url_text':auth_url_text
+              }))
 
 class ClearData(webapp.RequestHandler):
     def get(self):
@@ -73,6 +78,9 @@ application = webapp.WSGIApplication([
           ('/admin/packages/editpackage', EditPackage),
           ('/admin/packages/deletepackage', DeletePackage),
           ('/admin/slots/viewslots', ViewSlots),
+          ('/admin/roles/viewuserroles', ViewUserRoles),
+          ('/admin/roles/captureuserrole', CaptureUserRole),
+          ('/admin/roles/deleteuserrole', DeleteUserRole),
           ], debug=False)
 
 def main():

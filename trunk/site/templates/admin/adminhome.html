@@ -9,5 +9,8 @@
     <p><a href="/admin/packages">View and Maintain Accommodation Packages</a></p>
     <p><a href="/admin/statistics">Statistics</a></p>
     <p><a href="/admin/slots/viewslots">View Slots</a></p>
+    {% if is_administrator %}
+        <p><a href="/admin/roles/viewuserroles">View User Roles</a></p>
+    {% endif %}
 
 {% endblock pagecontent %}
