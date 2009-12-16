@@ -21,7 +21,7 @@ class UserRoleForm(djangoforms.ModelForm):
         model = UserRole
         exclude = ['created', 'creator']
 
-    role = forms.ChoiceField(choices=getChoicesTuple(('role')))
+    role = forms.ChoiceField(choices=getChoicesTuple(('roles')))
 
 class ViewUserRoles(webapp.RequestHandler):
 
