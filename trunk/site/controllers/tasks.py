@@ -12,6 +12,7 @@ from controllers.home import BASE_PATH, PROJECT_PATH
 from controllers.utils import get_authentication_urls
 from controllers.date_utils import parse_datetime
 from models.bookinginfo import Enquiry
+from models.reports import Report
 from models.hostinfo import Owner, Venue, Slot, Bedroom, Bed, Berth
 
 logger = logging.getLogger("Tasks")
@@ -21,7 +22,7 @@ class ExpireEnquiries(webapp.RequestHandler):
         logger.info("Expire Enquiries")
         enquiries = Enquiry.all()
         enquiries.filter('expiryDate !=', None)
-        enquiries.filter('expiryDate <=', datetime.now())
+        enquiries.filter('expiryDate <=', datetime.time.now())
         for enquiry in enquiries:
             transitions = enquiry.getPossibleTransitions()
             for t in transitions:
@@ -256,28 +257,39 @@ class UpdateDatastore(webapp.RequestHandler):
 
 class VenueValidationReportTask(webapp.RequestHandler):
     def get(self):
+        reportname = self.request.get('reportname', None)
+        reportinstance = self.request.get('reportinstance', None)
         venuekey = self.request.get('venuekey', None)
         bedroomkey = self.request.get('bedroomkey', None)
         split_report = self.request.get('split_report', False)
         include_venue = self.request.get('include_venue', False)
         include_rooms = self.request.get('include_rooms', False)
 
+        if reportname is None:
+            logger.error('VenueValidationReportTask: no reportname provided')
+            return
+
+        if reportinstance is None:
+            logger.error('VenueValidationReportTask: no reportintance provided')
+            return
+        reportinstance = parse_datetime(reportinstance, '%Y-%m-%d %H:%M:%S')
+
         if venuekey is None:
             logger.error('VenueValidationReportTask: no venuekey provided')
             return
 
-        report = ""
+        row_text = ""
         try:
             venue = Venue.get(venuekey)
             if not split_report:
                 is_valid, err = venue.validate()
-                report += "%s %s status %s is valid %s\n" % (
+                row_text += "%s %s status %s is valid %s\n" % (
                         venue.owner.referenceNumber, venue.name, 
                         venue.state, is_valid)
             else:
                 if include_venue:
                     is_valid, err = venue.validate(skip_rooms=True)
-                    report += "Venue: %s owner %s status %s is valid %s\n" % (
+                    row_text += "Venue: %s owner %s status %s is valid %s\n" % (
                             venue.name, venue.owner.referenceNumber, 
                             venue.state, is_valid)
                 if include_rooms:
@@ -287,10 +299,13 @@ class VenueValidationReportTask(webapp.RequestHandler):
                         return
                     bedroom = Bedroom.get(bedroomkey)
                     is_valid, err = bedroom.validate()
-                    report += "Room: %s venue %s owner %s is valid %s\n" % (
+                    row_text += "Room: %s venue %s owner %s is valid %s\n" % (
                             bedroom.name, venue.name, 
                             venue.owner.referenceNumber, is_valid)
-            logger.info(report)
+            logger.info(row_text)
+            row = Report(
+                name=reportname, instance=reportinstance, rowText=row_text) 
+            row.put()
         except DeadlineExceededError:
             self.response.clear()
             self.response.set_status(500)
