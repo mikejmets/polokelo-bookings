@@ -132,7 +132,7 @@ class Enquiry(workflow.WorkflowAware):
                 raise NoSettlementException, \
                         'No deposit transaction exists for %s' % self.referenceNumber
             else:
-                txn_amount = txn.total
+                txn_amount = -1 * txn.total
         else:
             txn_amount = int(kw['txn_amount'])
 
@@ -162,7 +162,7 @@ class Enquiry(workflow.WorkflowAware):
                 raise NoSettlementException, \
                         'No settlement transaction exists for %s' % self.referenceNumber
             else:
-                txn_amount = txn.total
+                txn_amount = -1 * txn.total
         else:
             txn_amount = int(kw['txn_amount'])
 
@@ -188,7 +188,7 @@ class Enquiry(workflow.WorkflowAware):
                 raise NoSettlementException, \
                         'No settlement transaction exists for %s' % self.referenceNumber
             else:
-                txn_amount = txn.total
+                txn_amount = -1 * txn.total
         else:
             txn_amount = int(kw['txn_amount'])
 
@@ -204,10 +204,11 @@ class Enquiry(workflow.WorkflowAware):
     def ontransition_canceldeposit(self, *args, **kw):
         self.cancel()
 
-        # set amount owed to 0
-        self.totalAmountInZAR = 0
-        self.quoteInZAR = 0
-        self.vatInZAR = 0
+        # set amount owed to 20%
+        oldTotal = self.totalAmountInZAR
+        self.totalAmountInZAR = int(0.2 * self.totalAmountInZAR)
+        self.quoteInZAR = int((self.totalAmountInZAR / 114.0) * 100.0)
+        self.vatInZAR = self.totalAmountInZAR - self.quoteInZAR
         self.put()
 
         # create the cancel transaction in the collection
@@ -226,12 +227,12 @@ class Enquiry(workflow.WorkflowAware):
                             subType = 'Cancel',
                             description = description,
                             enquiryReference = self.referenceNumber,
-                            total = 0)
+                            total = -1 * (oldTotal - self.totalAmountInZAR))
         else:
             txn.subType = 'Cancel',
             txn.description = description,
             txn.enquiryReference = self.referenceNumber,
-            txn.total = 0
+            txn.total = -1 * (oldTotal - self.totalAmountInZAR)
         txn.type = 'Booking'
         txn.category = 'Manual'
         txn.creator = users.get_current_user()
@@ -241,10 +242,11 @@ class Enquiry(workflow.WorkflowAware):
     def ontransition_cancelfull(self, *args, **kw):
         self.cancel()
 
-        # set amount owed to 0
-        self.totalAmountInZAR = 0
-        self.quoteInZAR = 0
-        self.vatInZAR = 0
+        # set amount owed to 20%
+        oldTotal = self.totalAmountInZAR
+        self.totalAmountInZAR = int(0.2 * self.totalAmountInZAR)
+        self.quoteInZAR = int((self.totalAmountInZAR / 114.0) * 100.0)
+        self.vatInZAR = self.totalAmountInZAR - self.quoteInZAR
         self.put()
 
         # create the cancel transaction in the collection
@@ -263,12 +265,12 @@ class Enquiry(workflow.WorkflowAware):
                             subType = 'Cancel',
                             description = description,
                             enquiryReference = self.referenceNumber,
-                            total = 0)
+                            total = -1 * (oldTotal - self.totalAmountInZAR))
         else:
             txn.subType = 'Cancel',
             txn.description = description,
             txn.enquiryReference = self.referenceNumber,
-            txn.total = 0
+            txn.total = -1 * (oldTotal - self.totalAmountInZAR)
         txn.type = 'Booking'
         txn.category = 'Manual'
         txn.creator = users.get_current_user()
