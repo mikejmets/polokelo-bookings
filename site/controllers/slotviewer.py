@@ -8,7 +8,7 @@ from google.appengine.ext import db
 
 from controllers.home import BASE_PATH, PROJECT_PATH
 from controllers.utils import get_authentication_urls
-from models.hostinfo import Slot
+from models.hostinfo import Venue, Slot
 
 from controllers.utils import get_authentication_urls
 
@@ -37,6 +37,7 @@ class ViewSlots(webapp.RequestHandler):
                   'slots':slots,
                   }
         self.response.out.write(template.render(filepath, context))
+
 
 
 
