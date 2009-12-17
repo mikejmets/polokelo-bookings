@@ -5,13 +5,14 @@ from google.appengine.ext import webapp
 from google.appengine.ext.webapp.util import run_wsgi_app
 from google.appengine.ext.webapp import template
 from google.appengine.ext import db
+from google.appengine.runtime import DeadlineExceededError
 from google.appengine.api.labs.taskqueue import Task
 
 from controllers.home import BASE_PATH, PROJECT_PATH
 from controllers.utils import get_authentication_urls
 from controllers.date_utils import parse_datetime
 from models.bookinginfo import Enquiry
-from models.hostinfo import Owner, Venue, Slot, Bed, Berth
+from models.hostinfo import Owner, Venue, Slot, Bedroom, Bed, Berth
 
 logger = logging.getLogger("Tasks")
 
@@ -253,6 +254,64 @@ class UpdateDatastore(webapp.RequestHandler):
                   }
         self.response.out.write(context) 
 
+class VenueValidationReportTask(webapp.RequestHandler):
+    def get(self):
+        venuekey = self.request.get('venuekey', None)
+        bedroomkey = self.request.get('bedroomkey', None)
+        split_report = self.request.get('split_report', False)
+        include_venue = self.request.get('include_venue', False)
+        include_rooms = self.request.get('include_rooms', False)
+
+        if venuekey is None:
+            logger.error('VenueValidationReportTask: no venuekey provided')
+            return
+
+        report = ""
+        try:
+            venue = Venue.get(venuekey)
+            if not split_report:
+                is_valid, err = venue.validate()
+                report += "%s %s status %s is valid %s\n" % (
+                        venue.owner.referenceNumber, venue.name, 
+                        venue.state, is_valid)
+            else:
+                if include_venue:
+                    is_valid, err = venue.validate(skip_rooms=True)
+                    report += "Venue: %s owner %s status %s is valid %s\n" % (
+                            venue.name, venue.owner.referenceNumber, 
+                            venue.state, is_valid)
+                if include_rooms:
+                    if not bedroomkey:
+                        logger.error('VenueValidationReportTask: ' + \
+                            'no bedroomkey provided')
+                        return
+                    bedroom = Bedroom.get(bedroomkey)
+                    is_valid, err = bedroom.validate()
+                    report += "Room: %s venue %s owner %s is valid %s\n" % (
+                            bedroom.name, venue.name, 
+                            venue.owner.referenceNumber, is_valid)
+            logger.info(report)
+        except DeadlineExceededError:
+            self.response.clear()
+            self.response.set_status(500)
+            logger.error("Except DeadlineExceeded for venue %s",
+                "%s %s" % (venue.owner.referenceNumber, venue.name))
+        except Exception, e:
+            self.response.clear()
+            self.response.set_status(500)
+            logger.error("Except %s Error for venue %s",
+                e,
+                "%s %s" % (venue.owner.referenceNumber, venue.name))
+
+        auth_url, auth_url_text = get_authentication_urls(self.request.uri)
+        filepath = os.path.join(PROJECT_PATH, 'templates', 'index.html')
+        self.response.out.write(template.render(filepath, 
+                                    {
+                                        'base_path':BASE_PATH,
+                                        'auth_url':auth_url,
+                                        'auth_url_text':auth_url_text
+                                        }))
+
 class VenueValidation(webapp.RequestHandler):
     def get(self):
         owners = Owner.all()
@@ -291,6 +350,7 @@ application = webapp.WSGIApplication([
       ('/tasks/deleteberthslots', DeleteBerthSlots),
       ('/tasks/update_datastore', UpdateDatastore),
       ('/tasks/bedvalidation', BedValidation),
+      ('/tasks/venuevalidationreporttask', VenueValidationReportTask),
       ('/tasks/venuevalidation', VenueValidation),
       ], debug=False)
 

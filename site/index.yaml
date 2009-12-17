@@ -219,6 +219,11 @@ indexes:
 - kind: Venue
   properties:
   - name: owner
+  - name: contractStartDate
+
+- kind: Venue
+  properties:
+  - name: owner
   - name: state
   - name: created
 
