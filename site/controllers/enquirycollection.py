@@ -250,8 +250,15 @@ class CaptureTransactionRecord(webapp.RequestHandler):
             clean_data = data._cleaned_data()
             total = clean_data.get('total') and \
                     int(clean_data.get('total')) or 0
+            sub_type = clean_data.get('subType')
+            if sub_type in ['Deposit', 'Settle', 'Payment', 'Unapplied']:
+                if total > 0:
+                    total = -1 * total
+            elif sub_type in ['Refund', 'Shortfall']:
+                if total < 0:
+                    total = -1 * total
             txn = CollectionTransaction(parent=theparent,
-                        subType = clean_data.get('subType'),
+                        subType = sub_type,
                         description = clean_data.get('description'),
                         enquiryReference = clean_data.get('enquiryReference'),
                         total=total)
@@ -309,6 +316,12 @@ class EditTransactionRecord(webapp.RequestHandler):
         data = CollectionTransactionForm(data=self.request.POST, instance=txn)
         if data.is_valid():
             entity = data.save(commit=False)
+            if entity.subType in ['Deposit', 'Settle', 'Payment', 'Unapplied']:
+                if entity.total > 0:
+                    entity.total = -1 * entity.total
+            elif entity.subType in ['Refund', 'Shortfall']:
+                if entity.total < 0:
+                    entity.total = -1 * entity.total
             entity.creator = users.get_current_user()
             entity.category='Manual'
             entity.cost = int(entity.total / 114.0 * 100.0)
