@@ -1,0 +1,21 @@
+import logging
+from google.appengine.ext import db
+from google.appengine.api import users
+
+from exceptions import Exception
+
+
+class ReportError(Exception):
+    pass
+
+
+class Report(db.Model):
+    """ Association betw User and Role
+    """
+    created = db.DateTimeProperty(auto_now_add=True)
+    creator = db.UserProperty()
+    name = db.StringProperty(verbose_name="Report Name")
+    instance = db.DateTimeProperty(verbose_name="Instance Id")
+    rowText = db.TextProperty(verbose_name="Row Text")
+
+
