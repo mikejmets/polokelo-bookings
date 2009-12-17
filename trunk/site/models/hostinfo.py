@@ -167,18 +167,19 @@ class Venue(db.Model):
     def canModify(self):
         return self.state != 'Open'
 
-    def validate(self):
+    def validate(self, skip_rooms=False):
         #Check venue fields
         if not self.registrationFeePaid:
             return False, "Registration fee not received"
         if not (self.contractStartDate and self.contractEndDate):
             return False, "Missing contract dates"
 
-        #Check bedrooms
-        for b in self.venue_bedrooms:
-            is_valid, err = b.validate()
-            if not is_valid:
-                return False, err
+        if not skip_rooms:
+            #Check bedrooms
+            for b in self.venue_bedrooms:
+                is_valid, err = b.validate()
+                if not is_valid:
+                    return False, err
 
         #Check bathrooms
         if len(self.venue_bathrooms.fetch(1)) == 0:

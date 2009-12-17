@@ -9,7 +9,8 @@ from google.appengine.api import users
 from google.appengine.api.labs.taskqueue import Task
 
 from controllers.home import BASE_PATH, PROJECT_PATH
-from controllers.match import MatchSchedule, CaptureMatch, EditMatch, DeleteMatch
+from controllers.match import \
+    MatchSchedule, CaptureMatch, EditMatch, DeleteMatch
 from models.hostinfo import Owner, Venue
 
 from controllers.slotviewer import ViewSlots
@@ -21,6 +22,7 @@ from controllers.roles import \
 from controllers.packages import \
     PackageRoot, CapturePackage, EditPackage, DeletePackage
 from controllers.statistics import ViewStatistics
+from controllers.reports import VenueValidationReport
 from controllers.utils import get_authentication_urls
 from models.schedule import Match
 from models.roles import UserRole
@@ -105,6 +107,7 @@ application = webapp.WSGIApplication([
           ('/admin/packages/deletepackage', DeletePackage),
           ('/admin/slots/viewslots', ViewSlots),
           ('/admin/slots/createslots', CreateSlots),
+          ('/admin/reports/venuevalidationreport', VenueValidationReport),
           ('/admin/roles/viewuserroles', ViewUserRoles),
           ('/admin/roles/captureuserrole', CaptureUserRole),
           ('/admin/roles/deleteuserrole', DeleteUserRole),
