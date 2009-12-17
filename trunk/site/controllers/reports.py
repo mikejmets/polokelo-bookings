@@ -42,7 +42,6 @@ class ViewReports(webapp.RequestHandler):
         if report_instance:
             rows.filter('instance =', 
                 parse_datetime(report_instance, '%Y-%m-%d %H:%M:%S'))
-        logging.info('---GET---%s %s', report_name, report_instance)
         report_rows = [r.rowText for r in rows]
         self.response.out.write(template.render(filepath, 
                 {
@@ -61,7 +60,6 @@ class ViewReports(webapp.RequestHandler):
     def post(self):
         report_name = self.request.get('report_name')
         report_instance = self.request.get('report_instance')
-        logging.info('---POST---%s %s', report_name, report_instance)
         refresh = self.request.get('refresh')
         if refresh:
             params = {}
