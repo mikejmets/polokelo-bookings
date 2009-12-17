@@ -67,7 +67,7 @@ class CreateSlotsTask(webapp.RequestHandler):
                             url='/tasks/createslots',
                             params={'venuekey': venue.key()})
                         task.add('slot-creation')
-                        logger.info('CreateSlotsTask again, venue %s = %s', 
+                        logger.info('CreateSlotsTask: reenter venue %s = %s', 
                             venue.name, num_slots)
                 except DeadlineExceededError:
                     self.response.clear()

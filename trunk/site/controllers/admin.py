@@ -6,10 +6,11 @@ from google.appengine.ext import webapp
 from google.appengine.ext.webapp.util import run_wsgi_app
 from google.appengine.ext.webapp import template
 from google.appengine.api import users
+from google.appengine.api.labs.taskqueue import Task
 
 from controllers.home import BASE_PATH, PROJECT_PATH
 from controllers.match import MatchSchedule, CaptureMatch, EditMatch, DeleteMatch
-from models.hostinfo import Owner
+from models.hostinfo import Owner, Venue
 
 from controllers.slotviewer import ViewSlots
 from controllers.codelookup import \
@@ -38,6 +39,31 @@ class AdminHomePage(webapp.RequestHandler):
               'auth_url':auth_url,
               'auth_url_text':auth_url_text
               }))
+
+class CreateSlots(webapp.RequestHandler):
+    def get(self):
+
+        #if not UserRole.hasRole(users.get_current_user(), 'Administrator'):
+        #    return
+        cnt = 0
+        for venue in Venue.all().order('contractStartDate'):
+            task = Task(
+                method='GET',
+                url='/tasks/createslots',
+                params={'venuekey': venue.key()})
+            task.add('slot-creation')
+            logging.info('CreateSlotsTask: invoke venue %s', 
+                venue.name)
+            cnt += 1
+              
+        auth_url, auth_url_text = get_authentication_urls(self.request.uri)
+        filepath = os.path.join(
+            PROJECT_PATH, 'templates', 'admin', 'adminhome.html')
+        context = {'base_path':BASE_PATH,
+                  'auth_url':auth_url,
+                  'auth_url_text':auth_url_text,
+                  }
+        self.response.out.write(template.render(filepath, context))
 
 class ClearData(webapp.RequestHandler):
     def get(self):
@@ -78,6 +104,7 @@ application = webapp.WSGIApplication([
           ('/admin/packages/editpackage', EditPackage),
           ('/admin/packages/deletepackage', DeletePackage),
           ('/admin/slots/viewslots', ViewSlots),
+          ('/admin/slots/createslots', CreateSlots),
           ('/admin/roles/viewuserroles', ViewUserRoles),
           ('/admin/roles/captureuserrole', CaptureUserRole),
           ('/admin/roles/deleteuserrole', DeleteUserRole),
