@@ -15,14 +15,22 @@
         {% if report_names %}
           <select name="report_name">
             {% for name in report_names %}
-              <option value="{{ name }}">{{ name }}</option>
+              <option value="{{ name }}"
+              {% ifequal name report_name %}
+                selected
+              {% endifequal %}
+              >{{ name }}</option>
             {% endfor %}
           </select>
         {% endif %}
         {% if report_instances %}
           <select name="report_instance">
             {% for instance in report_instances %}
-              <option value="{{ instance }}">{{ instance|slice:":16" }}</option>
+              <option value="{{ instance }}"
+              {% ifequal instance report_instance %}
+                selected
+              {% endifequal %}
+              >{{ instance|slice:":16" }}</option>
             {% endfor %}
           </select>
         {% endif %}
