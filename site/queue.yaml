@@ -2,4 +2,4 @@ queue:
 - name: slot-creation
   rate: 1/m
 - name: reporting
-  rate: 1/m
+  rate: 5/m
