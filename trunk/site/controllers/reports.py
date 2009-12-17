@@ -42,6 +42,7 @@ class ViewReports(webapp.RequestHandler):
         if report_instance:
             rows.filter('instance =', 
                 parse_datetime(report_instance, '%Y-%m-%d %H:%M:%S'))
+        logging.info('---GET---%s %s', report_name, report_instance)
         report_rows = [r.rowText for r in rows]
         self.response.out.write(template.render(filepath, 
                 {
@@ -60,6 +61,7 @@ class ViewReports(webapp.RequestHandler):
     def post(self):
         report_name = self.request.get('report_name')
         report_instance = self.request.get('report_instance')
+        logging.info('---POST---%s %s', report_name, report_instance)
         refresh = self.request.get('refresh')
         if refresh:
             params = {}
@@ -112,8 +114,8 @@ class VenueValidationReport(webapp.RequestHandler):
                     logging.info('VenueValidationReport: invoke venue %s', 
                         venue.name)
             cnt += 1
-            if cnt > 5:
-                break
+            #if cnt > 5:
+            #    break
               
         params = {}
         params = urllib.urlencode(params)
