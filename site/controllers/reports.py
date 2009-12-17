@@ -18,13 +18,12 @@ class VenueValidationReport(webapp.RequestHandler):
         if not UserRole.hasRole(users.get_current_user(), 'Administrator'):
             return
         report_name = 'VenueValidation'
-        report_instance = str(datetime.time.now())
+        report_instance = str(datetime.now())
         params = {'reportname': report_name, 
                   'reportinstance': report_instance}
         cnt = 0
         for owner in Owner.all().order('referenceNumber'):
             venues = Venue.all()
-            params['venuekey'] = venue.key()
             venues.filter('owner =', owner).order('contractStartDate')
             for venue in venues:
                 params['venuekey'] = venue.key()
@@ -35,7 +34,7 @@ class VenueValidationReport(webapp.RequestHandler):
                 task = Task(
                     method='GET',
                     url='/tasks/venuevalidationreporttask', 
-                    params=urllib.urlencode(params))
+                    params=params)
                 task.add('reporting')
                 logging.info('VenueValidationReport: invoke venue %s', 
                     venue.name)
@@ -47,7 +46,7 @@ class VenueValidationReport(webapp.RequestHandler):
                     task = Task(
                         method='GET',
                         url='/tasks/venuevalidationreporttask', 
-                        params=urllib.urlencode(params))
+                        params=params)
                     task.add('reporting')
                     logging.info('VenueValidationReport: invoke venue %s', 
                         venue.name)
