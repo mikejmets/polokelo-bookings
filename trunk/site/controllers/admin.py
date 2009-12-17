@@ -22,7 +22,7 @@ from controllers.roles import \
 from controllers.packages import \
     PackageRoot, CapturePackage, EditPackage, DeletePackage
 from controllers.statistics import ViewStatistics
-from controllers.reports import VenueValidationReport
+from controllers.reports import ViewReports, VenueValidationReport
 from controllers.utils import get_authentication_urls
 from models.schedule import Match
 from models.roles import UserRole
@@ -107,6 +107,7 @@ application = webapp.WSGIApplication([
           ('/admin/packages/deletepackage', DeletePackage),
           ('/admin/slots/viewslots', ViewSlots),
           ('/admin/slots/createslots', CreateSlots),
+          ('/admin/reports/viewreports', ViewReports),
           ('/admin/reports/venuevalidationreport', VenueValidationReport),
           ('/admin/roles/viewuserroles', ViewUserRoles),
           ('/admin/roles/captureuserrole', CaptureUserRole),

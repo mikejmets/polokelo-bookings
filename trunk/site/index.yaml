@@ -107,6 +107,23 @@ indexes:
   - name: __key__
     direction: desc
 
+- kind: Report
+  properties:
+  - name: instance
+  - name: name
+  - name: rowText
+
+- kind: Report
+  properties:
+  - name: name
+  - name: instance
+
+- kind: Report
+  properties:
+  - name: name
+  - name: instance
+  - name: rowText
+
 - kind: Slot
   properties:
   - name: __key__
