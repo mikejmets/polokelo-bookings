@@ -278,20 +278,25 @@ class VenueValidationReportTask(webapp.RequestHandler):
             logger.error('VenueValidationReportTask: no venuekey provided')
             return
 
-        row_text = ""
         try:
             venue = Venue.get(venuekey)
             if not split_report:
                 is_valid, err = venue.validate()
-                row_text += "%s %s status %s is valid %s\n" % (
+                row_text = "%s %s status %s is valid %s\n" % (
                         venue.owner.referenceNumber, venue.name, 
                         venue.state, is_valid)
+                row = Report(
+                    name=reportname, instance=reportinstance, rowText=row_text) 
+                row.put()
             else:
                 if include_venue:
                     is_valid, err = venue.validate(skip_rooms=True)
-                    row_text += "Venue: %s owner %s status %s is valid %s\n" % (
-                            venue.name, venue.owner.referenceNumber, 
+                    row_text = "%s %s venue status=%s valid=%s\n" % (
+                            venue.owner.referenceNumber, venue.name,  
                             venue.state, is_valid)
+                    row = Report(name=reportname, instance=reportinstance, 
+                            rowText=row_text) 
+                    row.put()
                 if include_rooms:
                     if not bedroomkey:
                         logger.error('VenueValidationReportTask: ' + \
@@ -299,13 +304,12 @@ class VenueValidationReportTask(webapp.RequestHandler):
                         return
                     bedroom = Bedroom.get(bedroomkey)
                     is_valid, err = bedroom.validate()
-                    row_text += "Room: %s venue %s owner %s is valid %s\n" % (
-                            bedroom.name, venue.name, 
-                            venue.owner.referenceNumber, is_valid)
-            logger.info(row_text)
-            row = Report(
-                name=reportname, instance=reportinstance, rowText=row_text) 
-            row.put()
+                    row_text = "%s %s room %s valid=%s\n" % (
+                            venue.owner.referenceNumber, venue.name, 
+                            bedroom.name, is_valid)
+                    row = Report(name=reportname, instance=reportinstance, 
+                            rowText=row_text) 
+                    row.put()
         except DeadlineExceededError:
             self.response.clear()
             self.response.set_status(500)
