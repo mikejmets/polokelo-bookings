@@ -22,7 +22,7 @@ class ViewReports(webapp.RequestHandler):
         auth_url, auth_url_text = get_authentication_urls(self.request.uri)
         filepath = os.path.join(PROJECT_PATH, 
                     'templates', 'admin', 'viewreports.html')
-        rows= Report.all()
+        rows = Report.all().order('rowText')
         report_names_dict = {}
         report_instances_dict = {}
         for row in rows:
@@ -114,8 +114,8 @@ class VenueValidationReport(webapp.RequestHandler):
                     logging.info('VenueValidationReport: invoke venue %s', 
                         venue.name)
             cnt += 1
-            #if cnt > 5:
-            #    break
+            if cnt > 5:
+                break
               
         params = {}
         params = urllib.urlencode(params)

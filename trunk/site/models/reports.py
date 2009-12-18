@@ -16,6 +16,6 @@ class Report(db.Model):
     creator = db.UserProperty()
     name = db.StringProperty(verbose_name="Report Name")
     instance = db.DateTimeProperty(verbose_name="Instance Id")
-    rowText = db.TextProperty(verbose_name="Row Text")
+    rowText = db.StringProperty(verbose_name="Row Text")
 
 
