@@ -22,7 +22,7 @@ class ExpireEnquiries(webapp.RequestHandler):
         logger.info("Expire Enquiries")
         enquiries = Enquiry.all()
         enquiries.filter('expiryDate !=', None)
-        enquiries.filter('expiryDate <=', datetime.time.now())
+        enquiries.filter('expiryDate <=', datetime.now())
         for enquiry in enquiries:
             transitions = enquiry.getPossibleTransitions()
             for t in transitions:
