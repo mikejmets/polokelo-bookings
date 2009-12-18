@@ -291,7 +291,7 @@ class VenueValidationReportTask(webapp.RequestHandler):
             else:
                 if include_venue:
                     is_valid, err = venue.validate(skip_rooms=True)
-                    row_text = "%s, %s, %s, %s\n" % (
+                    row_text = "%s, %s, Venue, %s, %s\n" % (
                             venue.owner.referenceNumber, venue.name,  
                             venue.state, is_valid)
                     row = Report(name=reportname, instance=reportinstance, 
@@ -304,7 +304,7 @@ class VenueValidationReportTask(webapp.RequestHandler):
                         return
                     bedroom = Bedroom.get(bedroomkey)
                     is_valid, err = bedroom.validate()
-                    row_text = "%s, %s, %s, %s\n" % (
+                    row_text = "%s, %s, Room, %s, %s\n" % (
                             venue.owner.referenceNumber, venue.name, 
                             bedroom.name, is_valid)
                     row = Report(name=reportname, instance=reportinstance, 
