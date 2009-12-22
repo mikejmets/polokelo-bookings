@@ -1,7 +1,7 @@
 #!/bin/bash
 EMAIL=$1
-HOST=http://www.polokelo-bookings.co.za
-APP_ID=polokelo-bookings
+HOST=http://backup-pb.appspot.com
+APP_ID=backup-pb
 
 loader/restoreadmin.sh $HOST $EMAIL $APP_ID
 loader/restorehosts.sh $HOST $EMAIL $APP_ID
