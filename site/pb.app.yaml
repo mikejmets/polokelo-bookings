@@ -1,5 +1,5 @@
 application: polokelo-bookings
-version: 0-14-alpha
+version: 0-1-beta
 runtime: python
 api_version: 1
 
@@ -32,9 +32,11 @@ handlers:
 
 - url: /externalbookings
   script: externalrequests/externalhandlers.py
+  secure: always
 
 - url: /paymentnotify
   script: externalrequests/paymenthandlers.py
+  secure: always
 
 - url: /tasks/.*
   script: controllers/tasks.py
@@ -42,6 +44,9 @@ handlers:
 - url: /unload
   script: $PYTHON_LIB/google/appengine/ext/remote_api/handler.py
   login: required
+
+- url: /stats.* 
+  script: appstats/ui.py 
 
 - url: /
   script: controllers/home.py
