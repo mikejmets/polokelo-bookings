@@ -261,9 +261,10 @@ class VenueValidationReportTask(webapp.RequestHandler):
         reportinstance = self.request.get('reportinstance', None)
         venuekey = self.request.get('venuekey', None)
         bedroomkey = self.request.get('bedroomkey', None)
-        split_report = self.request.get('split_report', False)
-        include_venue = self.request.get('include_venue', False)
-        include_rooms = self.request.get('include_rooms', False)
+        cnt = int(self.request.get('count', '0'))
+        split_report = eval(self.request.get('split_report', 'False'))
+        include_venue = eval(self.request.get('include_venue', 'False'))
+        include_rooms = eval(self.request.get('include_rooms', 'False'))
 
         if reportname is None:
             logger.error('VenueValidationReportTask: no reportname provided')
@@ -282,20 +283,21 @@ class VenueValidationReportTask(webapp.RequestHandler):
             venue = Venue.get(venuekey)
             if not split_report:
                 is_valid, err = venue.validate()
-                row_text = "%s %s status %s is valid %s\n" % (
-                        venue.owner.referenceNumber, venue.name, 
+                row_text = "%s %s %s status %s is valid %s" % (
+                        cnt, venue.owner.referenceNumber, venue.name, 
                         venue.state, is_valid)
                 row = Report(
-                    name=reportname, instance=reportinstance, rowText=row_text) 
+                    name=reportname, instance=reportinstance, 
+                    rowNumber = cnt, rowText=row_text) 
                 row.put()
             else:
                 if include_venue:
                     is_valid, err = venue.validate(skip_rooms=True)
-                    row_text = "%s, %s, Venue, %s, %s\n" % (
-                            venue.owner.referenceNumber, venue.name,  
+                    row_text = "%s, %s, %s, Venue, %s, %s" % (
+                            cnt, venue.owner.referenceNumber, venue.name,  
                             venue.state, is_valid)
                     row = Report(name=reportname, instance=reportinstance, 
-                            rowText=row_text) 
+                            rowNumber=cnt, rowText=row_text) 
                     row.put()
                 if include_rooms:
                     if not bedroomkey:
@@ -304,11 +306,11 @@ class VenueValidationReportTask(webapp.RequestHandler):
                         return
                     bedroom = Bedroom.get(bedroomkey)
                     is_valid, err = bedroom.validate()
-                    row_text = "%s, %s, Room, %s, %s\n" % (
-                            venue.owner.referenceNumber, venue.name, 
+                    row_text = "%s, %s, %s, Room, %s, %s" % (
+                            cnt, venue.owner.referenceNumber, venue.name, 
                             bedroom.name, is_valid)
                     row = Report(name=reportname, instance=reportinstance, 
-                            rowText=row_text) 
+                            rowNumber=cnt, rowText=row_text) 
                     row.put()
         except DeadlineExceededError:
             self.response.clear()
