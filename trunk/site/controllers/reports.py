@@ -78,14 +78,36 @@ class ViewReports(webapp.RequestHandler):
 class VenueValidationReport(webapp.RequestHandler):
     def get(self):
 
-        if not UserRole.hasRole(users.get_current_user(), 'Administrator'):
-            return
         report_name = 'VenueValidation'
+        if self.request.get('report_name', None) is not None:
+            report_name = self.request.get('report_name')
         report_instance = str(datetime.now())
+        if self.request.get('report_instance', None) is not None:
+            report_name = self.request.get('report_instance')
         params = {'reportname': report_name, 
                   'reportinstance': report_instance}
         cnt = 0
-        for owner in Owner.all().order('referenceNumber'):
+        owners = Owner.all().order('referenceNumber')
+        if self.request.get('ownerref', None) is not None:
+            owners.filter('referenceNumber >=', self.request.get('ownerref'))
+        num_remaining = owners.count()
+        for owner in owners.fetch(2):
+            
+            cnt += 1
+            if cnt > 1:
+                #max exceed to create recurring task and jump out
+                params = {'reportname': report_name, 
+                          'reportinstance': report_instance,
+                          'ownerref': owner.referenceNumber}
+                task = Task(
+                    method='GET',
+                    url='/admin/reports/venuevalidationreport', 
+                    params=params)
+                task.add('reporting')
+                logging.info('VenueValidationReport: invoke owner %s', 
+                    owner.referenceNumber)
+                break
+            #Find venues to process
             venues = Venue.all()
             venues.filter('owner =', owner).order('contractStartDate')
             for venue in venues:
@@ -94,6 +116,7 @@ class VenueValidationReport(webapp.RequestHandler):
 
                 # Process just venue
                 params['include_venue'] = True
+                params['include_rooms'] = False
                 task = Task(
                     method='GET',
                     url='/tasks/venuevalidationreporttask', 
@@ -105,6 +128,7 @@ class VenueValidationReport(webapp.RequestHandler):
                 # Proces just rooms
                 for room in venue.venue_bedrooms:
                     params['bedroomkey'] = room.key()
+                    params['include_venue'] = False
                     params['include_rooms'] = True
                     task = Task(
                         method='GET',
@@ -113,10 +137,14 @@ class VenueValidationReport(webapp.RequestHandler):
                     task.add('reporting')
                     logging.info('VenueValidationReport: invoke venue %s', 
                         venue.name)
-            cnt += 1
-            if cnt > 5:
+            #And last in the loop - just in case
+            if num_remaining == 1:
+                logging.info(
+                    'VenueValidationReport: started validating last owner %s',
+                    owner.referenceNumber)
                 break
-              
-        params = {}
+
+        params = {'reportname': report_name, 
+                  'reportinstance': report_instance}
         params = urllib.urlencode(params)
-        self.redirect('/admin/reports/viewreports')
+        self.redirect('/admin/reports/viewreports?%s' % params)
