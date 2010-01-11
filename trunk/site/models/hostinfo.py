@@ -448,15 +448,7 @@ class Berth(db.Model):
             room = bed.bedroom
         if venue is None:
             venue = room.venue
-        if venue.state == 'Closed':
-            return cnt
 
-        #slots = Slot.all().ancestor(self)
-        #slots.order('-startDate')
-        #last_slot = slots.get()
-        #if last_slot:
-        #    start_date = last_slot.startDate
-        #else:
         start_date = max(datetime.now().date(), venue.contractStartDate) 
 
         all_dates = getDateList(start_date, venue.contractEndDate)
