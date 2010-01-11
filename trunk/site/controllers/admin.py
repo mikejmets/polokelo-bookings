@@ -105,13 +105,14 @@ application = webapp.WSGIApplication([
           ('/admin/packages/capturepackage', CapturePackage),
           ('/admin/packages/editpackage', EditPackage),
           ('/admin/packages/deletepackage', DeletePackage),
-          ('/admin/slots/viewslots', ViewSlots),
-          ('/admin/slots/createslots', CreateSlots),
           ('/admin/reports/viewreports', ViewReports),
           ('/admin/reports/venuevalidationreport', VenueValidationReport),
           ('/admin/roles/viewuserroles', ViewUserRoles),
           ('/admin/roles/captureuserrole', CaptureUserRole),
           ('/admin/roles/deleteuserrole', DeleteUserRole),
+          #('/admin/system/sysadmin', ViewSysAdmin),
+          #('/admin/system/createslots', CreateSlots),
+          #('/admin/system/viewslots', ViewSlots),
           ], debug=False)
 
 def main():
