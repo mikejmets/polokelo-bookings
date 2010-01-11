@@ -20,13 +20,15 @@ def _getCardHolderDetails(collection):
     """ return the credit card holder details xml node 
         from the original xml source of the enquiry
     """
+    xml = XML('<creditcardholder />')
+
     guest_node = GuestElement.all().ancestor(collection).get()
     if guest_node:
         source = guest_node.xmlSource
         logging.info('xml source: %s', source)
-        xml = XML(source)
-    else:
-        xml = XML('<creditcardholder />')
+        if source is not None:
+            xml = XML(source)
+
     return xml
 
 def retrieveInvoice(node):
