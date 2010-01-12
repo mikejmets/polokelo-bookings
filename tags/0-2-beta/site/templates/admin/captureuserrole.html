@@ -1,0 +1,16 @@
+{% extends base_path %}
+
+{% block breadcrumbs %}
+<a href="/admin/roles/viewuserroles">go back</a>
+{% endblock %}
+
+{% block pagecontent %}
+    <h1>Capture User Role</h1>
+    <form name="userrole" method="post" action="/admin/roles/captureuserrole">
+        <input type="hidden" name="came_from" value="{{ came_from }}" />
+        <table>
+            {{ form }}
+        </table>
+        <input type="submit" value="Add User Role" />
+    </form>
+{% endblock pagecontent %}

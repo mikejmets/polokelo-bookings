@@ -1,0 +1,62 @@
+{% extends base_path %}
+
+{% block breadcrumbs %}
+    <a href="/bookings/bookinginfo">manage bookings</a>
+{% endblock %}
+
+{% block pagecontent %}
+<br />
+
+<h1>Contracted Booking</h1>
+
+<p>Booking Number: {{ booking.bookingNumber }} </p>
+<p>Booking Status: {{ booking.parent.getState.title }} </p>
+<p>Enquiry: <a href="/bookings/enquiry/viewenquiry?enquirykey={{ booking.parent.key}}">{{ booking.parent.referenceNumber }}</a></p>
+{%if client %}
+<p>Guest: 
+<a title="View Guest"
+  href="/clients/viewclient?clientkey={{ client.key }}">
+{{ client.surname }} {{ client.firstNames}} </a>
+<a title="Assign Guest to booking"
+  href="/bookings/assignclient?bookingkey={{ booking.key}}&clientkey={{ client.key }}&came_from=/bookings/viewcontractedbooking?bookingkey={{ booking.key }}">
+    <img src="/images/add.png"/></a>
+</p>
+{% else %}
+<p>Guest: ------- 
+<a title="Assign Guest to booking"
+  href="/bookings/assignclient?bookingkey={{ booking.key }}&came_from=/bookings/viewcontractedbooking?bookingkey={{ booking.key }}">
+    <img src="/images/add.png"/></a>
+</p>
+{% endif %}
+
+<table width="100%">
+  <tr>
+    <td valign="top">
+      <table class="listing" cellspacing="0">
+          <thead>
+            <td>Date</td>
+            <td>City</td>
+            <td>Type</td>
+            <td>Venue</td>
+            <td>Room</td>
+            <td>Bed</td>
+          </thead>
+          {% for slot in booking.slots %}
+          <tr>
+            <td><strong>{{ slot.startDate }}</strong></td>
+            <td> {{ slot.city }} </td>
+            <td> {{ slot.venueType }} </td>
+            <td> 
+              <a title="View host"
+                 href="/services/owner/viewvenue?venuekey={{ slot.berth.bed.bedroom.venue.key}}&ownerkey={{ slot.berth.bed.bedroom.venue.owner.key }}">
+                 {{ slot.berth.bed.bedroom.venue.name }}</a></td>
+            <td> {{ slot.berth.bed.bedroom.name }} </td>
+            <td> {{ slot.berth.bed.name }} </td>
+          </tr>
+          {% endfor %}
+      </table>
+    </td>
+  </tr>
+</table>
+
+{% endblock pagecontent %}

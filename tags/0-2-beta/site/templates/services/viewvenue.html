@@ -1,0 +1,402 @@
+{% extends base_path %}
+
+{% block breadcrumbs %}
+<a href="/services/owner/viewowner?ownerkey={{ownerkey}}">go back</a>
+{% endblock %}
+
+{% block pagecontent %}
+<input type='hidden' name='limited_view' value="{{ limited_view }}"/>
+<h1>Venue &nbsp;&nbsp; 
+      {% if limited_view %}
+      <a href="/services/owner/viewvenue?venuekey={{ venue.key }}&limited_view=False"/>(More ...)</a>
+      {% else %}
+      <a href="/services/owner/viewvenue?venuekey={{ venue.key }}&limited_view=True"/>(Less ...)</a>
+      {% endif %}
+</h1>
+
+<table width="100%">
+  <tr>
+    <td valign="top">
+      <table>
+          <tr>
+            <td><strong>Owner:</strong></td>
+            <td><a href="/services/owner/viewowner?ownerkey={{ownerkey}}">
+                {{ owner_name }} </a>
+            </td>
+          </tr>
+          {% for value in venue_values %}
+          <tr>
+            <td><strong>{{ value.0 }}:</strong></td>
+            <td> {{ value.1 }} </td>
+            {% if venue.canModify %}
+                {%if forloop.first %}
+                <td>
+                  <a title="Edit this venue"
+                     href="/services/owner/editvenue?venuekey={{ venue.key }}&ownerkey={{ ownerkey }}">
+                    <img src="/images/edit.png"/></a>
+                </td>
+                {% endif %}
+            {% endif %}
+          </tr>
+          {% endfor %}
+      </table>
+
+      <hr />
+      <form name="stateWorkFlow" method="post" 
+            action="/services/owner/viewvenue">
+        <input type="hidden" name="venuekey" value="{{ venue.key }}" />
+        <p>
+          <strong>Status:</strong>
+          <input style="border:0px" type="input" readonly="readonly" 
+              name="state" value="{{ venue.state }}" />
+          {% if is_admin_user %}
+            {% ifequal venue.state 'Closed' %}
+                <input type="submit" name="workflow" value="Open For Bookings" />
+            {% else %}
+                <input type="submit" name="workflow" value="Close For Bookings" />
+            {% endifequal %}
+          {% endif %}
+        </p>
+        <hr />
+        <strong>Validation</strong>
+        <p>
+            <input type="submit" name="validate_venue" value="Validate Venue" />
+            {% if is_admin_user %}
+              <input type="submit" name="validate_slots" 
+                  value="Validate Slots" />
+              {% ifequal venue.state 'Closed' %}
+                {% if not venue.hasBookings  %}
+                    <input type="submit" name="clear" value="Clear Slots" />
+                {% endif %}
+                <input type="submit" name="create" value="Create Slots" />
+              {% endifequal %}
+            {% endif %}
+        </p>
+      </form>
+    </td>
+
+    <td valign="top">
+      <p><strong>Contact Numbers</strong>
+      <a title="Add to number"
+        href="/services/owner/venue/contact/capturephone?containerkey={{ venue.key }}">
+        <img src="/images/add.png"/>
+      </a>
+      </p>
+
+      <table class="listing" cellspacing="0"> 
+          <thead>
+            <td>Type</td>
+            <td>Number</td>
+            <td colspan="2">&nbsp</td>
+          </thead>
+          {% for number in phonenumbers %}
+          <tr>
+              <td>{{ number.numberType }}</td>
+              <td>{{ number.number }}</td>
+              <td class="action">
+                <a title="Edit this number"
+                  href="/services/owner/venue/contact/editphone?phonekey={{ number.key }}">
+                  <img src="/images/edit.png"/>
+                </a>
+              </td>
+
+              <td class="action">
+                <a title="Delete this number"
+                  href="/services/owner/venue/contact/deletephone?phonekey={{ number.key }}"
+                   onclick="return confirm('Are you sure?');">
+                  <img src="/images/delete.png"/>
+                </a></td>
+          </tr>
+          {% endfor %}
+      </table>
+
+      <hr />
+      <p><strong>Email Addresses</strong>
+      <a title="Add a new email address"
+         href="/services/owner/venue/email/captureemail?containerkey={{ venue.key }}">
+       <img src="/images/add.png"/>
+      </a></p>
+      <table class="listing" cellspacing="0">
+          <thead>
+            <td>Type</td>
+            <td>Email</td>
+            <td colspan="2">&nbsp</td>
+          </thead>
+          {% for email in emails %}
+          <tr>
+              <td>{{ email.emailType }}</td>
+              <td>{{ email.email }}</td>
+              <td class="action">
+                <a title="Edit this email address"
+                  href="/services/owner/venue/email/editemail?emailkey={{ email.key }}">
+                  <img src="/images/edit.png"/>
+                </a></td>
+                <td class="action">
+                  <a title="Delete this email address"
+                    href="/services/owner/venue/email/deleteemail?emailkey={{ email.key }}"
+                   onclick="return confirm('Are you sure?');">
+                    <img src="/images/delete.png"/>
+                  </a></td>
+          </tr>
+          {% endfor %}
+      </table>
+
+      <hr />
+      <p><strong>Addresses</strong>
+      {% if venue.canModify %}
+        <a title="Add a new address"
+          href="/services/owner/venue/address/captureaddress?containerkey={{ venue.key }}">
+          <img src="/images/add.png"/>
+        </a>
+      {% endif %}
+      </p>
+
+      <table class="listing" cellspacing="0">
+          <thead>
+            <td>Type</td>
+            <td>Address</td>
+            {% if venue.canModify %}
+            <td colspan="2">&nbsp</td>
+            {% endif %}
+          </thead>
+          {% for address in addresses %}
+          <tr>
+              <td>{{ address.addressType }}</td>
+              <td>{{ address.listing_name }}</td>
+              {% if venue.canModify %}
+                <td class="action">
+                  <a title="Edit this address"
+                     href="/services/owner/venue/address/editaddress?addresskey={{ address.key }}">
+                      <img src="/images/edit.png"/>
+                  </a></td>
+                <td class="action">
+                  <a title="Delete this address"
+                     href="/services/owner/venue/address/deleteaddress?addresskey={{ address.key }}"
+                     onclick="return confirm('Are you sure?');">
+                      <img src="/images/delete.png"/>
+                </a></td>
+              {% endif %}
+          </tr>
+          {% endfor %}
+      </table>
+
+    </td>
+  </tr>
+</table>
+
+
+
+      <h3>Rooms</h3>
+      <p><strong>Bedrooms</strong>
+      {% if venue.canModify %}
+         <a title="Add a new room"
+            href="/services/owner/venue/capturebedroom?containerkey={{ venue.key }}">
+           <img src="/images/add.png"/>
+         </a>
+      {% endif %}
+      </p>
+      <table class="listing" cellspacing="0">
+          <thead>
+            <td>Name</td>
+            <td>Type</td>
+            <td>Bathroom</td>
+            <td>Capacity</td>
+            {% if venue.canModify %}
+              <td colspan="2">&nbsp</td>
+            {% endif %}
+          </thead>
+          {% for bedroom in bedrooms %}
+          <tr>
+              <td><a href="/services/owner/venue/viewbedroom?bedroomkey={{ bedroom.key }}">{{ bedroom.name }}</a></td>
+              <td>{{ bedroom.bedroomType }}</td>
+              <td>{{ bedroom.bathroomType }}</td>
+              <td>{{ bedroom.capacity }}</td>
+              {% if venue.canModify %}
+                <td class="action"><a title="Edit this room" 
+                       href="/services/owner/venue/editbedroom?bedroomkey={{ bedroom.key }}&venuekey={{ venue.key }}">
+                    <img src="/images/edit.png"/></a></td>
+                <td class="action">
+                  <a title="Delete this room" 
+                     href="/services/owner/venue/deletebedroom?bedroomkey={{ bedroom.key }}&venuekey={{ venue.key }}"
+                     onclick="return confirm('Are you sure?');">
+                    <img src="/images/delete.png"/></a></td>
+              {% endif %}
+          </tr>
+          {% endfor %}
+      </table>
+
+      {% if not limited_view %}
+      <hr />
+      <p><strong>Bathrooms</strong>
+      {% if venue.canModify %}
+        <a title="Add a new bathroom"
+          href="/services/owner/venue/capturebathroom?containerkey={{ venue.key }}">
+                    <img src="/images/add.png"/></a></td>
+        </a>
+      {% endif %}
+      </p>
+
+      <table class="listing"  cellspacing="0">
+          <thead>
+            <td>Description</td>
+            {% if venue.canModify %}
+              <td colspan="2">&nbsp</td>
+            {% endif %}
+          </thead>
+          {% for bathroom in bathrooms %}
+          <tr>
+              <td width="60%">{{ bathroom.listing_name }}</td>
+              {% if venue.canModify %}
+                <td class="action"><a title="Edit this bathroom"
+                    href="/services/owner/venue/editbathroom?bathroomkey={{ bathroom.key }}&venuekey={{ venue.key }}">
+                    <img src="/images/edit.png"/></a></td>
+                </a></td>
+                <td class="action"><a title="Delete this bathroom"
+                    href="/services/owner/venue/deletebathroom?bathroomkey={{ bathroom.key }}&venuekey={{ venue.key }}"
+                     onclick="return confirm('Are you sure?');">
+                    <img src="/images/delete.png"/></a></td>
+                </a></td>
+              {% endif %}
+          </tr>
+          {% endfor %}
+      </table>
+      {% endif %}
+
+      {% if not limited_view %}
+      <h3>Other Information</h3>
+      <p><strong>Photographs</strong>
+      <a title="Add a Photograph"
+        href="/services/owner/venue/capturephotograph?venuekey={{ venue.key }}">
+        <img src="/images/add.png"/>
+      </a>
+      </p>
+
+    <table cellspacing="15">
+        <tr>
+            {% for photo in photographs %}
+            <td valign="bottom">
+                <a href="/viewer/fullsize?photokey={{photo.key}}">
+                        <img src="/viewer/thumbnail?photokey={{photo.key}}" 
+                        alt="{{photo.caption}}" /></a>
+                <br />
+                <a title="Edit this Photograph"
+                  href="/services/owner/venue/editphotograph?photokey={{ photo.key }}">
+                  <img src="/images/edit.png"/>
+                </a>
+                &nbsp;
+                <a title="Delete this Photograph"
+                  href="/services/owner/venue/deletephotograph?photokey={{ photo.key }}"
+                   onclick="return confirm('Are you sure?');">
+                  <img src="/images/delete.png"/>
+                </a>
+            </td>
+            {% endfor %}
+        </tr>
+    </table>
+    {% endif %}
+
+    {% if not limited_view %}
+    <hr />
+      <p><strong>Inspection Records</strong>
+      <a title="Add an Inspection Record"
+        href="/services/owner/venue/captureinspection?containerkey={{ venue.key }}">
+        <img src="/images/add.png"/>
+      </a>
+      </p>
+
+      <table class="listing"  cellspacing="0">
+          <thead>
+            <td>Date</td>
+            <td>Details</td>
+            <td colspan="2">&nbsp</td>
+          </thead>
+          {% for inspection in inspections %}
+          <tr>
+              <td>{{ inspection.inspectionDate }}</td>
+              <td>{{ inspection.notes }}</td>
+              <td class="action">
+                <a href="/services/owner/venue/editinspection?inspectionkey={{ inspection.key }}&venuekey={{ venue.key }}">
+                  <img src="/images/edit.png"/></a></td>
+              </a></td>
+              <td class="action">
+                <a href="/services/owner/venue/deleteinspection?inspectionkey={{ inspection.key }}&venuekey={{ venue.key }}"
+                   onclick="return confirm('Are you sure?');">
+                  <img src="/images/delete.png"/></a></td>
+                </a></td>
+          </tr>
+          {% endfor %}
+      </table>
+
+    {% endif %}
+
+    {% if not limited_view %}
+      <hr />
+      <p><strong>Complaint Records</strong>
+      <a title="Add a Inspection Record"
+        href="/services/owner/venue/capturecomplaint?containerkey={{ venue.key }}">
+        <img src="/images/add.png"/>
+      </a>
+      </p>
+
+      <table class="listing"  cellspacing="0">
+          <thead>
+            <td>Date</td>
+            <td>Details</td>
+            <td colspan="2">&nbsp</td>
+          </thead>
+          {% for complaint in complaints %}
+          <tr>
+              <td>{{ complaint.complaintDate }}</td>
+              <td>{{ complaint.notes }}</td>
+              <td class="action">
+                <a title="Edit this complaint"
+                   href="/services/owner/venue/editcomplaint?complaintkey={{ complaint.key }}&venuekey={{ venue.key }}">
+                  <img src="/images/edit.png"/></a></td>
+                </a></td>
+              <td class="action">
+                <a title="Delete this complaint"
+                   href="/services/owner/venue/deletecomplaint?complaintkey={{ complaint.key }}&venuekey={{ venue.key }}"
+                   onclick="return confirm('Are you sure?');">
+                  <img src="/images/delete.png"/></a></td>
+                </a></td>
+          </tr>
+          {% endfor %}
+      </table>
+
+    {% endif %}
+
+    {% if not limited_view %}
+    <hr />
+    <p><strong>Contracted Bookings</strong>
+      <!-- <a title="Add a new booking"
+         href="/bookings/capturecontractedbooking">
+          <img src="/images/add.png"/>
+        </a> -->
+    </p>
+    <table class="listing" cellspacing="0">
+        <thead>
+          <td>Reference</td>
+          <td>&nbsp;</td>
+        </thead>
+        {% for contractedbooking in contractedbookings %}
+        <tr>
+          <td><a href="/bookings/viewcontractedbooking?bookingkey={{ contractedbooking.key }}">{{ contractedbooking.bookingNumber }}</a></td>
+          <!-- 
+          <td class="action">
+            <a title="Edit this booking"
+              href="/bookings/editcontractedbooking?contractedbookingkey={{ contractedbooking.key }}">
+              <img src="/images/edit.png"/>
+            </a></td>
+            -->
+          <td class="action">
+            <a title="Delete this booking"
+              href="/bookings/deletecontractedbooking?contractedbookingkey={{ contractedbooking.key }}"
+                   onclick="return confirm('Are you sure?');">
+              <img src="/images/delete.png"/>
+            </a></td>
+        </tr>
+        {% endfor %}
+    </table>
+    {% endif %}
+
+{% endblock pagecontent %}

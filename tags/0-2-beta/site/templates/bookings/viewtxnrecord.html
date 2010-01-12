@@ -1,0 +1,53 @@
+{% extends base_path %}
+
+{% block breadcrumbs %}
+<a href="{{ came_from }}">go back</a>
+{% endblock %}
+
+{% block pagecontent %}
+<h1>View Transaction Record</h1>
+
+<table class="listing" cellspacing="0" width="70%">
+    <tr>
+        <th>Date Received</th>
+        <td>{{ transaction.created.date }}</td>
+    </tr>
+    <tr>
+        <th>Enquiry Reference</th>
+        <td>{{ transaction.enquiryReference }}</td>
+    </tr>
+    <tr>
+        <th>Transaction Type</th>
+        <td>{{ transaction.type }}</td>
+    </tr>
+    <tr>
+        <th>Transaction Sub Type</th>
+        <td>{{ transaction.subType }}</td>
+    </tr>
+    <tr>
+        <th>Description</th>
+        <td>{{ transaction.description }}</td>
+    </tr>
+    <tr>
+        <th>Clarifying Notes</th>
+        <td>{{ transaction.notes }}</td>
+    </tr>
+    {% if transaction.cost %}
+    <tr>
+        <th>Cost</th>
+        <td>R {{ transaction.cost }}</td>
+    </tr>
+    {% endif %}
+    {% if transaction.vat %}
+    <tr>
+        <th>VAT</th>
+        <td>R {{ transaction.vat }}</td>
+    </tr>
+    {% endif %}
+    <tr>
+        <th>Total</th>
+        <td>R {{ transaction.total }}</td>
+    </tr>
+</table>
+
+{% endblock pagecontent %}

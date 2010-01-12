@@ -1,0 +1,25 @@
+{% extends base_path %}
+
+{% block pagecontent %}
+    <h1>Slot Management</h1>
+
+    <p><strong>Slots</strong>
+    {% if start %}
+    <p><a href="javascript:history.back()">Previous</a>
+       <a href="?size={{ size }}&start={{ start }}">Next</a></p>
+    {% endif %}
+
+    <table class="listing" cellspacing="0">
+        <thead>
+          <td>Key</td>
+          <td>Venue</td>
+        </thead>
+        {% for slot in slots %}
+        <tr>
+          <td>{{ slot.key }} </td>
+          <td>{{ slot.venue_key }} </td>
+        </tr>
+        {% endfor %}
+    </table>
+
+{% endblock pagecontent %}

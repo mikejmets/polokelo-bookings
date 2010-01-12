@@ -1,0 +1,64 @@
+{% extends base_path %}
+
+{% block breadcrumbs %}
+<a href="/services/owner/viewvenue?venuekey={{ venuekey }}">go back</a>
+{% endblock %}
+
+{% block pagecontent %}
+    <h1>Bedroom</h1>
+
+    <table>
+        {% for value in bedroom_values %}
+        <tr>
+          <td><strong>{{ value.0 }}:</strong></td>
+          <td> {{ value.1 }} </td>
+        </tr>
+        {% endfor %}
+    </table>
+
+    <hr />
+      <p><strong>Beds</strong>
+      {% if bedroom.venue.canModify %}
+        <a title="Add a new bed"
+           href="/services/owner/venue/capturebed?containerkey={{ bedroom.key }}">
+            <img src="/images/add.png"/></a></td>
+          </a>
+      {% endif %}
+      </p>
+
+    <table class="listing">
+        <thead>
+          <td>Name</td>
+          <td>Type</td>
+          <td>Capacity</td>
+        </thead>
+        {% for bed in beds %}
+        <tr>
+            {% if is_admin_user %}
+              <td><a title="View this bed"
+                    href="/services/owner/venue/viewbed?bedkey={{ bed.key }}">
+                    {{ bed.name }}</a>
+            </td>
+            {% else %}
+              <td>{{ bed.name }}</td>
+            {% endif %}
+            <td>{{ bed.bedType }}</td>
+            <td>{{ bed.capacity }}</td>
+            {% if bedroom.venue.canModify %}
+              <td class="action">
+                <a title="Edit this bed"
+                  href="/services/owner/venue/editbed?bedkey={{ bed.key }}">
+                  <img src="/images/edit.png"/>
+                </a></td>
+              <td class="action">
+                <a title="Delete this bed" 
+                  href="/services/owner/venue/deletebed?bedkey={{ bed.key }}"
+                  onclick="return confirm('Are you sure?');">
+                  <img src="/images/delete.png"/>
+                </a></td>
+            {% endif %}
+        </tr>
+        {% endfor %}
+    </table>
+
+{% endblock pagecontent %}

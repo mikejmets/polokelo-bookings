@@ -1,0 +1,18 @@
+{% extends base_path %}
+
+{% block pagecontent %}
+    <h1>Polokelo Booking System Administration</h1>
+
+    <p>Select an administration function you would like to perform</p>
+    <p><a href="/admin/schedule">View and Maintain the Match Schedule</a></p>
+    <p><a href="/admin/lookups">View and Maintain System Codes</a></p>
+    <p><a href="/admin/packages">View and Maintain Accommodation Packages</a></p>
+    <p><a href="/admin/statistics">Statistics</a></p>
+    <p><a href="/admin/slots/viewslots">View Slots</a></p>
+    {% if is_administrator %}
+        <p><a href="/admin/roles/viewuserroles">View User Roles</a></p>
+        <p><a href="/admin/slots/createslots">Beware: Create Slots</a></p>
+        <p><a href="/admin/reports/viewreports">Reports</a></p>
+    {% endif %}
+
+{% endblock pagecontent %}
