@@ -28,52 +28,6 @@ xml = """
     </creditcardholder>
     <enquiries>
         <enquiry>
-            <enquirynumber>YE8-DQN-2PG</enquirynumber>
-            <city>CPT</city>
-            <accommodation>
-                <type>GH</type>
-                <rooms>
-                    <single>2</single>
-                    <twin>0</twin>
-                    <double>1</double>
-                    <family>0</family>
-                </rooms>
-            </accommodation>
-            <startdate>2010-06-10</startdate>
-            <duration>3</duration>
-            <adults>2</adults>
-            <children>2</children>
-            <disability>
-                <wheelchairaccess>no</wheelchairaccess>
-                <otherspecialneeds>no</otherspecialneeds>
-            </disability>
-            <quote>34600.00</quote>
-            <vat>4844.00</vat>
-        </enquiry>
-        <enquiry>
-            <enquirynumber>YE8-DQN-2P1</enquirynumber>
-            <city>DUR</city>
-            <accommodation>
-                <type>GH</type>
-                <rooms>
-                    <single>2</single>
-                    <twin>0</twin>
-                    <double>1</double>
-                    <family>0</family>
-                </rooms>
-            </accommodation>
-            <startdate>2010-06-17</startdate>
-            <duration>4</duration>
-            <adults>2</adults>
-            <children>2</children>
-            <disability>
-                <wheelchairaccess>no</wheelchairaccess>
-                <otherspecialneeds>no</otherspecialneeds>
-            </disability>
-            <quote>0.00</quote>
-            <vat>0.00</vat>
-        </enquiry>
-        <enquiry>
             <enquirynumber>YE8-DQN-2PH</enquirynumber>
             <city>CPT</city>
             <accommodation>
@@ -85,8 +39,54 @@ xml = """
                     <family>0</family>
                 </rooms>
             </accommodation>
+            <startdate>2010-06-10</startdate>
+            <duration>5</duration>
+            <adults>2</adults>
+            <children>2</children>
+            <disability>
+                <wheelchairaccess>no</wheelchairaccess>
+                <otherspecialneeds>no</otherspecialneeds>
+            </disability>
+            <quote>34600.00</quote>
+            <vat>0</vat>
+        </enquiry>
+        <enquiry>
+            <enquirynumber>YE8-DQN-2PJ</enquirynumber>
+            <city>DUR</city>
+            <accommodation>
+                <type>GH</type>
+                <rooms>
+                    <single>2</single>
+                    <twin>0</twin>
+                    <double>1</double>
+                    <family>0</family>
+                </rooms>
+            </accommodation>
+            <startdate>2010-06-17</startdate>
+            <duration>5</duration>
+            <adults>2</adults>
+            <children>2</children>
+            <disability>
+                <wheelchairaccess>no</wheelchairaccess>
+                <otherspecialneeds>no</otherspecialneeds>
+            </disability>
+            <quote>0.00</quote>
+            <vat>0.00</vat>
+        </enquiry>
+        <enquiry>
+            <enquirynumber>YE8-DQN-2P6</enquirynumber>
+            <city>CPT</city>
+            <accommodation>
+                <type>GH</type>
+                <rooms>
+                    <single>2</single>
+                    <twin>0</twin>
+                    <double>1</double>
+                    <family>0</family>
+                </rooms>
+            </accommodation>
             <startdate>2010-06-25</startdate>
-            <duration>4</duration>
+            <duration>3</duration>
             <adults>2</adults>
             <children>2</children>
             <disability>
@@ -94,7 +94,7 @@ xml = """
                 <otherspecialneeds>no</otherspecialneeds>
             </disability>
             <quote>20760.00</quote>
-            <vat>2906.40</vat>
+            <vat>0</vat>
         </enquiry>
     </enquiries>
 </enquirylist>
