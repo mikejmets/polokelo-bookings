@@ -1,7 +1,7 @@
 xml = """
 <invoice>
     <action>retrieve invoice</action>
-    <enquirybatchnumber>YCT-4W7-9ZD</enquirybatchnumber>
+    <enquirybatchnumber>YCT-4W7-9ZF</enquirybatchnumber>
 </invoice>
 """
 

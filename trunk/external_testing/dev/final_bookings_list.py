@@ -6,7 +6,7 @@ url = 'http://localhost:8080/externalbookings'
 
 xml = """
 <enquirylist>
-    <enquirybatchnumber>YCT-4W7-9ZD</enquirybatchnumber>
+    <enquirybatchnumber>YCT-4W7-9ZF</enquirybatchnumber>
     <guestagentcode>Trafalgar-234234324</guestagentcode>
     <action>confirm enquiries</action>
     <creditcardholder>
