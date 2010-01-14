@@ -129,7 +129,7 @@ class BookingsTool():
             if people:
                 quote_amount = package.calculateQuote(element)
                 enquiry.quoteInZAR = quote_amount
-                enquiry.vatInZAR = long(quote_amount * 0.14)
+                enquiry.vatInZAR = 0 #VATZERO long(quote_amount * 0.14)
                 enquiry.totalAmountInZAR = enquiry.quoteInZAR + enquiry.vatInZAR
                 if enquiry.workflowStateName == 'temporary':
                     enquiry.doTransition('allocatetemporary')
