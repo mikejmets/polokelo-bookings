@@ -138,9 +138,9 @@ class Venue(db.Model):
                 double_indicator = 9
         return "%s %s %s %s %s %s" % (
             allocations, 
+            double_indicator, 
             self.owner.referenceNumber,
             self.name,
-            double_indicator, 
             berth.bed.bedroom.name,
             berth.bed.name)
 
