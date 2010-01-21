@@ -23,13 +23,26 @@ def _getCardHolderDetails(collection):
     """
     xml = XML('<creditcardholder />')
 
-    guest_node = GuestElement.all().ancestor(collection).get()
-    if guest_node:
-        source = guest_node.xmlSource
+    guest = GuestElement.all().ancestor(collection).get()
+    if guest:
+        source = guest.xmlSource
         logger.info('xml source: %s', source)
         if source is not None:
             xml = XML(source)
-
+        else:
+            #Construct xml from data
+            xml = XML('<creditcardholder />')
+            new_node = SubElement(xml, 'name')
+            new_node.text = guest.firstNames
+            new_node = SubElement(xml, 'surname')
+            new_node.text = guest.surname
+            new_node = SubElement(xml, 'passportnumber')
+            new_node.text = guest.identifyingNumber
+            new_node = SubElement(xml, 'email')
+            new_node.text = guest.email
+            new_node = SubElement(xml, 'telephone')
+            new_node.text = guest.contactNumber
+    logger.info('getCHD returns "%s"', tostring(xml))
     return xml
 
 def retrieveInvoice(node):
