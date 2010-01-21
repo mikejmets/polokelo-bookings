@@ -7,6 +7,7 @@ from models.enquiryroot import EnquiryRoot
 from models.bookinginfo import EnquiryCollection, CollectionTransaction, \
                                 Enquiry, AccommodationElement, GuestElement
 
+logger = logging.getLogger('RetrieveInvoice')
 
 def _addErrorNode(node, code='0', message=None):
     error_element = SubElement(node, 'systemerror')
@@ -25,7 +26,7 @@ def _getCardHolderDetails(collection):
     guest_node = GuestElement.all().ancestor(collection).get()
     if guest_node:
         source = guest_node.xmlSource
-        logging.info('xml source: %s', source)
+        logger.info('xml source: %s', source)
         if source is not None:
             xml = XML(source)
 
@@ -37,12 +38,12 @@ def retrieveInvoice(node):
     # TODO: return error codes as per Johan's suggestion
     # TODO: clean up error codes in general
 
-    logging.info('entering retrieveInvoice')
+    logger.info('entering retrieveInvoice with node "%s"', tostring(node))
     enquiry_root = EnquiryRoot.getEnquiryRoot()
 
     # get the enquiry collection
     collection_number = node.findtext('enquirybatchnumber')
-    logging.info('retrieveInvoice batch number: %s', collection_number)
+    logger.info('retrieveInvoice batch number: %s', collection_number)
     try:
         enquiry_collection = EnquiryCollection.get_by_key_name(collection_number, \
                                                            parent=enquiry_root)
@@ -91,7 +92,7 @@ def retrieveInvoice(node):
 
     except:
         error = sys.exc_info()[1]
-        logging.error('Unhandled error: %s', error)
+        logger.error('Unhandled error: %s', error)
         if not node.find('creditcardholder'):
             SubElement(node, 'creditcardholder')
         if not node.find('items'):
@@ -107,6 +108,7 @@ def retrieveInvoice(node):
     if not node.find('systemerror'):
         _addErrorNode(node)
 
+    logger.info('Return node "%s"', tostring(node))
     return tostring(node)
 
 
