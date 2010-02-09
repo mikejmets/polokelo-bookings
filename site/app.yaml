@@ -18,6 +18,9 @@ handlers:
   script: controllers/admin.py
   login: admin
 
+- url: /services
+  script: controllers/servicehandlers.py
+  login: required
 - url: /services/.*
   script: controllers/servicehandlers.py
   login: required
