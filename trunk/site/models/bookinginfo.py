@@ -50,6 +50,9 @@ class EnquiryCollection(db.Model):
 class Enquiry(workflow.WorkflowAware):
     created = db.DateTimeProperty(auto_now_add=True)
     creator = db.UserProperty()
+    type = db.StringProperty(
+        default='ContractedAccommodation',
+        verbose_name='Enquiry Type')
     referenceNumber = db.StringProperty(verbose_name='Reference Number')
     expiryDate = db.DateTimeProperty(verbose_name="Expiry Date/Time (YYYY-MM-DD hh:mm:ss)")
     guestEmail = db.StringProperty(verbose_name='Guest Email')
@@ -509,6 +512,20 @@ class ContractedBooking(db.Model):
                 slot.put()
         if venue:
             venue.recalcNumOfBookings()
+        self.delete()
+
+class NonContractedBooking(db.Model):
+    created = db.DateTimeProperty(auto_now_add=True)
+    creator = db.UserProperty()
+    bookingNumber = db.StringProperty(required=True)
+    serviceBookingNumber = db.StringProperty(required=True)
+    client = db.ReferenceProperty(
+        Client, collection_name='non_contracted_bookings')
+
+    def listing_name(self):
+        return '%s' % (self.bookingNumber)
+
+    def rdelete(self):
         self.delete()
 
 

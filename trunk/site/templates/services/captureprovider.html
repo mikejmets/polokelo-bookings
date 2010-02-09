@@ -1,0 +1,16 @@
+{% extends base_path %}
+
+{% block breadcrumbs %}
+<a href="/services/providers">go back</a>
+{% endblock %}
+
+{% block pagecontent %}
+    <h1>Capture New Provider</h1>
+    <form name="provider" method="post" 
+          action="/services/provider/captureprovider">
+        <table>
+            {{ form }}
+        </table>
+        <input type="submit" value="Add Provider" />
+    </form>
+{% endblock pagecontent %}
