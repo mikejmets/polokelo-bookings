@@ -210,8 +210,10 @@ class Enquiry(workflow.WorkflowAware):
         # set amount owed to 20%
         oldTotal = self.totalAmountInZAR
         self.totalAmountInZAR = int(0.2 * self.totalAmountInZAR)
-        self.quoteInZAR = self.totalAmountInZAR # VATZERO int((self.totalAmountInZAR / 114.0) * 100.0)
-        self.vatInZAR = 0 #VATZERO self.totalAmountInZAR - self.quoteInZAR
+        self.quoteInZAR = int((self.totalAmountInZAR / 114.0) * 100.0)
+        #self.quoteInZAR = self.totalAmountInZAR # VATZERO 
+        self.vatInZAR = self.totalAmountInZAR - self.quoteInZAR
+        #self.vatInZAR = 0 #VATZERO 
         self.put()
 
         # create the cancel transaction in the collection
@@ -248,8 +250,10 @@ class Enquiry(workflow.WorkflowAware):
         # set amount owed to 20%
         oldTotal = self.totalAmountInZAR
         self.totalAmountInZAR = int(0.2 * self.totalAmountInZAR)
-        self.quoteInZAR = self.totalAmountInZAR #VATZERO int((self.totalAmountInZAR / 114.0) * 100.0)
-        self.vatInZAR = 0 #VATZERO self.totalAmountInZAR - self.quoteInZAR
+        self.quoteInZAR = int((self.totalAmountInZAR / 114.0) * 100.0)
+        #self.quoteInZAR = self.totalAmountInZAR #VATZERO 
+        self.vatInZAR = self.totalAmountInZAR - self.quoteInZAR
+        #self.vatInZAR = 0 #VATZERO 
         self.put()
 
         # create the cancel transaction in the collection
