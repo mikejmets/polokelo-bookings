@@ -114,7 +114,8 @@ class ExternalBookings(webapp.RequestHandler):
         if not available:
             enquiry.doTransition('putonhold')
         enquiry.quoteInZAR = amount
-        enquiry.vatInZAR = 0 #VATZERO long(amount * 0.14)
+        enquiry.vatInZAR = long(amount * 0.14)
+        #enquiry.vatInZAR = 0 #VATZERO 
         enquiry.totalAmountInZAR = enquiry.quoteInZAR + enquiry.vatInZAR
         enquiry.put()
 
@@ -125,7 +126,8 @@ class ExternalBookings(webapp.RequestHandler):
         amount_elem = SubElement(search_elem, 'amount')
         amount_elem.text = "%0.2f" % (enquiry.quoteInZAR / 100.0)
         amount_elem = SubElement(search_elem, 'vat')
-        amount_elem.text = "0" #VATZERO "%0.2f" % (enquiry.vatInZAR / 100.0)
+        amount_elem.text = "%0.2f" % (enquiry.vatInZAR / 100.0)
+        #amount_elem.text = "0" #VATZERO 
 
         # append the error element
         self._addErrorNode(node)
