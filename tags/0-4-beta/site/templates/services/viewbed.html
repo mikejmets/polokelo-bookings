@@ -1,0 +1,38 @@
+{% extends base_path %}
+
+{% block breadcrumbs %}
+<a href="/services/owner/venue/viewbedroom?bedroomkey={{ bedroomkey }}&venuekey={{ venuekey }}">go back</a>
+{% endblock %}
+
+{% block pagecontent %}
+    <h1>Bed</h1>
+
+    <table>
+        {% for value in bed_values %}
+        <tr>
+          <td><strong>{{ value.0 }}:</strong></td>
+          <td> {{ value.1 }} </td>
+        </tr>
+        {% endfor %}
+    </table>
+
+    <hr />
+      <p><strong>Berths</strong> </p>
+
+    <table class="listing">
+        <thead>
+          <td>Name</td>
+          <td>Slots</td>
+        </thead>
+        {% for berth in berths %}
+        <tr>
+            <td>
+                <a title="View this berth"
+                  href="/services/owner/venue/viewberth?berthkey={{ berth.key }}">
+                  {{ berth.key }}</a></td>
+              <td>{{ berth.berth_slots.count }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+
+{% endblock pagecontent %}

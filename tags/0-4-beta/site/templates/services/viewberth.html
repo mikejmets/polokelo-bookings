@@ -1,0 +1,52 @@
+{% extends base_path %}
+
+{% block breadcrumbs %}
+<a href="/services/owner/venue/viewbed?bedkey={{ bedkey }}">go back</a>
+{% endblock %}
+
+{% block pagecontent %}
+    <h1>berth</h1>
+
+    <table>
+        {% for value in berth_values %}
+        <tr>
+          <td><strong>{{ value.0 }}:</strong></td>
+          <td> {{ value.1 }} </td>
+        </tr>
+        {% endfor %}
+    </table>
+
+    <hr />
+      <p><strong>Slots</strong> </p>
+
+    <table class="listing">
+        <thead>
+          <td>Date</td>
+          <td>Occupied</td>
+          <td>Owner</td>
+          <td>City</td>
+          <td>VenueType</td>
+          <td>BedType</td>
+          <td>Child</td>
+          <td>Access</td>
+          <td>Capacity</td>
+        </thead>
+        {% for slot in slots %}
+        <tr>
+            <td>
+                <a title="View this slot"
+                  href="/services/owner/venue/viewslot?slotkey={{ slot.key }}">
+                  {{ slot.startDate }}</a></td>
+            <td>{{ slot.occupied }} </td>
+            <td>{{ slot.ownerReference }} </td>
+            <td>{{ slot.city }} </td>
+            <td>{{ slot.venueType }} </td>
+            <td>{{ slot.bedType }} </td>
+            <td>{{ slot.childFriendly }} </td>
+            <td>{{ slot.wheelchairAccess }} </td>
+            <td>{{ slot.venue_capacity }} </td>
+        </tr>
+        {% endfor %}
+    </table>
+
+{% endblock pagecontent %}

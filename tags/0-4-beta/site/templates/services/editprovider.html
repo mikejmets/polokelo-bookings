@@ -1,0 +1,17 @@
+{% extends base_path %}
+
+{% block breadcrumbs %}
+<a href="{{came_from}}">go back</a>
+{% endblock %}
+
+{% block pagecontent %}
+    <h1>Edit Existing Provider</h1>
+    <form name="provider" method="post" 
+          action="/services/provider/editprovider">
+        <input type="hidden" name="providerkey" value="{{ providerkey }}" />
+        <table>
+            {{ form }}
+        </table>
+        <input type="submit" value="Update Provider" />
+    </form>
+{% endblock pagecontent %}

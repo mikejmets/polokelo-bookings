@@ -1,0 +1,28 @@
+from models.bookinginfo import ContractedBooking
+for s in ContractedBooking.all():
+  s.rdelete()
+
+from models.bookinginfo import EnquiryCollection
+for s in EnquiryCollection.all():
+  s.rdelete()
+
+#from models.hostinfo import Slot
+#for s in Slot.all():
+#  s.delete()
+
+from workflow.workflow import \
+  Workflow, State, Transition, ExpirationSetting
+
+for w in Workflow.all():
+  w.delete()
+
+for s in State.all():
+  s.delete()
+
+for t in Transition.all():
+  t.delete()
+
+for e in ExpirationSetting.all():
+  e.delete()
+
+print 'ok'

@@ -1,0 +1,50 @@
+{% extends base_path %}
+
+{% block pagecontent %}
+    <h1>Report Management</h1>
+
+    <p><strong>Run Reports</strong>
+    </p>
+    <p><a href="/admin/reports/venuevalidationreport">Beware: Report: Venue Validation</a></p>
+    <p><strong> Existing Reports</strong>
+    </p>
+
+    <form
+      name="viewreport" method="post" action="/admin/reports/viewreports">
+      <p>
+        {% if report_names %}
+          <select name="report_name">
+            {% for name in report_names %}
+              <option value="{{ name }}"
+              {% ifequal name report_name %}
+                selected
+              {% endifequal %}
+              >{{ name }}</option>
+            {% endfor %}
+          </select>
+        {% endif %}
+        {% if report_instances %}
+          <select name="report_instance">
+            {% for instance in report_instances %}
+              <option value="{{ instance }}"
+              {% ifequal instance report_instance %}
+                selected
+              {% endifequal %}
+              >{{ instance|slice:":16" }}</option>
+            {% endfor %}
+          </select>
+        {% endif %}
+        <input type="submit" name="refresh" value="Refresh"/>
+      </p>
+      <table class="listing" cellspacing="0">
+          <thead>
+            <td>Row</td>
+          </thead>
+          {% for row_text in report_rows %}
+          <tr>
+            <td>{{ row_text }} </td>
+          </tr>
+          {% endfor %}
+      </table>
+    </form>
+{% endblock pagecontent %}

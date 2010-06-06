@@ -1,0 +1,17 @@
+{% extends base_path %}
+
+{% block breadcrumbs %}
+<a href="/services/provider/viewprovider?providerkey={{ providerkey }}">go back</a>
+{% endblock %}
+
+{% block pagecontent %}
+    <h1>Capture New Service</h1>
+    <form name="service" method="post" 
+          action="/services/provider/captureservice">
+        <input type='hidden' name='providerkey' value='{{ providerkey }}' />
+        <table>
+            {{ form }}
+        </table>
+        <input type="submit" value="Add Service" />
+    </form>
+{% endblock pagecontent %}
