@@ -92,6 +92,46 @@ class CreateSlotsTask(webapp.RequestHandler):
                                         'auth_url_text':auth_url_text
                                         }))
 
+class DeleteSlotsTask(webapp.RequestHandler):
+    def get(self):
+        venuekey = self.request.get('venuekey')
+        logger.info('DeleteSlotsTask got key %s', venuekey)
+        if venuekey:
+            venue = Venue.get(venuekey)
+            if venue:
+                try:
+                    limit = 20
+                    num_slots = venue.deleteSlots(limit=limit)
+                    if num_slots >= limit:
+                        #Create task to continue
+                        task = Task(
+                            method='GET',
+                            url='/tasks/deleteslots',
+                            params={'venuekey': venue.key()})
+                        task.add('slot-deletion')
+                        logger.info('DeleteSlotsTask: reenter venue %s = %s', 
+                            venue.name, num_slots)
+                except DeadlineExceededError:
+                    self.response.clear()
+                    self.response.set_status(500)
+                    logger.error("Except DeadlineExceeded for venue %s",
+                        "%s %s" % (venue.owner.referenceNumber, venue.name))
+                except Exception, e:
+                    self.response.clear()
+                    self.response.set_status(500)
+                    logger.error("Except %s Error for venue %s",
+                        e,
+                        "%s %s" % (venue.owner.referenceNumber, venue.name))
+
+        auth_url, auth_url_text = get_authentication_urls(self.request.uri)
+        filepath = os.path.join(PROJECT_PATH, 'templates', 'index.html')
+        self.response.out.write(template.render(filepath, 
+                                    {
+                                        'base_path':BASE_PATH,
+                                        'auth_url':auth_url,
+                                        'auth_url_text':auth_url_text
+                                        }))
+
 class CreateBerthSlots(webapp.RequestHandler):
     def get(self):
         berths = Berth.all().order('created')
@@ -367,6 +407,7 @@ application = webapp.WSGIApplication([
       ('/tasks/expireenquiries', ExpireEnquiries),
       ('/tasks/emailguests', EmailGuests),
       ('/tasks/createslots', CreateSlotsTask),
+      ('/tasks/deleteslots', DeleteSlotsTask),
       ('/tasks/createberthslots', CreateBerthSlots),
       ('/tasks/deleteberthslots', DeleteBerthSlots),
       ('/tasks/update_datastore', UpdateDatastore),

@@ -1,5 +1,7 @@
 queue:
 - name: slot-creation
   rate: 1/m
+- name: slot-deletion
+  rate: 1/m
 - name: reporting
   rate: 5/m

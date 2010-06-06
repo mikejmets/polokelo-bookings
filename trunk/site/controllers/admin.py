@@ -67,6 +67,32 @@ class CreateSlots(webapp.RequestHandler):
                   }
         self.response.out.write(template.render(filepath, context))
 
+class DeleteSlots(webapp.RequestHandler):
+    def get(self):
+
+        #if not UserRole.hasRole(users.get_current_user(), 'Administrator'):
+        #    logging.info('DeleteSlots: not administrator')
+        #    return
+        cnt = 0
+        for venue in Venue.all().order('contractStartDate'):
+            task = Task(
+                method='GET',
+                url='/tasks/deleteslots',
+                params={'venuekey': venue.key()})
+            task.add('slot-deletion')
+            logging.info('DeleteSlots: invoke venue %s', 
+                venue.name)
+            cnt += 1
+              
+        auth_url, auth_url_text = get_authentication_urls(self.request.uri)
+        filepath = os.path.join(
+            PROJECT_PATH, 'templates', 'admin', 'adminhome.html')
+        context = {'base_path':BASE_PATH,
+                  'auth_url':auth_url,
+                  'auth_url_text':auth_url_text,
+                  }
+        self.response.out.write(template.render(filepath, context))
+
 class ClearData(webapp.RequestHandler):
     def get(self):
         error = None
@@ -112,6 +138,7 @@ application = webapp.WSGIApplication([
           ('/admin/roles/deleteuserrole', DeleteUserRole),
           #('/admin/system/sysadmin', ViewSysAdmin),
           #('/admin/system/createslots', CreateSlots),
+          ('/admin/slots/deleteslots', DeleteSlots),
           #('/admin/system/viewslots', ViewSlots),
           ], debug=False)
 
