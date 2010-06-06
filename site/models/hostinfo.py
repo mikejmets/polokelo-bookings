@@ -252,6 +252,18 @@ class Venue(db.Model):
                         slot.rdelete()
 
 
+    def deleteSlots(self, limit=10):
+        counter = 0
+        for room in self.venue_bedrooms:
+            for bed in room.bedroom_beds:
+                for berth in bed.bed_berths:
+                    for slot in berth.berth_slots:
+                        counter += 1
+                        slot.rdelete()
+                        if limit and counter >= limit:
+                            #Jump out so that the request doesn't timeout
+                            return counter
+        return counter
     def getCapacity(self):
         cap = 0
         for b in self.venue_bedrooms:
